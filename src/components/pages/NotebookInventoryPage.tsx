@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "../ui/button";
+import { mapNotebook } from "@/utils/notebook";
 import {
   Card,
   CardContent,
@@ -11,6 +12,7 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "../ui/spinner";
 import {
   Select,
   SelectContent,
@@ -19,26 +21,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, PlusCircle, Pencil, Trash2, X } from "lucide-react";
+import { useNotebooks } from "@/hooks";
+import type {
+  NotebookStatus,
+  Notebook,
+  NotebookFormModalProps,
+} from "../../interfaces/notebook.interface";
 
 // --- TIPOS Y DATOS DE EJEMPLO ---
-
-type NotebookStatus =
-  | "Recibido"
-  | "En Reparación"
-  | "Listo para Donar"
-  | "Donado";
-
-interface Notebook {
-  id: string;
-  serialNumber: string;
-  brand: string;
-  model: string;
-  status: NotebookStatus;
-  specs: string;
-  repairNeeded: string;
-  repairHistory: string;
-  entryDate: string;
-}
 
 const initialNotebooks: Notebook[] = [
   {
@@ -97,12 +87,6 @@ const statusColors: { [key in NotebookStatus]: string } = {
 };
 
 // --- COMPONENTE DEL FORMULARIO MODAL ---
-
-interface NotebookFormModalProps {
-  notebook: Notebook | null;
-  onSave: (notebook: Notebook) => void;
-  onClose: () => void;
-}
 
 const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   notebook,
@@ -268,13 +252,20 @@ const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
 // --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
 
 export default function NotebookInventoryPage() {
-  const [notebooks, setNotebooks] = useState<Notebook[]>(initialNotebooks);
+  const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  // custom hook - tanstack query - supabase
+  const { notebooks: ntbks, isLoading } = useNotebooks();
+
+  if (isLoading || !ntbks) {
+    <Spinner></Spinner>;
+  }
 
   const handleOpenModal = (notebook: Notebook | null) => {
     setSelectedNotebook(notebook);
@@ -309,7 +300,9 @@ export default function NotebookInventoryPage() {
   };
 
   const filteredNotebooks = useMemo(() => {
-    return notebooks
+    if (!ntbks) return [];
+
+    return ntbks
       .filter((notebook) => {
         if (statusFilter === "all") return true;
         return notebook.status === statusFilter;
@@ -322,7 +315,7 @@ export default function NotebookInventoryPage() {
           notebook.model.toLowerCase().includes(term)
         );
       });
-  }, [notebooks, searchTerm, statusFilter]);
+  }, [ntbks, searchTerm, statusFilter]);
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 lg:p-8">
