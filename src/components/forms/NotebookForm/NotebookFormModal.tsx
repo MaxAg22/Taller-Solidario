@@ -58,7 +58,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.serialNumber || !formData.model) {
+    if (!formData.model) {
       toast.error("El número de serie y el modelo son obligatorios.");
       return;
     }
@@ -70,12 +70,9 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
       model: formData.model,
       repairHistory: formData.repairHistory,
       repairNeeded: formData.repairNeeded,
-      serialNumber: formData.serialNumber,
       specs: formData.specs,
       status: formData.status,
     });
-
-    console.log("Esto es form dara", formData);
 
     onSave();
   };
@@ -109,17 +106,6 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
             </div>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="serialNumber">Número de Serie</Label>
-              <Input
-                id="serialNumber"
-                name="serialNumber"
-                value={formData.serialNumber}
-                onChange={handleChange}
-                placeholder="Ej: 505"
-                required
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="model">Modelo</Label>
               <Input

@@ -194,6 +194,8 @@ export default function NotebookInventoryPage() {
                     Ingreso: {notebook.entryDate}
                   </p>
                   <div className="flex gap-2">
+                    {/* Boton para hacer update */}
+
                     <Button
                       variant="outline"
                       size="sm"

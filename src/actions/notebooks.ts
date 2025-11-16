@@ -17,7 +17,7 @@ export const getNotebooks = async () => {
   return notebooks;
 };
 
-export const createNotebook = async (notebook: Notebook) => {
+export const createNotebook = async (notebook: any) => {
   const { data: newNotebook, error } = await supabase
     .from("notebooks")
     .insert({
@@ -26,7 +26,6 @@ export const createNotebook = async (notebook: Notebook) => {
       model: notebook.model,
       repairHistory: notebook.repairHistory,
       repairNeeded: notebook.repairNeeded,
-      serialNumber: Number(notebook.serialNumber),
       specs: notebook.specs,
       status: notebook.status,
     })
