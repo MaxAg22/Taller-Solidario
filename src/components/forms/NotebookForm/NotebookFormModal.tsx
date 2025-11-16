@@ -24,6 +24,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "../../ui/input";
+import { useCreateNotebook } from "@/hooks/notebooks/useCreateNotebook";
+import { Spinner } from "@/components/ui/spinner";
+import toast from "react-hot-toast";
 
 export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   notebook,
@@ -40,6 +43,8 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
     repairHistory: notebook?.repairHistory || "",
   });
 
+  const { mutate: createNotebook, isPending } = useCreateNotebook();
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -54,16 +59,28 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.serialNumber || !formData.model) {
-      alert("El número de serie y el modelo son obligatorios.");
+      toast.error("El número de serie y el modelo son obligatorios.");
       return;
     }
-    const notebookToSave: Notebook = {
-      ...formData,
+
+    createNotebook({
       id: notebook?.id || Date.now().toString(),
+      brand: formData.brand,
       entryDate: notebook?.entryDate || new Date().toISOString().split("T")[0],
-    };
-    onSave(notebookToSave);
+      model: formData.model,
+      repairHistory: formData.repairHistory,
+      repairNeeded: formData.repairNeeded,
+      serialNumber: formData.serialNumber,
+      specs: formData.specs,
+      status: formData.status,
+    });
+
+    console.log("Esto es form dara", formData);
+
+    onSave();
   };
+
+  if (isPending) return <Spinner></Spinner>;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
@@ -99,7 +116,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
                 name="serialNumber"
                 value={formData.serialNumber}
                 onChange={handleChange}
-                placeholder="Ej: GNB-005-E"
+                placeholder="Ej: 505"
                 required
               />
             </div>

@@ -18,6 +18,6 @@ export interface Notebook {
 
 export interface NotebookFormModalProps {
   notebook: Notebook | null;
-  onSave: (notebook: Notebook) => void;
+  onSave: () => void;
   onClose: () => void;
 }

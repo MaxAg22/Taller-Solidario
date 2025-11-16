@@ -56,15 +56,7 @@ export default function NotebookInventoryPage() {
     setSelectedNotebook(null);
   };
 
-  const handleSaveNotebook = (notebookToSave: Notebook) => {
-    const exists = notebooks.some((n) => n.id === notebookToSave.id);
-    if (exists) {
-      setNotebooks(
-        notebooks.map((n) => (n.id === notebookToSave.id ? notebookToSave : n))
-      );
-    } else {
-      setNotebooks([notebookToSave, ...notebooks]);
-    }
+  const handleSaveNotebook = () => {
     handleCloseModal();
   };
 

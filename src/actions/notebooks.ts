@@ -1,5 +1,6 @@
 // Funciones que interactuan con la API de SUPABASE
 
+import type { Notebook } from "@/interfaces";
 import { supabase } from "@/supabase/client";
 
 export const getNotebooks = async () => {
@@ -14,4 +15,26 @@ export const getNotebooks = async () => {
   }
 
   return notebooks;
+};
+
+export const createNotebook = async (notebook: Notebook) => {
+  const { data: newNotebook, error } = await supabase
+    .from("notebooks")
+    .insert({
+      brand: notebook.brand,
+      entryDate: notebook.entryDate,
+      model: notebook.model,
+      repairHistory: notebook.repairHistory,
+      repairNeeded: notebook.repairNeeded,
+      serialNumber: Number(notebook.serialNumber),
+      specs: notebook.specs,
+      status: notebook.status,
+    })
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return newNotebook;
 };
