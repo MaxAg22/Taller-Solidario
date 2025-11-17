@@ -1,19 +1,21 @@
+import { updateNotebook } from "@/actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createNotebook } from "@/actions";
 import toast from "react-hot-toast";
 
-export const useCreateNotebook = ({ onSuccess }: any = {}) => {
+export const useUpdateNotebook = ({ onSuccess }: any = {}) => {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: createNotebook,
+    mutationFn: updateNotebook,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notebooks"] });
-      toast.success("Equipo creado correctamente");
+      queryClient.invalidateQueries({
+        queryKey: ["notebooks"],
+      });
+      toast.success("Equipo actualizado correctamente!");
       onSuccess?.();
     },
     onError: (error) => {
-      toast.error("Ocurrió un error al crear el equipo");
+      toast.error("Ocurrió un error al actualizar el equipo");
       console.log(error);
     },
   });

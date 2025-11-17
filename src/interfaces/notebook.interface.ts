@@ -16,6 +16,16 @@ export interface Notebook {
   entryDate: string;
 }
 
+export interface UpdateNotebook {
+  id: string;
+  brand: string;
+  model: string;
+  status: NotebookStatus;
+  specs: string;
+  repairNeeded: string;
+  repairHistory: string;
+}
+
 export interface NotebookFormModalProps {
   notebook: Notebook | null;
   onSave: () => void;

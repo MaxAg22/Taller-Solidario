@@ -11,6 +11,7 @@ export const useDeleteNotebook = () => {
       queryClient.invalidateQueries({
         queryKey: ["notebooks"],
       });
+      toast.success("Equipo eliminado correctamente!");
     },
     onError: (error) => {
       toast.error("Ocurrió un error al eliminar el equipo");

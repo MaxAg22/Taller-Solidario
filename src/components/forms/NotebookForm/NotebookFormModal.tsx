@@ -27,6 +27,7 @@ import { Input } from "../../ui/input";
 import { useCreateNotebook } from "@/hooks/notebooks/useCreateNotebook";
 import { Spinner } from "@/components/ui/spinner";
 import toast from "react-hot-toast";
+import { useUpdateNotebook } from "@/hooks/notebooks/useUpdateNotebook";
 
 export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   notebook,
@@ -43,7 +44,10 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
     repairHistory: notebook?.repairHistory || "",
   });
 
-  const { mutate: createNotebook, isPending } = useCreateNotebook();
+  const { mutate: createNotebook, isPending: isPendingCreate } =
+    useCreateNotebook({ onSuccess: () => onSave() });
+  const { mutate: updateNotebook, isPending: isPendingUpdate } =
+    useUpdateNotebook({ onSuccess: () => onSave() });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -58,26 +62,26 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!formData.model) {
-      toast.error("El modelo son obligatorios.");
+      toast.error("El modelo es obligatorio.");
       return;
     }
 
-    createNotebook({
-      id: notebook?.id || Date.now().toString(),
-      brand: formData.brand,
-      entryDate: notebook?.entryDate || new Date().toISOString().split("T")[0],
-      model: formData.model,
-      repairHistory: formData.repairHistory,
-      repairNeeded: formData.repairNeeded,
-      specs: formData.specs,
-      status: formData.status,
-    });
+    const isEdit = !!notebook?.id;
 
-    onSave();
+    if (isEdit) {
+      updateNotebook({
+        id: notebook.id,
+        ...formData,
+      });
+    } else {
+      createNotebook({
+        ...formData,
+        entryDate: new Date().toISOString().split("T")[0],
+      });
+    }
   };
-
-  if (isPending) return <Spinner></Spinner>;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
@@ -182,6 +186,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
               Cancelar
             </Button>
             <Button type="submit">Guardar Cambios</Button>
+            {(isPendingCreate || isPendingUpdate) && <Spinner></Spinner>}
           </CardFooter>
         </form>
       </Card>

@@ -25,6 +25,7 @@ import type {
 } from "../../interfaces/notebook.interface";
 import { NotebookFormModal } from "../forms/NotebookForm/NotebookFormModal";
 import { useDeleteNotebook } from "@/hooks/notebooks/useDeleteNotebook";
+import { ConfirmModal } from "../modals/ConfirmModal";
 
 const statusColors: { [key in NotebookStatus]: string } = {
   Recibido: "bg-blue-100 text-blue-800 border-blue-300",
@@ -36,18 +37,18 @@ const statusColors: { [key in NotebookStatus]: string } = {
 // --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
 
 export default function NotebookInventoryPage() {
-  const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
   // custom hook - tanstack query - supabase
   const { notebooks: ntbks, isLoading } = useNotebooks();
-  const { mutate: deleteNotebook, isPending: isDeletePending } =
-    useDeleteNotebook();
+  const { mutate: deleteNotebook } = useDeleteNotebook();
 
   const handleOpenModal = (notebook: Notebook | null) => {
     setSelectedNotebook(notebook);
@@ -64,13 +65,13 @@ export default function NotebookInventoryPage() {
   };
 
   const handleDeleteNotebook = (id: string) => {
-    if (
-      window.confirm(
-        "¿Estás seguro de que quieres eliminar este equipo? Esta acción no se puede deshacer."
-      )
-    ) {
-      deleteNotebook(id);
-    }
+    setDeletingId(id);
+
+    deleteNotebook(id, {
+      onSettled: () => {
+        setDeletingId(null);
+      },
+    });
   };
 
   const filteredNotebooks = useMemo(() => {
@@ -101,10 +102,18 @@ export default function NotebookInventoryPage() {
         <NotebookFormModal
           notebook={selectedNotebook}
           onSave={handleSaveNotebook}
-          // on update
           onClose={handleCloseModal}
         />
       )}
+
+      {confirmDeleteId && (
+        <ConfirmModal
+          confirmDeleteId={confirmDeleteId}
+          handleDeleteNotebook={handleDeleteNotebook}
+          setConfirmDeleteId={setConfirmDeleteId}
+        ></ConfirmModal>
+      )}
+
       <div className="max-w-7xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-primary">
@@ -210,10 +219,10 @@ export default function NotebookInventoryPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDeleteNotebook(notebook.id)}
+                      onClick={() => setConfirmDeleteId(notebook.id)}
                     >
-                      {isDeletePending ? (
-                        <Spinner></Spinner>
+                      {deletingId === notebook.id ? (
+                        <Spinner />
                       ) : (
                         <Trash2 className="h-4 w-4" />
                       )}
