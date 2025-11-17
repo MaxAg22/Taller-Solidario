@@ -1,6 +1,4 @@
 // Funciones que interactuan con la API de SUPABASE
-
-import type { Notebook } from "@/interfaces";
 import { supabase } from "@/supabase/client";
 
 export const getNotebooks = async () => {
@@ -36,4 +34,12 @@ export const createNotebook = async (notebook: any) => {
   }
 
   return newNotebook;
+};
+
+export const deleteNotebook = async (id: string) => {
+  const { error } = await supabase.from("notebooks").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 };

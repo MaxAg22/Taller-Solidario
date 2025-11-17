@@ -59,7 +59,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.model) {
-      toast.error("El número de serie y el modelo son obligatorios.");
+      toast.error("El modelo son obligatorios.");
       return;
     }
 

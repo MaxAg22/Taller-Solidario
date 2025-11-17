@@ -24,6 +24,7 @@ import type {
   Notebook,
 } from "../../interfaces/notebook.interface";
 import { NotebookFormModal } from "../forms/NotebookForm/NotebookFormModal";
+import { useDeleteNotebook } from "@/hooks/notebooks/useDeleteNotebook";
 
 const statusColors: { [key in NotebookStatus]: string } = {
   Recibido: "bg-blue-100 text-blue-800 border-blue-300",
@@ -45,6 +46,8 @@ export default function NotebookInventoryPage() {
 
   // custom hook - tanstack query - supabase
   const { notebooks: ntbks, isLoading } = useNotebooks();
+  const { mutate: deleteNotebook, isPending: isDeletePending } =
+    useDeleteNotebook();
 
   const handleOpenModal = (notebook: Notebook | null) => {
     setSelectedNotebook(notebook);
@@ -66,7 +69,7 @@ export default function NotebookInventoryPage() {
         "¿Estás seguro de que quieres eliminar este equipo? Esta acción no se puede deshacer."
       )
     ) {
-      setNotebooks(notebooks.filter((n) => n.id !== id));
+      deleteNotebook(id);
     }
   };
 
@@ -98,6 +101,7 @@ export default function NotebookInventoryPage() {
         <NotebookFormModal
           notebook={selectedNotebook}
           onSave={handleSaveNotebook}
+          // on update
           onClose={handleCloseModal}
         />
       )}
@@ -208,7 +212,11 @@ export default function NotebookInventoryPage() {
                       size="sm"
                       onClick={() => handleDeleteNotebook(notebook.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {isDeletePending ? (
+                        <Spinner></Spinner>
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </CardFooter>
