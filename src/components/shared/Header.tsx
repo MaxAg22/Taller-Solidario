@@ -11,7 +11,7 @@ export const Header = () => {
     >
       <Logo />
       <h1 className="hidden sm:block text-lg tracking-wide font-montserrat">
-        Taller Solidario de Notebooks
+        FAMAF - Taller Solidario
       </h1>
       <Nav />
     </header>

@@ -16,12 +16,6 @@ const NavLinks = () => {
       <NavLink to="/" className={({ isActive }) => navClass(isActive)}>
         Inventario
       </NavLink>
-      <NavLink
-        to="/asistencia"
-        className={({ isActive }) => navClass(isActive)}
-      >
-        Asistencia
-      </NavLink>
       <NavLink to="/ordenes" className={({ isActive }) => navClass(isActive)}>
         Ordenes
       </NavLink>
@@ -44,7 +38,7 @@ const Nav = () => {
   return (
     <>
       <nav className="w-1/3 flex justify-end">
-        <div className="hidden w-full justify-between md:flex">
+        <div className="hidden w-full justify-evenly md:flex">
           <NavLinks />
         </div>
 
