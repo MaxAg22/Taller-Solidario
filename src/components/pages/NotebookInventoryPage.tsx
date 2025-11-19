@@ -32,6 +32,8 @@ const statusColors: { [key in NotebookStatus]: string } = {
   "En Reparación": "bg-yellow-100 text-yellow-800 border-yellow-300",
   "Listo para Donar": "bg-green-100 text-green-800 border-green-300",
   Donado: "bg-gray-100 text-gray-800 border-gray-300",
+  Bloqueada: "bg-red-100 text-red-800 border-red-300",
+  Desbloqueada: "bg-orange-100 text-orange-800 border-orange-300",
 };
 
 // --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
@@ -150,6 +152,8 @@ export default function NotebookInventoryPage() {
                     Listo para Donar
                   </SelectItem>
                   <SelectItem value="Donado">Donado</SelectItem>
+                  <SelectItem value="Bloqueada">Bloqueada</SelectItem>
+                  <SelectItem value="Desbloqueada">Desbloqueada</SelectItem>
                 </SelectContent>
               </Select>
             </div>
