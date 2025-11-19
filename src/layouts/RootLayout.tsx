@@ -1,7 +1,7 @@
 // Layout es lo que se renderiza en todas las rutas
 // Outlet es donde se renderiza el contenido de cada ruta específica
 
-import Header from "@/components/shared/navbar/Header";
+import Header from "@/components/shared/Header";
 import { Outlet } from "react-router-dom";
 
 export const RootLayout = () => {

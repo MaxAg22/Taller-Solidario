@@ -6,7 +6,7 @@ export const ConfirmModal = ({
   if (!confirmDeleteId) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/40 flex items-center z-50 justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-80">
         <h2 className="text-lg font-bold mb-4">Eliminar equipo</h2>
         <p className="mb-6">
