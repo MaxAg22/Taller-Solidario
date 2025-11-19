@@ -99,7 +99,7 @@ export default function NotebookInventoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-background text-foreground pt-2 sm:pt-4 lg:pt-6">
       {isModalOpen && (
         <NotebookFormModal
           notebook={selectedNotebook}
@@ -117,15 +117,6 @@ export default function NotebookInventoryPage() {
       )}
 
       <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-primary">
-            Taller Solidario de Notebooks
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Gestión de inventario para equipos recuperados y donados.
-          </p>
-        </header>
-
         <Card className="mb-8">
           <CardContent className="p-4 flex flex-col sm:flex-row items-center gap-4">
             <div className="relative w-full sm:w-1/2 lg:w-1/3">
