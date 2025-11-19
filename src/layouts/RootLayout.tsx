@@ -6,9 +6,13 @@ import { Outlet } from "react-router-dom";
 export const RootLayout = () => {
   return (
     <div className="h-screen flex flex-col font-montserrat">
+      {/* NAVBAR */}
+
       <main className="container my-8 flex-1 mx-auto px-4">
         <Outlet />
       </main>
+
+      {/* FOOTER */}
     </div>
   );
 };

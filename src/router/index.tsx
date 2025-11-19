@@ -10,9 +10,8 @@ export const router = createBrowserRouter([
     path: "/",
     element: <RootLayout />,
     children: [
-      { index: true, element: null },
       {
-        path: "inventory",
+        index: true,
         element: <NotebookInventoryPage />,
       },
     ],
