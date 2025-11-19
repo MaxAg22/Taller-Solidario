@@ -15,9 +15,6 @@ const statusColors: { [key in OrderStatus]: string } = {
   Lista: "bg-blue-100 text-blue-800 border-blue-300",
   Pendiente: "bg-yellow-100 text-yellow-800 border-yellow-300",
   Entregada: "bg-green-100 text-green-800 border-green-300",
-  //: "bg-gray-100 text-gray-800 border-gray-300",
-  //Bloqueada: "bg-red-100 text-red-800 border-red-300",
-  //Desbloqueada: "bg-orange-100 text-orange-800 border-orange-300",
 };
 
 interface OrderCardProps {
