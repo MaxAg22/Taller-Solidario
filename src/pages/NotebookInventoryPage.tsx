@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,9 +7,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Input } from "../ui/input";
-import { Spinner } from "../ui/spinner";
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Spinner } from "../components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -22,10 +22,10 @@ import { useNotebooks } from "@/hooks";
 import type {
   NotebookStatus,
   Notebook,
-} from "../../interfaces/notebook.interface";
-import { NotebookFormModal } from "../forms/NotebookForm/NotebookFormModal";
+} from "../interfaces/notebook.interface";
+import { NotebookFormModal } from "../components/forms/NotebookForm/NotebookFormModal";
 import { useDeleteNotebook } from "@/hooks/notebooks/useDeleteNotebook";
-import { ConfirmModal } from "../modals/ConfirmModal";
+import { ConfirmModal } from "../components/modals/ConfirmModal";
 
 const statusColors: { [key in NotebookStatus]: string } = {
   Recibido: "bg-blue-100 text-blue-800 border-blue-300",
