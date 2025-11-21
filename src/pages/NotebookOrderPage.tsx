@@ -140,7 +140,7 @@ export default function NotebookOrderPage() {
             <div className="relative w-full sm:w-1/2 lg:w-1/3">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nombre o número de orden."
+                placeholder="Buscar por nombre o número de orden..."
                 className="pl-10"
                 value={searchTerm}
                 onChange={(e: {

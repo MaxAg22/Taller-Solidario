@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
 import {
   Card,
   CardContent,
@@ -8,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
 import { SelectContent, SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import type { Order, OrderFormModalProps, OrderStatus } from "@/interfaces";
@@ -25,13 +27,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useCreateOrder } from "@/hooks/orders/useCreateOrder";
-import toast from "react-hot-toast";
 
 export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   order,
   onSave,
   onClose,
 }) => {
+  const { register, handleSubmit } = useForm();
+
   const [formData, setFormData] = useState<Omit<Order, "id">>({
     name: order?.name || "",
     orderNumber: order?.orderNumber || "",
@@ -66,6 +69,16 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!date) {
+      toast.error("La fecha de entrega es obligatoria");
+      return;
+    }
+
+    if (!formData.totalNotebooks || !formData.readyNotebooks) {
+      toast.error("El número de equipos es obligatorio");
+      return;
+    }
+
     const isEdit = !!order?.id;
 
     if (isEdit) {
@@ -76,8 +89,9 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
     } else {
       createOrder({
         ...formData,
-        deadline: new Date().toISOString().split("T")[0],
+        deadline: date?.toISOString().split("T")[0],
       });
+      console.log("Creando", formData, date);
     }
   };
 
@@ -108,27 +122,25 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
             </div>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* NOMBRE */}
             <div className="space-y-2">
               <Label htmlFor="name">Nombre</Label>
               <Input
                 id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
+                {...register("name")}
                 placeholder="Ej: Orden para PUC"
-                required
               />
             </div>
+            {/* DESCRIPCION */}
             <div className="space-y-2">
               <Label htmlFor="description">Descripción</Label>
               <Input
                 id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
+                {...register("description")}
                 placeholder="Preparar 15 notebooks con ubuntu"
               />
             </div>
+            {/* ESTADO */}
             <div className="space-y-2">
               <Label htmlFor="status">Estado</Label>
               <Select
@@ -146,26 +158,27 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
               </Select>
             </div>
 
+            {/* NOTEBOOKS A ENTREGAR */}
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="totalNotebooks">Notebooks a entregar</Label>
               <Input
                 type="number"
-                id="amount"
-                defaultValue={formData.totalNotebooks.toString()}
-                min={0}
+                id="totalNotebooks"
+                {...register("totalNotebooks")}
               />
             </div>
 
+            {/* NOTEBOOKS LISTAS */}
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="readyNotebooks">Notebooks entregadas</Label>
               <Input
                 type="number"
-                id="amount1"
-                defaultValue={formData.readyNotebooks.toString()}
-                min={0}
+                id="readyNotebooks"
+                {...register("readyNotebooks")}
               />
             </div>
 
+            {/* FECHA DE ENTREGA */}
             <div className="flex flex-col gap-3">
               <Label htmlFor="date" className="px-1">
                 Fecha de entrega
@@ -204,7 +217,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
             </Button>
             <Button type="submit">Guardar Cambios</Button>
             {/*CHANGE FOR IN PENDING */}
-            {false && <Spinner></Spinner>}
+            {isPendingCreate && <Spinner></Spinner>}
           </CardFooter>
         </form>
       </Card>
