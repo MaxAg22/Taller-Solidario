@@ -78,6 +78,50 @@ export type Database = {
         };
         Relationships: [];
       };
+      orders: {
+        Row: {
+          created_at: string;
+          deadline: string | null;
+          description: string | null;
+          id: string;
+          name: string | null;
+          orderNumber: number;
+          readyNotebooks: number | null;
+          status: string | null;
+          totalNotebooks: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          deadline?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string | null;
+          orderNumber?: number;
+          readyNotebooks?: number | null;
+          status?: string | null;
+          totalNotebooks?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          deadline?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string | null;
+          orderNumber?: number;
+          readyNotebooks?: number | null;
+          status?: string | null;
+          totalNotebooks?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "orders_id_fkey";
+            columns: ["id"];
+            isOneToOne: true;
+            referencedRelation: "notebooks";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

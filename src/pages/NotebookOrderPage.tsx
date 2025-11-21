@@ -83,7 +83,7 @@ export default function NotebookOrderPage() {
     setSelectedOrder(null);
   };
 
-  const handleSaveNotebook = () => {
+  const handleSaveOrder = () => {
     handleCloseModal();
   };
 
@@ -112,7 +112,13 @@ export default function NotebookOrderPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-2 sm:pt-4 lg:pt-6">
-      {isModalOpen && <OrderFormModal />}
+      {isModalOpen && (
+        <OrderFormModal
+          order={selectedOrder}
+          onSave={handleSaveOrder}
+          onClose={handleCloseModal}
+        />
+      )}
 
       {confirmDeleteId && (
         <ConfirmModal
