@@ -46,6 +46,7 @@ export type Database = {
           entryDate: string | null;
           id: string;
           model: string | null;
+          order_id: string | null;
           repairHistory: string | null;
           repairNeeded: string | null;
           serialNumber: number;
@@ -58,6 +59,7 @@ export type Database = {
           entryDate?: string | null;
           id?: string;
           model?: string | null;
+          order_id?: string | null;
           repairHistory?: string | null;
           repairNeeded?: string | null;
           serialNumber?: number;
@@ -70,13 +72,22 @@ export type Database = {
           entryDate?: string | null;
           id?: string;
           model?: string | null;
+          order_id?: string | null;
           repairHistory?: string | null;
           repairNeeded?: string | null;
           serialNumber?: number;
           specs?: string | null;
           status?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "notebooks_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       orders: {
         Row: {
@@ -112,15 +123,7 @@ export type Database = {
           status?: string | null;
           totalNotebooks?: number | null;
         };
-        Relationships: [
-          {
-            foreignKeyName: "orders_id_fkey";
-            columns: ["id"];
-            isOneToOne: true;
-            referencedRelation: "notebooks";
-            referencedColumns: ["id"];
-          }
-        ];
+        Relationships: [];
       };
     };
     Views: {

@@ -24,6 +24,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useCreateOrder } from "@/hooks/orders/useCreateOrder";
+import toast from "react-hot-toast";
 
 export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   order,
@@ -40,8 +42,14 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
     status: order?.status || "Pendiente",
   });
 
+  const { mutate: createOrder, isPending: isPendingCreate } = useCreateOrder({
+    onSuccess: () => onSave(),
+  });
+
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [date, setDate] = React.useState<Date | undefined>(
+    order?.deadline ? new Date(order.deadline) : undefined
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -54,9 +62,23 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
     setFormData((prev) => ({ ...prev, status: value }));
   };
 
-  // TODOOO: VERIFICAR QUE NOTEBOOKENTREGADAS < NOTEBOOK A ENTREGAR
+  // TODOOO: VERIFICAR QUE NOTEBOOKENTREGADAS < NOTEBOOK A
   const handleSubmit = (e: React.FormEvent) => {
-    return;
+    e.preventDefault();
+
+    const isEdit = !!order?.id;
+
+    if (isEdit) {
+      //updateNotebook({
+      //  id: notebook.id,
+      //  ...formData,
+      //});
+    } else {
+      createOrder({
+        ...formData,
+        deadline: new Date().toISOString().split("T")[0],
+      });
+    }
   };
 
   return (
@@ -89,8 +111,8 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
             <div className="space-y-2">
               <Label htmlFor="name">Nombre</Label>
               <Input
-                id="model"
-                name="model"
+                id="name"
+                name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Ej: Orden para PUC"
@@ -100,11 +122,11 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
             <div className="space-y-2">
               <Label htmlFor="description">Descripción</Label>
               <Input
-                id="brand"
-                name="brand"
+                id="description"
+                name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Preparar 15 notebooks con ubuntu mate"
+                placeholder="Preparar 15 notebooks con ubuntu"
               />
             </div>
             <div className="space-y-2">
@@ -126,17 +148,27 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
 
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="totalNotebooks">Notebooks a entregar</Label>
-              <Input type="number" id="amount" placeholder="0" min={0} />
+              <Input
+                type="number"
+                id="amount"
+                defaultValue={formData.totalNotebooks.toString()}
+                min={0}
+              />
             </div>
 
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="readyNotebooks">Notebooks entregadas</Label>
-              <Input type="number" id="amount1" placeholder="0" min={0} />
+              <Input
+                type="number"
+                id="amount1"
+                defaultValue={formData.readyNotebooks.toString()}
+                min={0}
+              />
             </div>
 
             <div className="flex flex-col gap-3">
               <Label htmlFor="date" className="px-1">
-                Date of birth
+                Fecha de entrega
               </Label>
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>

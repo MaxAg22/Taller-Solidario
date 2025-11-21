@@ -1,6 +1,12 @@
 import type { Tables } from "@/supabase/supabase";
-import type { NotebookStatus, Notebook } from "@/interfaces";
+import type {
+  NotebookStatus,
+  Notebook,
+  Order,
+  OrderStatus,
+} from "@/interfaces";
 type NotebookRow = Tables<"notebooks">;
+type OrderRow = Tables<"orders">;
 
 export function mapNotebook(row: NotebookRow): Notebook {
   return {
@@ -13,5 +19,18 @@ export function mapNotebook(row: NotebookRow): Notebook {
     repairNeeded: row.repairNeeded ?? "",
     repairHistory: row.repairHistory ?? "",
     entryDate: row.entryDate ?? "",
+  };
+}
+
+export function mapOrder(row: OrderRow): Order {
+  return {
+    id: row.id,
+    name: row.name ?? "",
+    orderNumber: row.orderNumber?.toString() ?? "",
+    description: row.description ?? "",
+    deadline: row.deadline ?? "",
+    totalNotebooks: row.totalNotebooks ?? 0,
+    readyNotebooks: row.readyNotebooks ?? 0,
+    status: (row.status as OrderStatus) ?? "Pendiente",
   };
 }

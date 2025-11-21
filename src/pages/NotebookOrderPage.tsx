@@ -16,6 +16,7 @@ import { ConfirmModal } from "../components/modals/ConfirmModal";
 import { OrderCard } from "@/components/orders/OrderCard";
 import type { Order } from "@/interfaces/order.interface";
 import { OrderFormModal } from "@/components/forms/OrderForm/OrderFormModal";
+import { useOrder } from "@/hooks/orders/useOrder";
 
 export const Orders: Order[] = [
   {
@@ -72,6 +73,7 @@ export default function NotebookOrderPage() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   // custom hook - tanstack query - supabase
+  const { orders, isLoading } = useOrder();
 
   const handleOpenModal = (order: Order | null) => {
     setSelectedOrder(order);
@@ -92,21 +94,23 @@ export default function NotebookOrderPage() {
   };
 
   const filteredOrders = useMemo(() => {
-    if (!Orders) return [];
+    if (!orders) return [];
 
-    return Orders.filter((order) => {
-      if (statusFilter === "all") return true;
-      return order.status === statusFilter;
-    }).filter((order) => {
-      const term = searchTerm.toLowerCase();
-      return (
-        order.orderNumber.toLowerCase().includes(term) ||
-        order.name.toLowerCase().includes(term)
-      );
-    });
-  }, [Orders, searchTerm, statusFilter]);
+    return orders
+      .filter((order) => {
+        if (statusFilter === "all") return true;
+        return order.status === statusFilter;
+      })
+      .filter((order) => {
+        const term = searchTerm.toLowerCase();
+        return (
+          order.orderNumber.toLowerCase().includes(term) ||
+          order.name.toLowerCase().includes(term)
+        );
+      });
+  }, [orders, searchTerm, statusFilter]);
 
-  if (!Orders) {
+  if (!orders) {
     return <Spinner></Spinner>;
   }
 
