@@ -1,8 +1,11 @@
+import type { ConfirmModalType } from "@/interfaces";
+
 export const ConfirmModal = ({
   confirmDeleteId,
   handleDeleteNotebook,
   setConfirmDeleteId,
-}: any) => {
+  item,
+}: ConfirmModalType) => {
   if (!confirmDeleteId) return null;
 
   return (
@@ -10,7 +13,9 @@ export const ConfirmModal = ({
       <div className="bg-white p-6 rounded-lg shadow-lg w-80">
         <h2 className="text-lg font-bold mb-4">Eliminar equipo</h2>
         <p className="mb-6">
-          Esta acción no se puede deshacer. ¿Deseás eliminar este equipo?
+          {item === "Order"
+            ? "Esta acción no se puede deshacer, ¿Deseás eliminar esta Orden?"
+            : "Esta acción no se puede deshacer, ¿Deseás eliminar este equipo?"}
         </p>
 
         <div className="flex justify-end gap-2">

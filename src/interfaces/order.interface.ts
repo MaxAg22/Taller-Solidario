@@ -10,3 +10,9 @@ export interface Order {
   readyNotebooks: number;
   status: OrderStatus;
 }
+
+export interface OrderFormModalProps {
+  order: Order | null;
+  onSave: () => void;
+  onClose: () => void;
+}

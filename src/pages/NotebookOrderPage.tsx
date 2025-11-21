@@ -15,6 +15,7 @@ import {
 import { ConfirmModal } from "../components/modals/ConfirmModal";
 import { OrderCard } from "@/components/orders/OrderCard";
 import type { Order } from "@/interfaces/order.interface";
+import { OrderFormModal } from "@/components/forms/OrderForm/OrderFormModal";
 
 export const Orders: Order[] = [
   {
@@ -111,11 +112,15 @@ export default function NotebookOrderPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-2 sm:pt-4 lg:pt-6">
+      {isModalOpen && <OrderFormModal />}
+
       {confirmDeleteId && (
         <ConfirmModal
+          // TODOOOOOO HERE, HANDLE DELETE ORDER
           confirmDeleteId={confirmDeleteId}
           handleDeleteNotebook={handleDeleteNotebook}
           setConfirmDeleteId={setConfirmDeleteId}
+          item={"Order"}
         ></ConfirmModal>
       )}
 
@@ -124,7 +129,6 @@ export default function NotebookOrderPage() {
           <CardContent className="p-4 flex flex-col sm:flex-row items-center gap-4">
             <div className="relative w-full sm:w-1/2 lg:w-1/3">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              {/* CHANGE ORDER SEARCH */}
               <Input
                 placeholder="Buscar por nombre o número de orden."
                 className="pl-10"
