@@ -94,11 +94,11 @@ export default function NotebookInventoryPage() {
       });
   }, [ntbks, searchTerm, statusFilter]);
 
-  if (isLoading || !ntbks) {
-    return <Spinner></Spinner>;
-  }
-
-  return (
+  return isLoading ? (
+    <div className="min-h-screen flex items-center justify-center">
+      <Spinner className="w-10 h-10 size-15" />
+    </div>
+  ) : (
     <div className="min-h-screen bg-background text-foreground pt-2 sm:pt-4 lg:pt-6">
       {isModalOpen && (
         <NotebookFormModal
