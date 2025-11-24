@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   Card,
   CardContent,
@@ -9,14 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import toast from "react-hot-toast";
 import { SelectContent, SelectItem } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import type { Order, OrderFormModalProps, OrderStatus } from "@/interfaces";
+import type { OrderFormModalProps } from "@/interfaces";
 import { Select, SelectTrigger, SelectValue } from "@radix-ui/react-select";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
-import { useState } from "react";
 
 import * as React from "react";
 import { ChevronDownIcon } from "lucide-react";
@@ -27,58 +25,52 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useCreateOrder } from "@/hooks/orders/useCreateOrder";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  orderFormSchema,
+  type OrderForm,
+} from "@/validators/orderFormModal.validator";
+import { useEffect } from "react";
+
 
 export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   order,
   onSave,
   onClose,
 }) => {
-  const { register, handleSubmit } = useForm();
-
-  const [formData, setFormData] = useState<Omit<Order, "id">>({
-    name: order?.name || "",
-    orderNumber: order?.orderNumber || "",
-    description: order?.description || "",
-    deadline: order?.deadline || "",
-    totalNotebooks: order?.totalNotebooks || 0,
-    readyNotebooks: order?.readyNotebooks || 0,
-    status: order?.status || "Pendiente",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm<OrderForm>({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: {
+      name: order?.name || "",
+      description: order?.description || "",
+      totalNotebooks: order?.totalNotebooks || 0,
+      readyNotebooks: order?.readyNotebooks || 0,
+      status: order?.status || "Pendiente",
+      deadline: order?.deadline ? new Date(order.deadline) : undefined,
+    },
   });
+
+  useEffect(() => {
+    console.log("errors", errors)
+  }, [errors])
+
+
+
+
 
   const { mutate: createOrder, isPending: isPendingCreate } = useCreateOrder({
     onSuccess: () => onSave(),
   });
 
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(
-    order?.deadline ? new Date(order.deadline) : undefined
-  );
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (value: OrderStatus) => {
-    setFormData((prev) => ({ ...prev, status: value }));
-  };
 
   // TODOOO: VERIFICAR QUE NOTEBOOKENTREGADAS < NOTEBOOK A
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!date) {
-      toast.error("La fecha de entrega es obligatoria");
-      return;
-    }
-
-    if (!formData.totalNotebooks || !formData.readyNotebooks) {
-      toast.error("El número de equipos es obligatorio");
-      return;
-    }
-
+  const onSubmit = (data: OrderForm) => {
     const isEdit = !!order?.id;
 
     if (isEdit) {
@@ -88,17 +80,17 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
       //});
     } else {
       createOrder({
-        ...formData,
-        deadline: date?.toISOString().split("T")[0],
+        ...data,
+        deadline: data.deadline.toISOString().split("T")[0],
       });
-      console.log("Creando", formData, date);
+      console.log("Creando", data);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
@@ -130,6 +122,9 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
                 {...register("name")}
                 placeholder="Ej: Orden para PUC"
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
             </div>
             {/* DESCRIPCION */}
             <div className="space-y-2">
@@ -139,76 +134,111 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
                 {...register("description")}
                 placeholder="Preparar 15 notebooks con ubuntu"
               />
+              {errors.description && (
+                <p className="text-red-500 text-sm">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
             {/* ESTADO */}
             <div className="space-y-2">
               <Label htmlFor="status">Estado</Label>
-              <Select
-                onValueChange={handleSelectChange}
-                defaultValue={formData.status}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Seleccionar estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Lista">Lista</SelectItem>
-                  <SelectItem value="Pendiente">Pendiente</SelectItem>
-                  <SelectItem value="Entregada">Entregada</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger id="status">
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Lista">Lista</SelectItem>
+                      <SelectItem value="Pendiente">Pendiente</SelectItem>
+                      <SelectItem value="Entregada">Entregada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && (
+                <p className="text-red-500 text-sm">{errors.status.message}</p>
+              )}
             </div>
-
             {/* NOTEBOOKS A ENTREGAR */}
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="totalNotebooks">Notebooks a entregar</Label>
               <Input
                 type="number"
                 id="totalNotebooks"
-                {...register("totalNotebooks")}
+                {...register("totalNotebooks", { valueAsNumber: true })}
               />
+              {errors.totalNotebooks && (
+                <p className="text-red-500 text-sm">
+                  {errors.totalNotebooks.message}
+                </p>
+              )}
             </div>
-
             {/* NOTEBOOKS LISTAS */}
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="readyNotebooks">Notebooks entregadas</Label>
               <Input
                 type="number"
                 id="readyNotebooks"
-                {...register("readyNotebooks")}
+                {...register("readyNotebooks", { valueAsNumber: true })}
               />
+              {errors.readyNotebooks && (
+                <p className="text-red-500 text-sm">
+                  {errors.readyNotebooks.message}
+                </p>
+              )}
             </div>
-
             {/* FECHA DE ENTREGA */}
             <div className="flex flex-col gap-3">
               <Label htmlFor="date" className="px-1">
                 Fecha de entrega
               </Label>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    id="date"
-                    className="w-48 justify-between font-normal"
-                  >
-                    {date ? date.toLocaleDateString() : "Select date"}
-                    <ChevronDownIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto overflow-hidden p-0"
-                  align="start"
-                >
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    captionLayout="dropdown"
-                    onSelect={(date) => {
-                      setDate(date);
-                      setOpen(false);
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
+              <Controller
+                control={control}
+                name="deadline"
+                render={({ field }) => (
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        id="date"
+                        className="w-48 justify-between font-normal"
+                      >
+                        {field.value
+                          ? field.value.toLocaleDateString()
+                          : "Select date"}
+                        <ChevronDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          field.onChange(date);
+                          setOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
+              {errors.deadline && (
+                <p className="text-red-500 text-sm">
+                  {errors.deadline.message}
+                </p>
+              )}
             </div>
           </CardContent>
           <CardFooter className="flex justify-end gap-2">
