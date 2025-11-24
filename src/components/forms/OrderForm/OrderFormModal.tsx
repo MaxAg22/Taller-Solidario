@@ -30,6 +30,7 @@ import {
   orderFormSchema,
   type OrderForm,
 } from "@/validators/orderFormModal.validator";
+import { useUpdateOrder } from "@/hooks/orders/useUpdateNotebooks";
 
 export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   order,
@@ -56,24 +57,30 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   const { mutate: createOrder, isPending: isPendingCreate } = useCreateOrder({
     onSuccess: () => onSave(),
   });
+  const { mutate: updateOrder, isPending: isPendingUpdate } = useUpdateOrder({
+    onSuccess: () => onSave(),
+  });
 
   const [open, setOpen] = React.useState(false);
 
-  // TODOOO: VERIFICAR QUE NOTEBOOKENTREGADAS < NOTEBOOK A
   const onSubmit = (data: OrderForm) => {
     const isEdit = !!order?.id;
 
     if (isEdit) {
-      //updateNotebook({
-      //  id: notebook.id,
-      //  ...formData,
-      //});
+      updateOrder({
+        id: order.id,
+        name: data.name,
+        description: data.description || "",
+        totalNotebooks: data.totalNotebooks,
+        readyNotebooks: data.readyNotebooks,
+        deadline: data.deadline || "",
+        status: data.status,
+      });
     } else {
       createOrder({
         ...data,
         deadline: data.deadline.toISOString().split("T")[0],
       });
-      console.log("Creando", data);
     }
   };
 
@@ -236,8 +243,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
               Cancelar
             </Button>
             <Button type="submit">Guardar Cambios</Button>
-            {/*CHANGE FOR IN PENDING */}
-            {isPendingCreate && <Spinner></Spinner>}
+            {(isPendingCreate || isPendingUpdate) && <Spinner></Spinner>}
           </CardFooter>
         </form>
       </Card>

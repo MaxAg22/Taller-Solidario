@@ -1,3 +1,4 @@
+import type { UpdateOrder } from "@/interfaces";
 import { supabase } from "@/supabase/client";
 
 export const getOrders = async () => {
@@ -21,8 +22,8 @@ export const createOrder = async (order: any) => {
       name: order.name,
       description: order.description,
       deadline: order.deadline,
-      readyNotebooks: order.readyNotebooks,
-      totalNotebooks: order.totalNotebooks,
+      readyorders: order.readyorders,
+      totalorders: order.totalorders,
       status: order.status,
     })
     .select();
@@ -40,4 +41,25 @@ export const deleteOrder = async (id: string) => {
   if (error) {
     throw new Error(error.message);
   }
+};
+
+export const updateOrder = async (order: UpdateOrder) => {
+  const { data: modifiedOrder, error } = await supabase
+    .from("orders")
+    .update({
+      name: order.name,
+      description: order.description,
+      totalNotebooks: order.totalNotebooks,
+      readyNotebooks: order.readyNotebooks,
+      deadline: order.deadline.toISOString().split("T")[0],
+      status: order.status,
+    })
+    .eq("id", order.id)
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return modifiedOrder;
 };

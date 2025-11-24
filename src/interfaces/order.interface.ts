@@ -23,6 +23,6 @@ export interface UpdateOrder {
   description: string;
   totalNotebooks: number;
   readyNotebooks: number;
-  deadline: string;
+  deadline: Date;
   status: OrderStatus;
 }
