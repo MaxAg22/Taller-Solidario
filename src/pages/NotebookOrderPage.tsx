@@ -4,7 +4,6 @@ import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Spinner } from "../components/ui/spinner";
 import { Search, PlusCircle } from "lucide-react";
-
 import {
   Select,
   SelectContent,
@@ -133,12 +132,14 @@ export default function NotebookOrderPage() {
         {filteredOrders.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredOrders.map((order) => (
-              <OrderCard
-                order={order}
-                handleOpenModal={handleOpenModal}
-                setConfirmDeleteId={setConfirmDeleteId}
-                deletingId={deletingId}
-              />
+              <div key={order.id}>
+                <OrderCard
+                  order={order}
+                  handleOpenModal={handleOpenModal}
+                  setConfirmDeleteId={setConfirmDeleteId}
+                  deletingId={deletingId}
+                />
+              </div>
             ))}
           </div>
         ) : (

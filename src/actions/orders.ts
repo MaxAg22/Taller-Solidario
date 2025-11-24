@@ -22,8 +22,8 @@ export const createOrder = async (order: any) => {
       name: order.name,
       description: order.description,
       deadline: order.deadline,
-      readyorders: order.readyorders,
-      totalorders: order.totalorders,
+      readyNotebooks: order.readyNotebooks,
+      totalNotebooks: order.totalNotebooks,
       status: order.status,
     })
     .select();

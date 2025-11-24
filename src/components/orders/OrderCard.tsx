@@ -60,8 +60,6 @@ export const OrderCard = ({
           Fecha de entrega: {order.deadline}
         </p>
         <div className="flex gap-2">
-          {/* Boton para hacer update */}
-
           <Button
             variant="outline"
             size="sm"
