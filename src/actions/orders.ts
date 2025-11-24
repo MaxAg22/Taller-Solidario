@@ -33,3 +33,11 @@ export const createOrder = async (order: any) => {
 
   return newOrder;
 };
+
+export const deleteOrder = async (id: string) => {
+  const { error } = await supabase.from("orders").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+};

@@ -30,8 +30,6 @@ import {
   orderFormSchema,
   type OrderForm,
 } from "@/validators/orderFormModal.validator";
-import { useEffect } from "react";
-
 
 export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   order,
@@ -54,14 +52,6 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
       deadline: order?.deadline ? new Date(order.deadline) : undefined,
     },
   });
-
-  useEffect(() => {
-    console.log("errors", errors)
-  }, [errors])
-
-
-
-
 
   const { mutate: createOrder, isPending: isPendingCreate } = useCreateOrder({
     onSuccess: () => onSave(),

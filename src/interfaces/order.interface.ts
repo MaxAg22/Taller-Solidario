@@ -16,3 +16,13 @@ export interface OrderFormModalProps {
   onSave: () => void;
   onClose: () => void;
 }
+
+export interface UpdateOrder {
+  id: string;
+  name: string;
+  description: string;
+  totalNotebooks: number;
+  readyNotebooks: number;
+  deadline: string;
+  status: OrderStatus;
+}

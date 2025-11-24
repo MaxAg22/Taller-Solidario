@@ -17,52 +17,7 @@ import { OrderCard } from "@/components/orders/OrderCard";
 import type { Order } from "@/interfaces/order.interface";
 import { OrderFormModal } from "@/components/forms/OrderForm/OrderFormModal";
 import { useOrder } from "@/hooks/orders/useOrder";
-
-export const Orders: Order[] = [
-  {
-    id: "1",
-    name: "Reparación de pantallas",
-    orderNumber: "ORD-001",
-    description: "Reemplazo de pantallas dañadas y pruebas de funcionamiento",
-    deadline: "2025-11-25",
-    totalNotebooks: 8,
-    readyNotebooks: 3,
-    status: "Pendiente",
-  },
-  {
-    id: "2",
-    name: "Mantenimiento preventivo",
-    orderNumber: "ORD-002",
-    description:
-      "Limpieza interna, control térmico y actualización de software",
-    deadline: "2025-12-03",
-    totalNotebooks: 15,
-    readyNotebooks: 15,
-    status: "Lista",
-  },
-  {
-    id: "3",
-    name: "Diagnóstico inicial",
-    orderNumber: "ORD-003",
-    description: "Revisión general del nuevo lote recibido",
-    deadline: "2025-11-30",
-    totalNotebooks: 12,
-    readyNotebooks: 0,
-    status: "Pendiente",
-  },
-  {
-    id: "4",
-    name: "Reparación avanzada",
-    orderNumber: "ORD-004",
-    description: "Cambio de motherboards y reinstalación del sistema operativo",
-    deadline: "2025-12-10",
-    totalNotebooks: 6,
-    readyNotebooks: 6,
-    status: "Entregada",
-  },
-];
-
-// --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
+import { useDeleteOrder } from "@/hooks/orders/useDeleteOrder";
 
 export default function NotebookOrderPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -74,6 +29,7 @@ export default function NotebookOrderPage() {
 
   // custom hook - tanstack query - supabase
   const { orders, isLoading } = useOrder();
+  const { mutate: deleteOrder } = useDeleteOrder();
 
   const handleOpenModal = (order: Order | null) => {
     setSelectedOrder(order);
@@ -89,8 +45,14 @@ export default function NotebookOrderPage() {
     handleCloseModal();
   };
 
-  const handleDeleteNotebook = (id: string) => {
+  const handleDeleteOrder = (id: string) => {
     setDeletingId(id);
+
+    deleteOrder(id, {
+      onSettled: () => {
+        setDeletingId(null);
+      },
+    });
   };
 
   const filteredOrders = useMemo(() => {
@@ -126,9 +88,8 @@ export default function NotebookOrderPage() {
 
       {confirmDeleteId && (
         <ConfirmModal
-          // TODOOOOOO HERE, HANDLE DELETE ORDER
           confirmDeleteId={confirmDeleteId}
-          handleDeleteNotebook={handleDeleteNotebook}
+          handleDeleteNotebook={handleDeleteOrder}
           setConfirmDeleteId={setConfirmDeleteId}
           item={"Order"}
         ></ConfirmModal>

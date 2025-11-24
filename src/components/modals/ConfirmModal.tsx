@@ -8,12 +8,16 @@ export const ConfirmModal = ({
 }: ConfirmModalType) => {
   if (!confirmDeleteId) return null;
 
+  const order = item === "Order";
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center z-50 justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-        <h2 className="text-lg font-bold mb-4">Eliminar equipo</h2>
+        <h2 className="text-lg font-bold mb-4">
+          {order ? "Eliminar orden" : "Eliminar equipo"}
+        </h2>
         <p className="mb-6">
-          {item === "Order"
+          {order
             ? "Esta acción no se puede deshacer, ¿Deseás eliminar esta Orden?"
             : "Esta acción no se puede deshacer, ¿Deseás eliminar este equipo?"}
         </p>
