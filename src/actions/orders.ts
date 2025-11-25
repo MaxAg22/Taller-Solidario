@@ -39,17 +39,12 @@ export const createOrder = async (order: CreateOrder) => {
       oldNotebooksSelected: [],
       newNotebooksSelected: order.newNotebooksSelected,
     });
+
+    await updateNotebooksStatus(newOrder[0])
   }
+
 
   return newOrder;
-};
-
-export const deleteOrder = async (id: string) => {
-  const { error } = await supabase.from("orders").delete().eq("id", id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
 };
 
 export const updateOrder = async (order: UpdateOrder) => {
@@ -66,6 +61,7 @@ export const updateOrder = async (order: UpdateOrder) => {
     .eq("id", order.id);
 
     await updateNotebooksIds(order);
+    await updateNotebooksStatus(order);
 
   if (error) {
     throw new Error(error.message);
@@ -74,6 +70,15 @@ export const updateOrder = async (order: UpdateOrder) => {
   return modifiedOrder;
 };
 
+export const deleteOrder = async (id: string) => {
+  const { error } = await supabase.from("orders").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+};
+
+// Helper function to update notebooks ids
 const updateNotebooksIds = async (order: any) => {
   const oldIds = new Set<string>(order.oldNotebooksSelected);   
   const newIds = new Set<string>(order.newNotebooksSelected);  
@@ -100,3 +105,12 @@ const updateNotebooksIds = async (order: any) => {
   }
 };
 
+// Helper function to update notebooks status
+const updateNotebooksStatus = async (order: any) => {
+  const { error } = await supabase
+    .from("notebooks")
+    .update({ status: order.status === "Entregada" ? "Donado" : "Listo para Donar" })
+    .eq("order_id", order.id);
+
+  if (error) throw new Error(error.message);
+};

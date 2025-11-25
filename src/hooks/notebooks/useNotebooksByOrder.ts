@@ -7,6 +7,7 @@ export const useNotebooksByOrder = (orderId: string) => {
   const { data, isLoading } = useQuery({
     queryKey: ["notebooks", orderId],
     queryFn: () => getNotebooksByOrder(orderId),
+    enabled: !!orderId,
     staleTime: 1000 * 60 * 5, // 1 hour
   });
 

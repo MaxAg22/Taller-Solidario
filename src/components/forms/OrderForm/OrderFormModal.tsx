@@ -110,7 +110,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
         name: data.name,
         description: data.description || "",
         totalNotebooks: data.totalNotebooks,
-        readyNotebooks: data.readyNotebooks,
+        readyNotebooks: selectedNotebooks.length,
         deadline: data.deadline || "",
         status: data.status,
         newNotebooksSelected: selectedNotebooks,
@@ -123,6 +123,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
         description: data.description || "",
         deadline: data.deadline.toISOString().split("T")[0],
         newNotebooksSelected: selectedNotebooks,
+        readyNotebooks: selectedNotebooks.length,
       });
     }
   };
