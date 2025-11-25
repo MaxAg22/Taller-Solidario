@@ -98,7 +98,7 @@ const updateNotebooksIds = async (order: any) => {
   for (const id of removed) {
     const { error } = await supabase
       .from("notebooks")
-      .update({ order_id: null })
+      .update({ order_id: null, status: "Listo para Donar" })
       .eq("id", id);
 
     if (error) throw new Error(error.message);

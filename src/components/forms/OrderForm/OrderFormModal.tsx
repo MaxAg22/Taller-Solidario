@@ -53,9 +53,13 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   onSave,
   onClose,
 }) => {
+  const { notebooks: orderNotebooks, isLoading: isPendingNotebookByOrder } =
+    useNotebooksByOrder(order?.id || "");
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     control,
   } = useForm<OrderForm>({
@@ -66,6 +70,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
       totalNotebooks: order?.totalNotebooks || 0,
       status: order?.status || "Pendiente",
       deadline: order?.deadline ? new Date(order.deadline) : undefined,
+      newNotebooksSelected: orderNotebooks?.map((notebook) => notebook.id) || [],
     },
   });
 
@@ -75,8 +80,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   const { mutate: updateOrder, isPending: isPendingUpdate } = useUpdateOrder({
     onSuccess: () => onSave(),
   });
-  const { notebooks: orderNotebooks, isLoading: isPendingNotebookByOrder } =
-    useNotebooksByOrder(order?.id || "");
+
   const [open, setOpen] = React.useState(false);
   const [selectedNotebooks, setSelectedNotebooks] = useState<string[]>(
     orderNotebooks?.map((notebook) => notebook.id) || []
@@ -84,9 +88,11 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
 
   useEffect(() => {
     if (orderNotebooks) {
-      setSelectedNotebooks(orderNotebooks.map((n) => n.id));
+      const ids = orderNotebooks.map((n) => n.id);
+      setSelectedNotebooks(ids);
+      setValue("newNotebooksSelected", ids);
     }
-  }, [orderNotebooks]);
+  }, [orderNotebooks, setValue]);
 
   const combinedNotebooks = React.useMemo(() => {
     const ready = readyNotebooks || [];
@@ -224,31 +230,49 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
             {/* AGREGAR/QUITAR EQUIPOS */}
             <div className="space-y-2">
               <Label htmlFor="add-delete">Agregar/Quitar equipos</Label>
-              {isPendingNotebookByOrder ? (
-                <div className="w-full flex justify-center py-4">
-                  <Spinner />
-                </div>
-              ) : (
-                <MultiSelect
-                  values={selectedNotebooks}
-                  onValuesChange={setSelectedNotebooks}
-                >
-                  <MultiSelectTrigger className="w-full max-w-[400px]">
-                    <MultiSelectValue placeholder="Seleccione equipos..." />
-                  </MultiSelectTrigger>
+              <Controller
+                control={control}
+                name="newNotebooksSelected"
+                render={({ field }) => (
+                  <>
+                    {isPendingNotebookByOrder ? (
+                      <div className="w-full flex justify-center py-4">
+                        <Spinner />
+                      </div>
+                    ) : (
+                      <MultiSelect
+                        values={selectedNotebooks}
+                        onValuesChange={(vals) => {
+                          setSelectedNotebooks(vals)
+                          field.onChange(vals)
+                        }}
+                      >
+                        <MultiSelectTrigger className="w-full max-w-[400px]">
+                          <MultiSelectValue placeholder="Seleccione equipos..." />
+                        </MultiSelectTrigger>
 
-                  <MultiSelectContent>
-                    <MultiSelectGroup>
-                      {combinedNotebooks.map((nb) => (
-                        <MultiSelectItem key={nb.id} value={String(nb.id)}>
-                          Modelo: {nb.model} - Nro.Serie: {nb.serialNumber}
-                        </MultiSelectItem>
-                      ))}
-                    </MultiSelectGroup>
-                  </MultiSelectContent>
-                </MultiSelect>
+                        <MultiSelectContent>
+                          <MultiSelectGroup>
+                            {combinedNotebooks.map((nb) => (
+                              <MultiSelectItem key={nb.id} value={String(nb.id)}>
+                                Modelo: {nb.model} - Nro.Serie: {nb.serialNumber}
+                              </MultiSelectItem>
+                            ))}
+                          </MultiSelectGroup>
+                        </MultiSelectContent>
+                      </MultiSelect>
+                    )}
+                  </>
+                )}
+              />
+              {errors.newNotebooksSelected && (
+                <p className="text-red-500 text-sm">
+                  {errors.newNotebooksSelected.message}
+                </p>
               )}
+
             </div>
+
             {/* FECHA DE ENTREGA */}
             <div className="space-y-2">
               <Label htmlFor="date" className="px-1">
