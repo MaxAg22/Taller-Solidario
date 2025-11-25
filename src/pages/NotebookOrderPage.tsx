@@ -17,6 +17,7 @@ import type { Order } from "@/interfaces/order.interface";
 import { OrderFormModal } from "@/components/forms/OrderForm/OrderFormModal";
 import { useOrder } from "@/hooks/orders/useOrder";
 import { useDeleteOrder } from "@/hooks/orders/useDeleteOrder";
+import { useReadyNotebooks } from "@/hooks/notebooks/useReadyNotebooks";
 
 export default function NotebookOrderPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -29,6 +30,7 @@ export default function NotebookOrderPage() {
   // custom hook - tanstack query - supabase
   const { orders, isLoading } = useOrder();
   const { mutate: deleteOrder } = useDeleteOrder();
+  const { readyNotebooks } = useReadyNotebooks();
 
   const handleOpenModal = (order: Order | null) => {
     setSelectedOrder(order);
@@ -80,6 +82,7 @@ export default function NotebookOrderPage() {
       {isModalOpen && (
         <OrderFormModal
           order={selectedOrder}
+          readyNotebooks={readyNotebooks}
           onSave={handleSaveOrder}
           onClose={handleCloseModal}
         />

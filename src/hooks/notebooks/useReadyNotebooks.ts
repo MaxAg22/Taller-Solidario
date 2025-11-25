@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useReadyNotebooks = () => {
   const { data, isLoading } = useQuery({
-    queryKey: ["notebooks"],
+    queryKey: ["notebooks", "ready"],
     queryFn: () => getReadyNoteboks(),
-    staleTime: 1000 * 60 * 5, // 1 hour
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   return { readyNotebooks: data?.map(mapNotebook), isLoading };

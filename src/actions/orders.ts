@@ -50,12 +50,13 @@ export const updateOrder = async (order: UpdateOrder) => {
       name: order.name,
       description: order.description,
       totalNotebooks: order.totalNotebooks,
-      readyNotebooks: order.readyNotebooks,
+      readyNotebooks: order.newNotebooksSelected?.length,
       deadline: order.deadline.toISOString().split("T")[0],
       status: order.status,
     })
-    .eq("id", order.id)
-    .select();
+    .eq("id", order.id);
+
+    await updateNotebooksIds(order);
 
   if (error) {
     throw new Error(error.message);
@@ -63,3 +64,30 @@ export const updateOrder = async (order: UpdateOrder) => {
 
   return modifiedOrder;
 };
+
+const updateNotebooksIds = async (order: UpdateOrder) => {
+  const oldIds = new Set(order.oldNotebooksSelected);   
+  const newIds = new Set(order.newNotebooksSelected);  
+
+  const added = [...newIds].filter(id => !oldIds.has(id));
+  const removed = [...oldIds].filter(id => !newIds.has(id));
+
+  for (const id of added) {
+    const { error } = await supabase
+      .from("notebooks")
+      .update({ order_id: order.id })
+      .eq("id", id);
+
+    if (error) throw new Error(error.message);
+  }
+
+  for (const id of removed) {
+    const { error } = await supabase
+      .from("notebooks")
+      .update({ order_id: null })
+      .eq("id", id);
+
+    if (error) throw new Error(error.message);
+  }
+};
+

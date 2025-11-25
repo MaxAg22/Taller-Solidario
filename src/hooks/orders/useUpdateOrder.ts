@@ -11,6 +11,9 @@ export const useUpdateOrder = ({ onSuccess }: any = {}) => {
       queryClient.invalidateQueries({
         queryKey: ["orders"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["notebooks"],
+      });
       toast.success("Orden actualizada correctamente!");
       onSuccess?.();
     },

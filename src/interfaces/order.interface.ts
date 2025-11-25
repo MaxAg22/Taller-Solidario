@@ -1,3 +1,5 @@
+import type { Notebook } from "./notebook.interface";
+
 export type OrderStatus = "Lista" | "Pendiente" | "Entregada";
 
 export interface Order {
@@ -13,6 +15,7 @@ export interface Order {
 
 export interface OrderFormModalProps {
   order: Order | null;
+  readyNotebooks: Notebook[] | undefined;
   onSave: () => void;
   onClose: () => void;
 }
@@ -25,4 +28,6 @@ export interface UpdateOrder {
   readyNotebooks: number;
   deadline: Date;
   status: OrderStatus;
+  newNotebooksSelected: string[];
+  oldNotebooksSelected: string[];
 }

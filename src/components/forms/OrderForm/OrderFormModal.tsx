@@ -8,6 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectGroup,
+  MultiSelectItem,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from "@/components/ui/multi-select";
 import { Input } from "@/components/ui/input";
 import {
   SelectContent,
@@ -35,11 +43,13 @@ import {
   orderFormSchema,
   type OrderForm,
 } from "@/validators/orderFormModal.validator";
-import { useUpdateOrder } from "@/hooks/orders/useUpdateNotebooks";
-import { useReadyNotebooks } from "@/hooks/notebooks/useReadyNotebooks";
+import { useUpdateOrder } from "@/hooks/orders/useUpdateOrder";
+import { useEffect, useState } from "react";
+import { useNotebooksByOrder } from "@/hooks/notebooks/useNotebooksByOrder";
 
 export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   order,
+  readyNotebooks,
   onSave,
   onClose,
 }) => {
@@ -66,9 +76,34 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   const { mutate: updateOrder, isPending: isPendingUpdate } = useUpdateOrder({
     onSuccess: () => onSave(),
   });
-  const { readyNotebooks, isLoading } = useReadyNotebooks();
+  const { notebooks: orderNotebooks } = useNotebooksByOrder(order?.id || "");
 
   const [open, setOpen] = React.useState(false);
+  const [selectedNotebooks, setSelectedNotebooks] = useState<string[]>(
+    orderNotebooks?.map((notebook) => notebook.id) || []
+  );
+
+  useEffect(() => {
+    if (orderNotebooks) {
+      setSelectedNotebooks(orderNotebooks.map((n) => n.id));
+    }
+  }, [orderNotebooks]);
+
+  const combinedNotebooks = React.useMemo(() => {
+    const ready = readyNotebooks || [];
+    const current = orderNotebooks || [];
+    
+    // Create a Map to ensure uniqueness by ID
+    const notebookMap = new Map();
+    
+    // Add ready notebooks
+    ready.forEach(nb => notebookMap.set(nb.id, nb));
+    
+    // Add current order notebooks (this ensures they are available even if not "ready")
+    current.forEach(nb => notebookMap.set(nb.id, nb));
+    
+    return Array.from(notebookMap.values());
+  }, [readyNotebooks, orderNotebooks]);
 
   const onSubmit = (data: OrderForm) => {
     const isEdit = !!order?.id;
@@ -82,6 +117,9 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
         readyNotebooks: data.readyNotebooks,
         deadline: data.deadline || "",
         status: data.status,
+        newNotebooksSelected: selectedNotebooks,
+        oldNotebooksSelected:
+          orderNotebooks?.map((notebook) => notebook.id) || [],
       });
     } else {
       createOrder({
@@ -186,32 +224,29 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
             </div>
             {/* AGREGAR/QUITAR EQUIPOS */}
             <div className="space-y-2">
-              <Label htmlFor="status">Agregar/Quitar equipos</Label>
-              <Controller
-                control={control}
-                name="status"
-                render={({ field }) => (
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger id="status">
-                      <SelectValue placeholder="Seleccionar estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Lista">Lista</SelectItem>
-                      <SelectItem value="Pendiente">Pendiente</SelectItem>
-                      <SelectItem value="Entregada">Entregada</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.status && (
-                <p className="text-red-500 text-sm">{errors.status.message}</p>
-              )}
+              <Label htmlFor="add-delete">Agregar/Quitar equipos</Label>
+
+              <MultiSelect
+                values={selectedNotebooks}
+                defaultValues={selectedNotebooks}
+                onValuesChange={setSelectedNotebooks}
+              >
+                <MultiSelectTrigger className="w-full max-w-[400px]">
+                  <MultiSelectValue placeholder="Seleccione equipos..." />
+                </MultiSelectTrigger>
+                <MultiSelectContent>
+                  <MultiSelectGroup>
+                    {combinedNotebooks.map((nb) => (
+                      <MultiSelectItem key={nb.id} value={String(nb.id)}>
+                        {nb.model} - {nb.serialNumber}
+                      </MultiSelectItem>
+                    ))}
+                  </MultiSelectGroup>
+                </MultiSelectContent>
+              </MultiSelect>
             </div>
             {/* FECHA DE ENTREGA */}
-            <div className="flex flex-col gap-3">
+            <div className="space-y-2">
               <Label htmlFor="date" className="px-1">
                 Fecha de entrega
               </Label>
