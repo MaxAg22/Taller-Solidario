@@ -9,10 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Select,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import type { OrderFormModalProps } from "@/interfaces";
-import { Select, SelectTrigger, SelectValue } from "@radix-ui/react-select";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 
@@ -31,6 +36,7 @@ import {
   type OrderForm,
 } from "@/validators/orderFormModal.validator";
 import { useUpdateOrder } from "@/hooks/orders/useUpdateNotebooks";
+import { useReadyNotebooks } from "@/hooks/notebooks/useReadyNotebooks";
 
 export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   order,
@@ -60,6 +66,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   const { mutate: updateOrder, isPending: isPendingUpdate } = useUpdateOrder({
     onSuccess: () => onSave(),
   });
+  const { readyNotebooks, isLoading } = useReadyNotebooks();
 
   const [open, setOpen] = React.useState(false);
 
@@ -85,7 +92,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-black/90 z-50 flex justify-center items-center p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardHeader>
@@ -110,7 +117,7 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8 pt-8">
             {/* NOMBRE */}
             <div className="space-y-2">
               <Label htmlFor="name">Nombre</Label>
@@ -163,9 +170,9 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
                 <p className="text-red-500 text-sm">{errors.status.message}</p>
               )}
             </div>
-            {/* NOTEBOOKS A ENTREGAR */}
-            <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="totalNotebooks">Notebooks a entregar</Label>
+            {/* EQUIPOS A ENTREGAR */}
+            <div className="space-y-2">
+              <Label htmlFor="totalNotebooks">Equipos a entregar</Label>
               <Input
                 type="number"
                 id="totalNotebooks"
@@ -177,18 +184,30 @@ export const OrderFormModal: React.FC<OrderFormModalProps> = ({
                 </p>
               )}
             </div>
-            {/* NOTEBOOKS LISTAS */}
-            <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="readyNotebooks">Notebooks entregadas</Label>
-              <Input
-                type="number"
-                id="readyNotebooks"
-                {...register("readyNotebooks", { valueAsNumber: true })}
+            {/* AGREGAR/QUITAR EQUIPOS */}
+            <div className="space-y-2">
+              <Label htmlFor="status">Agregar/Quitar equipos</Label>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger id="status">
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Lista">Lista</SelectItem>
+                      <SelectItem value="Pendiente">Pendiente</SelectItem>
+                      <SelectItem value="Entregada">Entregada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               />
-              {errors.readyNotebooks && (
-                <p className="text-red-500 text-sm">
-                  {errors.readyNotebooks.message}
-                </p>
+              {errors.status && (
+                <p className="text-red-500 text-sm">{errors.status.message}</p>
               )}
             </div>
             {/* FECHA DE ENTREGA */}
