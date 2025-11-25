@@ -9,6 +9,7 @@ export const useCreateOrder = ({ onSuccess }: any = {}) => {
     mutationFn: createOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["notebooks"] });
       toast.success("Orden creada correctamente");
       onSuccess?.();
     },

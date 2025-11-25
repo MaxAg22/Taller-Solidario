@@ -31,3 +31,13 @@ export interface UpdateOrder {
   newNotebooksSelected: string[];
   oldNotebooksSelected: string[];
 }
+
+export interface CreateOrder {
+  name: string;
+  description: string;
+  totalNotebooks: number;
+  readyNotebooks: number;
+  deadline: string;
+  status: OrderStatus;
+  newNotebooksSelected: string[];
+}

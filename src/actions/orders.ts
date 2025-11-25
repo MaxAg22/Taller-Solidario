@@ -1,4 +1,4 @@
-import type { UpdateOrder } from "@/interfaces";
+import type { CreateOrder, UpdateOrder } from "@/interfaces";
 import { supabase } from "@/supabase/client";
 
 export const getOrders = async () => {
@@ -15,14 +15,14 @@ export const getOrders = async () => {
   return orders;
 };
 
-export const createOrder = async (order: any) => {
+export const createOrder = async (order: CreateOrder) => {
   const { data: newOrder, error } = await supabase
     .from("orders")
     .insert({
       name: order.name,
       description: order.description,
       deadline: order.deadline,
-      readyNotebooks: order.readyNotebooks,
+      readyNotebooks: order.newNotebooksSelected?.length ?? 0,
       totalNotebooks: order.totalNotebooks,
       status: order.status,
     })
@@ -30,6 +30,15 @@ export const createOrder = async (order: any) => {
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  if (newOrder && newOrder.length > 0) {
+    await updateNotebooksIds({
+      ...order,
+      id: newOrder[0].id,
+      oldNotebooksSelected: [],
+      newNotebooksSelected: order.newNotebooksSelected,
+    });
   }
 
   return newOrder;
@@ -65,9 +74,9 @@ export const updateOrder = async (order: UpdateOrder) => {
   return modifiedOrder;
 };
 
-const updateNotebooksIds = async (order: UpdateOrder) => {
-  const oldIds = new Set(order.oldNotebooksSelected);   
-  const newIds = new Set(order.newNotebooksSelected);  
+const updateNotebooksIds = async (order: any) => {
+  const oldIds = new Set<string>(order.oldNotebooksSelected);   
+  const newIds = new Set<string>(order.newNotebooksSelected);  
 
   const added = [...newIds].filter(id => !oldIds.has(id));
   const removed = [...oldIds].filter(id => !newIds.has(id));
