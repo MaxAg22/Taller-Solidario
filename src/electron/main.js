@@ -1,15 +1,21 @@
-import {app, BrowserWindow} from "electron"
+import {app, BrowserWindow} from "electron";
+import path from "path";
 
 const createWindow = () => {
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1280,
+        height: 720,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
         },
     });
-    win.loadURL('http://localhost:5173');
+
+    if (app.isPackaged) {
+        win.loadFile(path.join(app.getAppPath(), 'dist/index.html'));
+    } else {
+        win.loadURL('http://localhost:5173');
+    }
 };
 
 app.whenReady().then(() => {

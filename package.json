@@ -3,13 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "public/electron.js",
+  "main": "src/electron/main.js",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "electron": "electron .",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "tsc -b && vite build",
+    "dist": "npm run build && electron-builder",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -26,11 +27,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "concurrently": "^9.2.1",
     "date-fns": "^4.1.0",
-    "electron": "^39.2.4",
     "lucide-react": "^0.553.0",
-    "npx": "^10.2.2",
     "react": "^18.3.1",
     "react-day-picker": "^9.11.1",
     "react-dom": "^18.3.1",
@@ -38,8 +36,34 @@
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.9.6",
     "tailwind-merge": "^3.4.0",
-    "wait-on": "^9.0.3",
     "zod": "^4.1.12"
+  },
+  "description": "Application for Taller Solidario",
+  "author": "Taller Solidario",
+  "build": {
+    "appId": "electron-react-vite",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "public/logo.png"
+    },
+    "files": [
+      "dist/**/*",
+      "src/electron/main.js",
+      "package.json",
+      "public/**/*"
+    ],
+    "nsis": {
+      "uninstallDisplayName": "Taller Solidario",
+      "license": "license.txt",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "releases",
+      "buildResources": "dist"
+    }
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -48,6 +72,9 @@
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.1.0",
     "autoprefixer": "^10.4.22",
+    "concurrently": "^9.2.1",
+    "electron": "^39.2.4",
+    "electron-builder": "^25.1.8",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
@@ -57,6 +84,7 @@
     "tw-animate-css": "^1.4.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.3",
-    "vite": "^7.2.2"
+    "vite": "^7.2.2",
+    "wait-on": "^9.0.3"
   }
 }
