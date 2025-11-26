@@ -3,8 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "public/electron.js",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -22,7 +26,9 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "concurrently": "^9.2.1",
     "date-fns": "^4.1.0",
+    "electron": "^39.2.4",
     "lucide-react": "^0.553.0",
     "npx": "^10.2.2",
     "react": "^18.3.1",
@@ -32,6 +38,7 @@
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.9.6",
     "tailwind-merge": "^3.4.0",
+    "wait-on": "^9.0.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
