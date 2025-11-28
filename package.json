@@ -46,7 +46,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/logo.png"
+      "icon": "public/prettylogo.png"
     },
     "files": [
       "dist/**/*",
