@@ -1,13 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Spinner } from "../components/ui/spinner";
 import {
@@ -17,26 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, PlusCircle, Pencil, Trash2 } from "lucide-react";
+import { Search, PlusCircle } from "lucide-react";
 import { useNotebooks } from "@/hooks";
-import type {
-  NotebookStatus,
-  Notebook,
-} from "../interfaces/notebook.interface";
+import type { Notebook } from "../interfaces/notebook.interface";
 import { NotebookFormModal } from "../components/forms/NotebookForm/NotebookFormModal";
 import { useDeleteNotebook } from "@/hooks/notebooks/useDeleteNotebook";
 import { ConfirmModal } from "../components/modals/ConfirmModal";
-
-const statusColors: { [key in NotebookStatus]: string } = {
-  Recibido: "bg-blue-100 text-blue-800 border-blue-300",
-  "En Reparación": "bg-yellow-100 text-yellow-800 border-yellow-300",
-  "Listo para Donar": "bg-green-100 text-green-800 border-green-300",
-  Donado: "bg-gray-100 text-gray-800 border-gray-300",
-  Bloqueada: "bg-red-100 text-red-800 border-red-300",
-  Desbloqueada: "bg-orange-100 text-orange-800 border-orange-300",
-};
-
-// --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
+import { NotebookCard } from "@/components/notebooks/NotebookCard";
 
 export default function NotebookInventoryPage() {
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(
@@ -160,72 +140,14 @@ export default function NotebookInventoryPage() {
         {filteredNotebooks.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredNotebooks.map((notebook) => (
-              <Card key={notebook.id} className="flex flex-col">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{notebook.model}</CardTitle>
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full border ${
-                        statusColors[notebook.status]
-                      }`}
-                    >
-                      {notebook.status}
-                    </span>
-                  </div>
-                  <CardDescription>
-                    {notebook.serialNumber} - {notebook.brand}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grow space-y-3">
-                  <div>
-                    <h4 className="font-semibold text-sm">Especificaciones:</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {notebook.specs || "No especificadas"}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm">
-                      Tareas Pendientes:
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      {notebook.repairNeeded || "Ninguna"}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm">Historial:</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {notebook.repairHistory || "Sin historial"}
-                    </p>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between items-center">
-                  <p className="text-xs text-muted-foreground">
-                    Ingreso: {notebook.entryDate}
-                  </p>
-                  <div className="flex gap-2">
-                    {/* Boton para hacer update */}
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleOpenModal(notebook)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setConfirmDeleteId(notebook.id)}
-                    >
-                      {deletingId === notebook.id ? (
-                        <Spinner />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
+              <div key={notebook.id}>
+                <NotebookCard
+                  notebook={notebook}
+                  handleOpenModal={handleOpenModal}
+                  setConfirmDeleteId={setConfirmDeleteId}
+                  deletingId={deletingId}
+                />
+              </div>
             ))}
           </div>
         ) : (
