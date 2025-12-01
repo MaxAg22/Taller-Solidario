@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+
 import {
   Select,
   SelectContent,
@@ -27,7 +29,12 @@ import { Input } from "../../ui/input";
 import { useCreateNotebook } from "@/hooks/notebooks/useCreateNotebook";
 import { Spinner } from "@/components/ui/spinner";
 import toast from "react-hot-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateNotebook } from "@/hooks/notebooks/useUpdateNotebook";
+import {
+  notebookFormSchema,
+  type NotebookForm,
+} from "@/validators/notebookFormModal.validator";
 
 export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   notebook,
@@ -42,6 +49,24 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
     specs: notebook?.specs || "",
     repairNeeded: notebook?.repairNeeded || "",
     repairHistory: notebook?.repairHistory || "",
+  });
+
+  const {
+    register,
+    setValue,
+    formState: { errors },
+    control,
+  } = useForm<NotebookForm>({
+    resolver: zodResolver(notebookFormSchema),
+    defaultValues: {
+      serialNumber: notebook?.serialNumber || "",
+      brand: notebook?.brand || "Gob. Ed.",
+      model: notebook?.model || "",
+      status: notebook?.status || "Recibido",
+      specs: notebook?.specs || "",
+      repairNeeded: notebook?.repairNeeded || "",
+      repairHistory: notebook?.repairHistory || "",
+    },
   });
 
   const { mutate: createNotebook, isPending: isPendingCreate } =
