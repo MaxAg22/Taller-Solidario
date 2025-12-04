@@ -69,6 +69,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
       updateNotebook({
         id: notebook.id,
         ...data,
+        // Error here
       } as UpdateNotebook);
     } else {
       createNotebook({
