@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import {
   Select,
@@ -11,9 +11,8 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import type {
-  NotebookStatus,
-  Notebook,
   NotebookFormModalProps,
+  UpdateNotebook,
 } from "../../../interfaces/notebook.interface";
 import { Label } from "../../ui/label";
 import {
@@ -28,7 +27,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "../../ui/input";
 import { useCreateNotebook } from "@/hooks/notebooks/useCreateNotebook";
 import { Spinner } from "@/components/ui/spinner";
-import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateNotebook } from "@/hooks/notebooks/useUpdateNotebook";
 import {
@@ -41,19 +39,9 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   onSave,
   onClose,
 }) => {
-  const [formData, setFormData] = useState<Omit<Notebook, "id" | "entryDate">>({
-    serialNumber: notebook?.serialNumber || "",
-    brand: notebook?.brand || "Gob. Ed.",
-    model: notebook?.model || "",
-    status: notebook?.status || "Recibido",
-    specs: notebook?.specs || "",
-    repairNeeded: notebook?.repairNeeded || "",
-    repairHistory: notebook?.repairHistory || "",
-  });
-
   const {
     register,
-    setValue,
+    handleSubmit,
     formState: { errors },
     control,
   } = useForm<NotebookForm>({
@@ -74,35 +62,17 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   const { mutate: updateNotebook, isPending: isPendingUpdate } =
     useUpdateNotebook({ onSuccess: () => onSave() });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (value: NotebookStatus) => {
-    setFormData((prev) => ({ ...prev, status: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.model) {
-      toast.error("El modelo es obligatorio.");
-      return;
-    }
-
+  const onSubmit = (data: NotebookForm) => {
     const isEdit = !!notebook?.id;
 
     if (isEdit) {
       updateNotebook({
         id: notebook.id,
-        ...formData,
-      });
+        ...data,
+      } as UpdateNotebook);
     } else {
       createNotebook({
-        ...formData,
+        ...data,
         entryDate: new Date().toISOString().split("T")[0],
       });
     }
@@ -111,7 +81,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex justify-center items-center p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
@@ -139,73 +109,92 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
               <Label htmlFor="model">Modelo</Label>
               <Input
                 id="model"
-                name="model"
-                value={formData.model}
-                onChange={handleChange}
+                {...register("model")}
                 placeholder="Ej: Juana Manso V3"
-                required
               />
+              {errors.model && (
+                <p className="text-red-500 text-sm">{errors.model.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="brand">Marca</Label>
               <Input
                 id="brand"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
+                {...register("brand")}
                 placeholder="Ej: Gob. Ed."
               />
+              {errors.brand && (
+                <p className="text-red-500 text-sm">{errors.brand.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Estado</Label>
-              <Select
-                onValueChange={handleSelectChange}
-                defaultValue={formData.status}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Seleccionar estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Recibido">Recibido</SelectItem>
-                  <SelectItem value="En Reparación">En Reparación</SelectItem>
-                  <SelectItem value="Listo para Donar">
-                    Listo para Donar
-                  </SelectItem>
-                  <SelectItem value="Donado">Donado</SelectItem>
-                  <SelectItem value="Bloqueada">Bloqueada</SelectItem>
-                  <SelectItem value="Desbloqueada">Desbloqueada</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger id="status">
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Recibido">Recibido</SelectItem>
+                      <SelectItem value="En Reparación">
+                        En Reparación
+                      </SelectItem>
+                      <SelectItem value="Listo para Donar">
+                        Listo para Donar
+                      </SelectItem>
+                      <SelectItem value="Donado">Donado</SelectItem>
+                      <SelectItem value="Bloqueada">Bloqueada</SelectItem>
+                      <SelectItem value="Desbloqueada">Desbloqueada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && (
+                <p className="text-red-500 text-sm">{errors.status.message}</p>
+              )}
             </div>
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="specs">Especificaciones</Label>
               <Textarea
                 id="specs"
-                name="specs"
-                value={formData.specs}
-                onChange={handleChange}
+                {...register("specs")}
                 placeholder="Ej: Intel Celeron N4020, 4GB RAM, 120GB SSD..."
               />
+              {errors.specs && (
+                <p className="text-red-500 text-sm">{errors.specs.message}</p>
+              )}
             </div>
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="repairNeeded">Tareas a Realizar</Label>
               <Textarea
                 id="repairNeeded"
-                name="repairNeeded"
-                value={formData.repairNeeded}
-                onChange={handleChange}
+                {...register("repairNeeded")}
                 placeholder="Describir los problemas detectados y las reparaciones necesarias."
               />
+              {errors.repairNeeded && (
+                <p className="text-red-500 text-sm">
+                  {errors.repairNeeded.message}
+                </p>
+              )}
             </div>
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="repairHistory">Historial de Reparaciones</Label>
               <Textarea
                 id="repairHistory"
-                name="repairHistory"
-                value={formData.repairHistory}
-                onChange={handleChange}
+                {...register("repairHistory")}
                 placeholder="Registrar las reparaciones y cambios realizados."
               />
+              {errors.repairHistory && (
+                <p className="text-red-500 text-sm">
+                  {errors.repairHistory.message}
+                </p>
+              )}
             </div>
           </CardContent>
           <CardFooter className="flex justify-end gap-2">

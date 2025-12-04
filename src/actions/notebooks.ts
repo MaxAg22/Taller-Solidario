@@ -76,6 +76,7 @@ export const deleteNotebook = async (id: string) => {
 };
 
 export const updateNotebook = async (notebook: UpdateNotebook) => {
+  console.log("esto updateo", notebook);
   const { data: modifiedNotebook, error } = await supabase
     .from("notebooks")
     .update({
