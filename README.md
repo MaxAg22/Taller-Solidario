@@ -1,6 +1,6 @@
 # Taller Solidario
 
-Sistema de gestión de inventario para un taller dedicado a reparar notebooks y otros equipos para donar a espacios y organizaciones que lo necesiten. Proyecto pensado para uso interno del taller.
+Sistema de gestión de inventario para un taller dedicado a reparar notebooks y otros equipos para donar a espacios y organizaciones que lo necesiten. Proyecto desarrollado en el marco de la **Universidad Nacional de Córdoba (UNC)**, en la **Facultad de Matemática, Astronomía, Física y Computación (FaMAF)**, y pensado para uso interno del taller.
 
 ## Tech stack
 - **React + Vite** — Frontend y build tool  
