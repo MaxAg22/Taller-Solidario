@@ -1,6 +1,7 @@
 export type NotebookStatus =
   | "Recibido"
   | "En Reparación"
+  | "Instalar SO"
   | "Listo para Donar"
   | "Donado"
   | "Bloqueada"

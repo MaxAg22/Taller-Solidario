@@ -146,6 +146,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
                       <SelectItem value="En Reparación">
                         En Reparación
                       </SelectItem>
+                      <SelectItem value="Instalar SO">Instalar SO</SelectItem>
                       <SelectItem value="Listo para Donar">
                         Listo para Donar
                       </SelectItem>

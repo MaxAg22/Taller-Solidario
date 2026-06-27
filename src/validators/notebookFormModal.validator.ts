@@ -9,6 +9,7 @@ export const notebookFormSchema = z.object({
   status: z.enum([
     "Recibido",
     "En Reparación",
+    "Instalar SO",
     "Listo para Donar",
     "Donado",
     "Bloqueada",

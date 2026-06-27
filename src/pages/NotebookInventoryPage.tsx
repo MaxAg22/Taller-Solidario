@@ -120,6 +120,7 @@ export default function NotebookInventoryPage() {
                   <SelectItem value="all">Todos los estados</SelectItem>
                   <SelectItem value="Recibido">Recibido</SelectItem>
                   <SelectItem value="En Reparación">En Reparación</SelectItem>
+                  <SelectItem value="Instalar SO">Instalar SO</SelectItem>
                   <SelectItem value="Listo para Donar">
                     Listo para Donar
                   </SelectItem>
@@ -138,7 +139,7 @@ export default function NotebookInventoryPage() {
         </Card>
 
         {filteredNotebooks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {filteredNotebooks.map((notebook) => (
               <div key={notebook.id}>
                 <NotebookCard
