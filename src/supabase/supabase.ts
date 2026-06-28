@@ -7,8 +7,6 @@ export type Json =
   | Json[];
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.5";
   };
@@ -24,8 +22,7 @@ export type Database = {
         Args: {
           extensions?: Json;
           operationName?: string;
-          query?: string;
-          variables?: Json;
+          variables?: { [key: string]: Json | undefined };
         };
         Returns: Json;
       };
@@ -46,7 +43,6 @@ export type Database = {
           entryDate: string | null;
           id: string;
           model: string | null;
-          order_id: string | null;
           repairHistory: string | null;
           repairNeeded: string | null;
           serialNumber: number;
@@ -59,7 +55,6 @@ export type Database = {
           entryDate?: string | null;
           id?: string;
           model?: string | null;
-          order_id?: string | null;
           repairHistory?: string | null;
           repairNeeded?: string | null;
           serialNumber?: number;
@@ -72,56 +67,11 @@ export type Database = {
           entryDate?: string | null;
           id?: string;
           model?: string | null;
-          order_id?: string | null;
           repairHistory?: string | null;
           repairNeeded?: string | null;
           serialNumber?: number;
           specs?: string | null;
           status?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "notebooks_order_id_fkey";
-            columns: ["order_id"];
-            isOneToOne: false;
-            referencedRelation: "orders";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
-      orders: {
-        Row: {
-          created_at: string;
-          deadline: string | null;
-          description: string | null;
-          id: string;
-          name: string | null;
-          orderNumber: number;
-          readyNotebooks: number | null;
-          status: string | null;
-          totalNotebooks: number | null;
-        };
-        Insert: {
-          created_at?: string;
-          deadline?: string | null;
-          description?: string | null;
-          id?: string;
-          name?: string | null;
-          orderNumber?: number;
-          readyNotebooks?: number | null;
-          status?: string | null;
-          totalNotebooks?: number | null;
-        };
-        Update: {
-          created_at?: string;
-          deadline?: string | null;
-          description?: string | null;
-          id?: string;
-          name?: string | null;
-          orderNumber?: number;
-          readyNotebooks?: number | null;
-          status?: string | null;
-          totalNotebooks?: number | null;
         };
         Relationships: [];
       };
@@ -184,7 +134,7 @@ export type TablesInsert<
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"])
     : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
@@ -209,7 +159,7 @@ export type TablesUpdate<
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"])
     : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
@@ -234,7 +184,7 @@ export type Enums<
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"])
     : never = never
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
@@ -251,14 +201,12 @@ export type CompositeTypes<
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof (DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"])
     : never = never
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? (DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"])[CompositeTypeName]
   : never;
 
 export const Constants = {

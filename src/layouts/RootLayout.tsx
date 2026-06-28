@@ -8,7 +8,7 @@ export const RootLayout = () => {
   return (
     <div className="h-screen flex flex-col font-montserrat">
       <Header />
-      <main className="container my-8 flex-1 mx-auto px-4">
+      <main className="min-h-0 flex-1 overflow-hidden bg-slate-50">
         <Outlet />
       </main>
 

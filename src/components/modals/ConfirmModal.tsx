@@ -1,37 +1,30 @@
-import type { ConfirmModalType } from "@/interfaces";
-
 export const ConfirmModal = ({
   confirmDeleteId,
   handleDeleteNotebook,
   setConfirmDeleteId,
-  item,
-}: ConfirmModalType) => {
+}: {
+  confirmDeleteId: string | null;
+  handleDeleteNotebook: (id: string) => void;
+  setConfirmDeleteId: React.Dispatch<React.SetStateAction<string | null>>;
+}) => {
   if (!confirmDeleteId) return null;
 
-  const order = item === "Order";
-
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center z-50 justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-        <h2 className="text-lg font-bold mb-4">
-          {order ? "Eliminar orden" : "Eliminar equipo"}
-        </h2>
-        <p className="mb-6">
-          {order
-            ? "Esta acción no se puede deshacer, ¿Deseás eliminar esta Orden?"
-            : "Esta acción no se puede deshacer, ¿Deseás eliminar este equipo?"}
-        </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-80 rounded-lg bg-white p-6 shadow-lg">
+        <h2 className="mb-4 text-lg font-bold">Eliminar equipo</h2>
+        <p className="mb-6">Esta acción no se puede deshacer, ¿Deseás eliminar este equipo?</p>
 
         <div className="flex justify-end gap-2">
           <button
-            className="px-3 py-1 bg-gray-200 rounded"
+            className="rounded bg-gray-200 px-3 py-1"
             onClick={() => setConfirmDeleteId(null)}
           >
             Cancelar
           </button>
 
           <button
-            className="px-3 py-1 bg-red-600 text-white rounded"
+            className="rounded bg-red-600 px-3 py-1 text-white"
             onClick={() => {
               handleDeleteNotebook(confirmDeleteId);
               setConfirmDeleteId(null);

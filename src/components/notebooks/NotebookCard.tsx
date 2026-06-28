@@ -1,11 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
@@ -37,59 +30,47 @@ export const NotebookCard = ({
   deletingId,
 }: NotebookCardProps) => {
   return (
-    <Card key={notebook.id} className="flex h-full flex-col overflow-hidden">
-      <CardHeader className="space-y-3 p-4 pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+    <Card key={notebook.id} className="overflow-hidden">
+      <CardContent className="grid gap-3 p-4 md:grid-cols-[150px_1.1fr_1.5fr_auto] md:items-center">
+        <div className="flex items-start justify-between gap-3 md:block md:space-y-2">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               Serie
             </p>
-            <CardTitle className="truncate font-mono text-2xl font-black leading-none tracking-tight">
+            <p className="font-mono text-2xl font-black leading-none tracking-tight md:text-xl">
               #{notebook.serialNumber || "S/N"}
-            </CardTitle>
+            </p>
           </div>
           <span
-            className={`shrink-0 rounded-full border px-2 py-1 text-xs font-semibold ${
+            className={`rounded-full border px-2 py-1 text-xs font-semibold ${
               statusColors[notebook.status]
             }`}
           >
             {notebook.status}
           </span>
         </div>
+
         <div className="min-w-0">
-          <CardDescription className="truncate text-sm font-semibold text-foreground">
+          <p className="truncate text-sm font-semibold text-foreground">
             {notebook.model || "Modelo sin cargar"}
-          </CardDescription>
+          </p>
           <p className="truncate text-xs text-muted-foreground">
-            {notebook.brand || "Marca sin cargar"}
+            {notebook.brand || "Marca sin cargar"} · Ingreso: {notebook.entryDate}
           </p>
         </div>
-      </CardHeader>
-      <CardContent className="grow space-y-2 px-4 pb-3">
-        <div className="rounded-md border bg-muted/30 p-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Specs
-          </p>
-          <p className="line-clamp-2 text-xs text-foreground">
+
+        <div className="min-w-0 space-y-1 rounded-md border bg-muted/30 p-2 md:border-0 md:bg-transparent md:p-0">
+          <p className="truncate text-xs text-foreground">
+            <span className="font-semibold text-muted-foreground">Specs: </span>
             {shortText(notebook.specs, "No especificadas")}
           </p>
-        </div>
-        <div className="rounded-md border bg-muted/30 p-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Tareas
-          </p>
-          <p className="line-clamp-2 text-xs text-foreground">
+          <p className="truncate text-xs text-foreground">
+            <span className="font-semibold text-muted-foreground">Tareas: </span>
             {shortText(notebook.repairNeeded, "Ninguna")}
           </p>
         </div>
-      </CardContent>
-      <CardFooter className="flex items-center justify-between gap-2 p-4 pt-0">
-        <p className="text-xs text-muted-foreground">
-          Ingreso: {notebook.entryDate}
-        </p>
-        <div className="flex gap-2">
-          {/* Boton para hacer update */}
 
+        <div className="flex justify-end gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -109,7 +90,7 @@ export const NotebookCard = ({
             )}
           </Button>
         </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };

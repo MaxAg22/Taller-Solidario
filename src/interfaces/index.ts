@@ -1,3 +1,8 @@
 export * from "./notebook.interface";
-export * from "./utils.interface";
-export * from "./order.interface";
+
+export type ConfirmModalType = {
+  confirmDeleteId: string | null;
+  handleDeleteNotebook: (id: string) => void;
+  setConfirmDeleteId: React.Dispatch<React.SetStateAction<string | null>>;
+  item: string;
+};

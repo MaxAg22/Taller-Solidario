@@ -1,23 +1,20 @@
-import { NavLink, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 const activeStyleCallback = ({ isActive }: { isActive: boolean }) =>
   isActive
-    ? "navlink font-semibold text-blue-600"
-    : "navlink text-gray-700 hover:text-blue-500 transition-colors";
+    ? "text-blue-600 shadow-[inset_0_-2px_0_#2563eb]"
+    : "text-slate-600 hover:text-blue-600";
 
 const navClass = (isActive: boolean) =>
-  `${activeStyleCallback({ isActive })} font-montserrat`;
+  `${activeStyleCallback({ isActive })} flex h-full items-center px-4 text-sm font-bold transition-colors`;
 
 const NavLinks = () => {
   return (
     <>
-      <NavLink to="/" className={({ isActive }) => navClass(isActive)}>
+      <NavLink to="/" end className={({ isActive }) => navClass(isActive)}>
         Inventario
-      </NavLink>
-      <NavLink to="/ordenes" className={({ isActive }) => navClass(isActive)}>
-        Ordenes
       </NavLink>
     </>
   );
@@ -25,29 +22,30 @@ const NavLinks = () => {
 
 const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    Promise.resolve().then(() => setIsOpen(false));
-  }, [location.pathname]);
-
   return (
     <>
-      <nav className="w-1/3 flex justify-end">
-        <div className="hidden w-full justify-evenly md:flex">
+      <nav className="flex h-full items-center justify-end md:flex-1">
+        <div className="hidden h-full items-center md:flex">
           <NavLinks />
         </div>
 
-        <div className="flex w-[75px] justify-end md:hidden">
-          <button onClick={toggleNavbar}>{isOpen ? <X /> : <Menu />}</button>
+        <div className="flex h-full items-center justify-end md:hidden">
+          <button
+            className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+            onClick={toggleNavbar}
+            type="button"
+          >
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
       </nav>
       {isOpen && (
-        <div className="flex flex-col items-center basis-full">
+        <div className="flex basis-full flex-col items-stretch border-t border-slate-100 py-2 md:hidden">
           <NavLinks></NavLinks>
         </div>
       )}
