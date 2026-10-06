@@ -2,33 +2,71 @@
 import type { UpdateNotebook } from "@/interfaces";
 import { supabase } from "@/supabase/client";
 
-export const getNotebooks = async () => {
-  const { data: notebooks, error } = await supabase
+interface PaginatedResult<T> {
+  data: T[];
+  count: number;
+}
+
+interface NotebooksFilters {
+  searchTerm?: string;
+  statusFilter?: string;
+}
+
+export const getNotebooks = async (
+  page = 1,
+  pageSize = 10,
+  filters?: NotebooksFilters,
+): Promise<PaginatedResult<any>> => {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
     .from("notebooks")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("serialNumber", { ascending: false });
 
+  if (filters?.searchTerm) {
+    const term = `%${filters.searchTerm}%`;
+    query = query.or(
+      `serialNumber::text.ilike.${term},brand.ilike.${term},model.ilike.${term},status.ilike.${term}`,
+    );
+  }
+
+  if (filters?.statusFilter && filters.statusFilter !== "all") {
+    query = query.eq("status", filters.statusFilter);
+  }
+
+  const { data, error, count } = await query.range(from, to);
+
   if (error) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 
-  return notebooks;
+  return { data: data ?? [], count: count ?? 0 };
 };
 
-export const getNotebooksByOrder = async (orderId: string) => {
-  const { data: notebooks, error } = await supabase
+export const getNotebooksMetrics = async () => {
+  const { data, error } = await supabase
     .from("notebooks")
-    .select("*")
-    .eq("order_id", orderId);
+    .select("status");
 
   if (error) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 
-  return notebooks;
+  const rows = data ?? [];
+
+  return {
+    total: rows.length,
+    blocked: rows.filter((r) => r.status === "Bloqueada").length,
+    ready: rows.filter((r) => r.status === "Listo para Donar").length,
+    repairing: rows.filter((r) => r.status === "En Reparación").length,
+    diagnosis: rows.filter(
+      (r) => r.status === "Recibido" || r.status === "Instalar SO",
+    ).length,
+  };
 };
+
 
 export const getReadyNoteboks = async () => {
   const { data: readyNotebooks, error } = await supabase

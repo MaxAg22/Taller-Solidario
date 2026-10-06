@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -21,7 +21,7 @@ import {
   Trash2,
   Wrench,
 } from "lucide-react";
-import { useNotebooks } from "@/hooks";
+import { useNotebooks, useNotebooksMetrics } from "@/hooks";
 import type { Notebook, NotebookStatus } from "../interfaces/notebook.interface";
 import { NotebookFormModal } from "../components/forms/NotebookForm/NotebookFormModal";
 import { useDeleteNotebook } from "@/hooks/notebooks/useDeleteNotebook";
@@ -66,49 +66,37 @@ export default function NotebookInventoryPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
 
-  const { notebooks: ntbks, isLoading } = useNotebooks();
+  const { notebooks, count, isLoading } = useNotebooks({
+    page,
+    searchTerm,
+    statusFilter,
+  });
+  const { metrics } = useNotebooksMetrics();
   const { mutate: deleteNotebook } = useDeleteNotebook();
 
-  const notebooks = ntbks ?? [];
+  const total = count ?? 0;
+  const pageSize = 10;
+  const totalPages = Math.ceil(total / pageSize);
 
-  const metrics = useMemo(() => {
-    const total = notebooks.length;
-    const blocked = notebooks.filter((notebook) => notebook.status === "Bloqueada").length;
-    const ready = notebooks.filter((notebook) => notebook.status === "Listo para Donar").length;
-    const repairing = notebooks.filter((notebook) => notebook.status === "En Reparación").length;
-    const diagnosis = notebooks.filter(
-      (notebook) => notebook.status === "Recibido" || notebook.status === "Instalar SO"
-    ).length;
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+    setPage(1);
+  }, []);
 
-    return { blocked, diagnosis, ready, repairing, total };
-  }, [notebooks]);
-
-  const filteredNotebooks = useMemo(() => {
-    return notebooks
-      .filter((notebook) => {
-        if (statusFilter === "all") return true;
-        return notebook.status === statusFilter;
-      })
-      .filter((notebook) => {
-        const term = searchTerm.trim().toLowerCase();
-        if (!term) return true;
-        return (
-          notebook.serialNumber.toLowerCase().includes(term) ||
-          notebook.brand.toLowerCase().includes(term) ||
-          notebook.model.toLowerCase().includes(term) ||
-          notebook.status.toLowerCase().includes(term)
-        );
-      });
-  }, [notebooks, searchTerm, statusFilter]);
+  const handleStatusFilterChange = useCallback((value: string) => {
+    setStatusFilter(value);
+    setPage(1);
+  }, []);
 
   const activeNotebook = useMemo(() => {
     return (
-      filteredNotebooks.find((notebook) => notebook.id === activeNotebookId) ??
-      filteredNotebooks[0] ??
+      notebooks?.find((notebook) => notebook.id === activeNotebookId) ??
+      notebooks?.[0] ??
       null
     );
-  }, [activeNotebookId, filteredNotebooks]);
+  }, [activeNotebookId, notebooks]);
 
   const handleOpenModal = (notebook: Notebook | null) => {
     setModalNotebook(notebook);
@@ -166,35 +154,35 @@ export default function NotebookInventoryPage() {
             color="from-indigo-500 to-violet-600"
             icon={<Monitor className="h-7 w-7" />}
             label="Total de equipos"
-            value={metrics.total}
+            value={metrics?.total ?? 0}
             detail="Todos los estados"
           />
           <MetricCard
             color="from-amber-400 to-orange-500"
             icon={<ClipboardList className="h-7 w-7" />}
             label="Pendientes diagnóstico"
-            value={metrics.diagnosis}
+            value={metrics?.diagnosis ?? 0}
             detail="Equipos por revisar"
           />
           <MetricCard
             color="from-emerald-400 to-green-600"
             icon={<Gift className="h-7 w-7" />}
             label="Listos para donar"
-            value={metrics.ready}
+            value={metrics?.ready ?? 0}
             detail="Disponibles para órdenes"
           />
           <MetricCard
             color="from-rose-400 to-red-600"
             icon={<Lock className="h-7 w-7" />}
             label="Bloqueados"
-            value={metrics.blocked}
+            value={metrics?.blocked ?? 0}
             detail="Requieren desbloqueo"
           />
           <MetricCard
             color="from-sky-500 to-blue-700"
             icon={<Wrench className="h-7 w-7" />}
             label="En reparación"
-            value={metrics.repairing}
+            value={metrics?.repairing ?? 0}
             detail="Trabajo en curso"
           />
         </section>
@@ -206,8 +194,8 @@ export default function NotebookInventoryPage() {
                 <InventoryToolbar
                   handleOpenModal={handleOpenModal}
                   searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  setStatusFilter={setStatusFilter}
+                  setSearchTerm={handleSearchChange}
+                  setStatusFilter={handleStatusFilterChange}
                   statusFilter={statusFilter}
                 />
               </CardContent>
@@ -226,7 +214,7 @@ export default function NotebookInventoryPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {filteredNotebooks.map((notebook) => {
+                    {notebooks?.map((notebook) => {
                       const isActive = activeNotebook?.id === notebook.id;
 
                       return (
@@ -287,7 +275,7 @@ export default function NotebookInventoryPage() {
                 </table>
               </div>
 
-              {filteredNotebooks.length === 0 ? (
+              {notebooks?.length === 0 ? (
                 <div className="border-t border-slate-100 px-6 py-16 text-center">
                   <h2 className="text-xl font-semibold text-slate-700">No se encontraron equipos</h2>
                   <p className="mt-2 text-sm text-slate-500">
@@ -301,23 +289,34 @@ export default function NotebookInventoryPage() {
 
               <div className="shrink-0 flex flex-col gap-2 border-t border-slate-200 px-5 py-2 text-sm text-slate-600 lg:flex-row lg:items-center lg:justify-between">
                 <p>
-                  Mostrando {formatNumber(filteredNotebooks.length)} de {formatNumber(notebooks.length)} equipos
+                  Mostrando {formatNumber(notebooks.length)} de {formatNumber(total)} equipos
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Button disabled size="sm" variant="outline">
+                  <Button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                    size="sm"
+                    variant="outline"
+                  >
                     Anterior
                   </Button>
-                  {[1, 2, 3, 4, 5].map((page) => (
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                     <Button
-                      key={page}
-                      className={page === 1 ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={p === page ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
                       size="sm"
-                      variant={page === 1 ? "default" : "outline"}
+                      variant={p === page ? "default" : "outline"}
                     >
-                      {page}
+                      {p}
                     </Button>
                   ))}
-                  <Button size="sm" variant="outline">
+                  <Button
+                    disabled={page === totalPages || totalPages === 0}
+                    onClick={() => setPage(page + 1)}
+                    size="sm"
+                    variant="outline"
+                  >
                     Siguiente
                   </Button>
                 </div>
@@ -404,7 +403,7 @@ function EquipmentDetailPanel({ notebook }: { notebook: Notebook | null }) {
           </div>
 
           <div className="space-y-2 rounded-xl border border-slate-200 p-2.5">
-            <DetailValue label="Specs" value={getShortText(notebook.specs)} />
+            <DetailValue label="Especificaciones" value={getShortText(notebook.specs)} />
             <DetailValue label="Tareas a realizar" value={getShortText(notebook.repairNeeded)} />
             <DetailValue label="Historial de reparaciones" value={getShortText(notebook.repairHistory)} />
           </div>
@@ -424,8 +423,8 @@ function InventoryToolbar({
 }: {
   handleOpenModal: (notebook: Notebook | null) => void;
   searchTerm: string;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
-  setStatusFilter: React.Dispatch<React.SetStateAction<string>>;
+  setSearchTerm: (value: string) => void;
+  setStatusFilter: (value: string) => void;
   statusFilter: string;
 }) {
   return (
