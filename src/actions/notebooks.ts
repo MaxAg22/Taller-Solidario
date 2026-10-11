@@ -2,18 +2,22 @@
 import type { UpdateNotebook } from "@/interfaces";
 import { supabase } from "@/supabase/client";
 
-export const getNotebooks = async () => {
-  const { data: notebooks, error } = await supabase
+export const getNotebooks = async (from: number, to: number) => {
+  const { data: notebooks, count, error } = await supabase
     .from("notebooks")
-    .select("*")
-    .order("serialNumber", { ascending: false });
+    .select("*", { count: "exact" })
+    .order("entryDate", { ascending: false })
+    .range(from,to);
 
   if (error) {
     console.log(error.message);
     throw new Error(error.message);
   }
 
-  return notebooks;
+  return {
+    notebooks: notebooks ?? [],
+    rowCount: count ?? 0,
+  };
 };
 
 export const createNotebook = async (notebook: any) => {

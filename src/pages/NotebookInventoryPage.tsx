@@ -7,12 +7,21 @@ import { NotebookFormModal } from "@/components/forms/NotebookForm/NotebookFormM
 import { InventorySummary } from "@/components/notebooks/InventorySummary";
 import { useNotebooks } from "@/hooks";
 import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
+import {  DataTable } from "@/components/notebooks/table/DataTable";
+import { columns } from "@/components/notebooks/table/NotebookColumns";
 
 export default function NotebookInventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const { notebooks, isLoading, isError, refetch } = useNotebooks();
+  const [pagination, setPagination] = useState({
+    pageIndex: 0, 
+    pageSize: 10,
+  });
+  const from = pagination.pageIndex * pagination.pageSize;
+  const to = from + pagination.pageSize - 1;
+  const { notebooks, rowCount,isLoading, isError, refetch } = useNotebooks(from, to);
+
 
   const filteredNotebooks = useMemo(() => {
     const term = searchTerm.trim().toLocaleLowerCase("es");
@@ -69,11 +78,13 @@ export default function NotebookInventoryPage() {
         </div>
       ) : (
         <p className="inventory-results" role="status">
-          {isLoading ? "Cargando inventario…" : `${filteredNotebooks.length} de ${notebooks?.length ?? 0} equipos`}
+          {isLoading ? "Cargando inventario…" : `${filteredNotebooks.length} de ${rowCount} equipos`}
         </p>
       )}
 
-      {/* Agregar aquí la tabla de inventario usando filteredNotebooks. */}
+      <div className="container mx-auto py-10">
+        <DataTable columns={columns} data={filteredNotebooks} pagination={pagination} setPagination={setPagination} rowCount={rowCount} />
+      </div>
 
       {isModalOpen && (
         <NotebookFormModal notebook={null} onSave={() => setIsModalOpen(false)} onClose={() => setIsModalOpen(false)} />
