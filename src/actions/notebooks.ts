@@ -16,36 +16,6 @@ export const getNotebooks = async () => {
   return notebooks;
 };
 
-export const getNotebooksByOrder = async (orderId: string) => {
-  const { data: notebooks, error } = await supabase
-    .from("notebooks")
-    .select("*")
-    .eq("order_id", orderId);
-
-  if (error) {
-    console.log(error.message);
-    throw new Error(error.message);
-  }
-
-  return notebooks;
-};
-
-export const getReadyNoteboks = async () => {
-  const { data: readyNotebooks, error } = await supabase
-    .from("notebooks")
-    .select("*")
-    .eq("status", "Listo para Donar")
-    .is("order_id", null)
-    .order("serialNumber", { ascending: true });
-
-  if (error) {
-    console.log(error.message);
-    throw new Error(error.message);
-  }
-
-  return readyNotebooks;
-};
-
 export const createNotebook = async (notebook: any) => {
   const { data: newNotebook, error } = await supabase
     .from("notebooks")

@@ -93,7 +93,6 @@ export default function NotebookInventoryPage() {
           confirmDeleteId={confirmDeleteId}
           handleDeleteNotebook={handleDeleteNotebook}
           setConfirmDeleteId={setConfirmDeleteId}
-          item={"Equipo"}
         ></ConfirmModal>
       )}
 

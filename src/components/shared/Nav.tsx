@@ -16,9 +16,6 @@ const NavLinks = () => {
       <NavLink to="/" className={({ isActive }) => navClass(isActive)}>
         Inventario
       </NavLink>
-      <NavLink to="/ordenes" className={({ isActive }) => navClass(isActive)}>
-        Ordenes
-      </NavLink>
     </>
   );
 };
