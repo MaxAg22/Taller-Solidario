@@ -18,3 +18,9 @@ export interface AttendanceRow extends AttendanceUser {
   attendance: Record<string, boolean>;
   attendanceDisabled: boolean;
 }
+
+export interface AttendanceReportRow extends AttendanceUser {
+  attendanceDays: number;
+  hoursPerDay: number | null;
+  totalHours: number | null;
+}

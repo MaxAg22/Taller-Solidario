@@ -1,4 +1,4 @@
-import { Film, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import type { TutorialVideo } from "@/actions/tutorials";
 import { tutorialDuration } from "@/utils/tutorials";
 
@@ -6,7 +6,7 @@ export function TutorialThumbnail({ video }: { video: TutorialVideo }) {
   const duration = tutorialDuration(video.videoMediaMetadata?.durationMillis);
   return (
     <span className="tutorials-thumbnail">
-      <Film size={32} aria-hidden="true" />
+      <img className="tutorials-thumbnail-fallback" src={`${import.meta.env.BASE_URL}video.png`} alt="" />
       {video.thumbnailLink && (
         <img
           key={video.thumbnailLink}

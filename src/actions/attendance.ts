@@ -71,3 +71,40 @@ export async function saveAttendance({ id, date, is_present }: AttendanceChange)
   if (error) throw error;
   return data;
 }
+
+export async function getAttendanceReportUsers(signal: AbortSignal) {
+  const users: AttendanceUser[] = [];
+  let total = Infinity;
+  while (users.length < total) {
+    const { data, count, error } = await supabase.from("users")
+      .select("id, name", { count: "exact" })
+      .order("name").order("id")
+      .range(users.length, users.length + 499)
+      .abortSignal(signal);
+    if (error) throw error;
+    if (count === null || (!data?.length && users.length < count)) throw new Error("No se pudo cargar la lista completa de alumnos.");
+    users.push(...(data ?? []));
+    total = count;
+  }
+  return users;
+}
+
+export async function getAttendanceReportCounts(start: string, end: string, signal: AbortSignal) {
+  const counts: Record<number, number> = {};
+  let offset = 0;
+  let total = Infinity;
+  while (offset < total) {
+    const { data, count, error } = await supabase.from("attendance")
+      .select("id, date", { count: "exact" })
+      .gte("date", start).lte("date", end)
+      .order("date").order("id")
+      .range(offset, offset + 499)
+      .abortSignal(signal);
+    if (error) throw error;
+    if (count === null || (!data?.length && offset < count)) throw new Error("No se pudo cargar la asistencia completa del período.");
+    for (const record of data ?? []) counts[record.id] = (counts[record.id] ?? 0) + 1;
+    offset += data?.length ?? 0;
+    total = count;
+  }
+  return counts;
+}

@@ -212,6 +212,30 @@
 .attendance-checkbox:disabled { cursor: wait; opacity: 0.5; }
 .attendance-checkbox:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 
+.attendance-heading-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.attendance-report-modal[data-slot="dialog-content"] { width: calc(100% - 32px); max-width: 1160px; max-height: calc(100dvh - 32px); display: flex; flex-direction: column; gap: 16px; padding: 24px; overflow-y: auto; border-radius: 4px; background: var(--card); box-shadow: none; }
+.attendance-report-modal [data-slot="dialog-header"] { padding-right: 24px; }
+.attendance-report-controls { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 16px; }
+.attendance-report-controls > div { display: flex; flex-direction: column; gap: 8px; }
+.attendance-report-controls input { height: 36px; border-radius: 4px; box-shadow: none; }
+.attendance-report-hint { color: var(--muted-foreground); font-size: 13px; line-height: 20px; }
+.attendance-report-error { color: var(--destructive); font-size: 13px; }
+.attendance-report-table { min-height: 0; overflow: auto; }
+.attendance-report-table [data-slot="table-container"] { overflow: visible; }
+.attendance-report-table [data-slot="table-header"] { position: sticky; top: 0; z-index: 1; }
+.attendance-report-table [data-slot="table"] { min-width: 780px; }
+.attendance-report-table [data-slot="table-head"]:not(:first-child), .attendance-report-table [data-slot="table-cell"]:not(:first-child) { text-align: right; }
+.attendance-report-table input { width: 120px; height: 32px; margin-left: auto; border-radius: 4px; text-align: right; box-shadow: none; }
+.attendance-report-footer { align-items: center; flex-shrink: 0; }
+.attendance-report-footer p { flex: 1; color: var(--muted-foreground); font-size: 13px; }
+.attendance-report-footer button { border-radius: 4px; }
+@media (max-width: 700px) {
+  .attendance-report-modal[data-slot="dialog-content"] { padding: 16px; }
+  .attendance-report-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .attendance-report-controls > div:last-child { grid-column: 1 / -1; }
+  .attendance-report-footer p { width: 100%; }
+}
+
 .tutorials-refresh { height: 36px; padding: 0 12px; border-radius: 4px; background: var(--card); font-size: 15px; box-shadow: none; }
 .tutorials-library, .tutorials-player { overflow: hidden; min-width: 0; border: 1px solid var(--border); border-radius: 4px; background: var(--card); }
 .tutorials-player { width: 100%; }
@@ -226,6 +250,7 @@
 .tutorials-card-name { display: block; padding: 10px 12px; font-size: 15px; font-weight: 500; line-height: 22px; overflow-wrap: anywhere; }
 .tutorials-thumbnail { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; overflow: hidden; background: var(--secondary); color: var(--muted-foreground); }
 .tutorials-thumbnail img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tutorials-thumbnail img.tutorials-thumbnail-fallback { position: static; width: 72px; height: 72px; object-fit: contain; }
 .tutorials-thumbnail img[hidden] { display: none; }
 .tutorials-thumbnail-play { position: absolute; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 4px; background: var(--card); color: var(--primary); opacity: 0; }
 .tutorials-card:hover .tutorials-thumbnail-play, .tutorials-card:focus-visible .tutorials-thumbnail-play { opacity: 1; }

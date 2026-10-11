@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Plus, Search } from "lucide-react";
+import { FileDown, Plus, Search } from "lucide-react";
 import { useAttendances, useUsers } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,12 +9,14 @@ import { DataTable } from "@/components/notebooks/table/DataTable";
 import { AttendanceCalendar } from "@/components/attendance/AttendanceCalendar";
 import { attendanceColumns } from "@/components/attendance/AttendanceColumns";
 import { UserFormModal } from "@/components/attendance/UserFormModal";
+import { AttendanceReportModal } from "@/components/attendance/AttendanceReportModal";
 import { attendanceDate, getAttendanceWeek } from "@/utils/attendance";
 
 export default function AttendancePage() {
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [search, setSearch] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const from = pagination.pageIndex * pagination.pageSize;
   const usersQuery = useUsers(from, from + pagination.pageSize - 1, search);
@@ -39,9 +41,14 @@ export default function AttendancePage() {
     <div className="attendance-page">
       <div className="inventory-heading">
         <h1>Asistencias</h1>
+        <div className="attendance-heading-actions">
+        <Button variant="outline" className="tutorials-refresh" onClick={() => setIsReportOpen(true)}>
+          <FileDown aria-hidden="true" /> Generar reporte de asistencia
+        </Button>
         <Button className="inventory-add" onClick={() => setIsCreating(true)}>
           <Plus aria-hidden="true" /> Agregar alumno
         </Button>
+        </div>
       </div>
       <div className="attendance-layout">
         <AttendanceCalendar selectedDate={selectedDate} week={week} onSelect={setSelectedDate} />
@@ -90,6 +97,7 @@ export default function AttendancePage() {
         </section>
       </div>
       {isCreating && <UserFormModal onClose={() => setIsCreating(false)} />}
+      {isReportOpen && <AttendanceReportModal selectedDate={selectedDate} onClose={() => setIsReportOpen(false)} />}
     </div>
   );
 }
