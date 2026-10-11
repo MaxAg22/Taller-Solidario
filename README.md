@@ -63,3 +63,17 @@ En Supabase → API Docs → Tables and Views → Introduction.
 1. Hacer click en Generate and download types.
 2. Reemplazar supabase.js por el generado.
 
+## Configurar una carpeta pública de videos de Google Drive
+
+La sección de tutoriales lista los videos ubicados directamente en una carpeta pública de Google Drive.
+
+1. En [Google Cloud Console](https://console.cloud.google.com/), creá o seleccioná un proyecto. Entrá a **APIs y servicios → Biblioteca**, buscá **Google Drive API** y habilitala.
+2. En **APIs y servicios → Credenciales → Crear credenciales → Clave de API**, generá una clave. En su configuración, limitá las **Restricciones de API** a **Google Drive API**.
+3. En Drive, abrí **Compartir** en la carpeta de videos y seleccioná **Acceso general → Cualquier persona con el enlace → Lector**.
+4. Copiá el ID de la carpeta desde su dirección. Por ejemplo, en `https://drive.google.com/drive/folders/ID_DE_LA_CARPETA`, el ID es `ID_DE_LA_CARPETA`; no copies la URL completa.
+5. Agregá estas variables al `.env` o `.env.local` de la raíz del proyecto, conservando las variables de Supabase existentes:
+
+   ```env
+   VITE_TUTORIALS_DRIVE_FOLDER_ID=ID_DE_LA_CARPETA
+   VITE_GOOGLE_DRIVE_API_KEY=TU_CLAVE_DE_API
+   ```
