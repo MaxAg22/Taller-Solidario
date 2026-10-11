@@ -4,7 +4,7 @@ export type NotebookStatus =
   | "Listo para Donar"
   | "Donado"
   | "Bloqueada"
-  | "Desbloqueada";
+  | "Instalar SO";
 
 export interface Notebook {
   id: string;

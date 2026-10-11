@@ -16,15 +16,14 @@ import type {
 } from "../../../interfaces/notebook.interface";
 import { Label } from "../../ui/label";
 import {
-  Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "../../ui/input";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
 import { useCreateNotebook } from "@/hooks/notebooks/useCreateNotebook";
 import { Spinner } from "@/components/ui/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -80,22 +79,23 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/90 z-50 flex justify-center items-center p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent showCloseButton={false} className="notebook-form-modal max-h-[90dvh] overflow-y-auto p-0 sm:max-w-[940px] bg-card">
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle>
-                  {notebook ? "Editar Equipo" : "Agregar Nuevo Equipo"}
-                </CardTitle>
-                <CardDescription>
+                <DialogTitle className="text-[26px] leading-tight">
+                  {notebook ? "Editar equipo" : "Agregar nuevo equipo"}
+                </DialogTitle>
+                <DialogDescription className="mt-2">
                   {notebook
                     ? "Modifica los detalles del equipo seleccionado."
-                    : "Completa la información del equipo que ingresa al taller."}
-                </CardDescription>
+                    : "Completá los datos de la netbook que ingresa al taller."}
+                </DialogDescription>
               </div>
               <Button
+                aria-label="Cerrar formulario"
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
@@ -128,7 +128,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
                 <p className="text-red-500 text-sm">{errors.brand.message}</p>
               )}
             </div>
-            <div className="space-y-2">
+            <div className="md:col-span-2 space-y-2">
               <Label htmlFor="status">Estado</Label>
               <Controller
                 control={control}
@@ -138,20 +138,16 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger id="status">
+                    <SelectTrigger id="status" className="w-full">
                       <SelectValue placeholder="Seleccionar estado" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Recibido">Recibido</SelectItem>
-                      <SelectItem value="En Reparación">
-                        En Reparación
-                      </SelectItem>
-                      <SelectItem value="Listo para Donar">
-                        Listo para Donar
-                      </SelectItem>
-                      <SelectItem value="Donado">Donado</SelectItem>
-                      <SelectItem value="Bloqueada">Bloqueada</SelectItem>
-                      <SelectItem value="Desbloqueada">Desbloqueada</SelectItem>
+                      {NOTEBOOK_STATUSES.map((state) => (
+                        <SelectItem key={state.value} value={state.value}>
+                          <span className="inventory-status-dot" style={{ backgroundColor: state.color }} aria-hidden="true" />
+                          {state.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}
@@ -198,15 +194,17 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex justify-end gap-2">
+          <CardFooter className="flex justify-end gap-3 border-t py-6">
             <Button variant="outline" onClick={onClose} type="button">
               Cancelar
             </Button>
-            <Button type="submit">Guardar Cambios</Button>
-            {(isPendingCreate || isPendingUpdate) && <Spinner></Spinner>}
+            <Button type="submit" disabled={isPendingCreate || isPendingUpdate}>
+              {(isPendingCreate || isPendingUpdate) && <Spinner />}
+              {notebook ? "Guardar cambios" : "Agregar equipo"}
+            </Button>
           </CardFooter>
         </form>
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

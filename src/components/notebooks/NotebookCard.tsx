@@ -17,7 +17,7 @@ const statusColors: { [key in NotebookStatus]: string } = {
   "Listo para Donar": "bg-green-100 text-green-800 border-green-300",
   Donado: "bg-gray-100 text-gray-800 border-gray-300",
   Bloqueada: "bg-red-100 text-red-800 border-red-300",
-  Desbloqueada: "bg-orange-100 text-orange-800 border-orange-300",
+  "Instalar SO": "bg-violet-100 text-violet-800 border-violet-300",
 };
 
 interface NotebookCardProps {
