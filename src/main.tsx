@@ -23,8 +23,8 @@ createRoot(document.getElementById("root")!).render(
             boxShadow: "none",
             padding: "8px 12px",
             fontFamily: "var(--font-sans)",
-            fontSize: "13px",
-            lineHeight: "20px",
+            fontSize: "15px",
+            lineHeight: "22px",
             maxWidth: "min(360px, calc(100vw - 32px))",
           },
           success: {

@@ -17,7 +17,7 @@ export default function NotebookInventoryPage() {
   const [statusFilter, setStatusFilter] = useState<NotebookStatus | "all">("all");  
   const [pagination, setPagination] = useState({
     pageIndex: 0, 
-    pageSize: 15,
+    pageSize: 14,
   });
   const from = pagination.pageIndex * pagination.pageSize;
   const to = from + pagination.pageSize - 1;
