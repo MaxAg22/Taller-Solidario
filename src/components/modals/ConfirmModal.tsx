@@ -1,39 +1,43 @@
 import type { ConfirmModalType } from "@/interfaces";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const ConfirmModal = ({
   confirmDeleteId,
   handleDeleteNotebook,
   setConfirmDeleteId,
+  isPending = false,
 }: ConfirmModalType) => {
   if (!confirmDeleteId) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center z-50 justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-        <h2 className="text-lg font-bold mb-4">Eliminar equipo</h2>
-        <p className="mb-6">
-          Esta acción no se puede deshacer, ¿Deseás eliminar este equipo?
-        </p>
-
-        <div className="flex justify-end gap-2">
-          <button
-            className="px-3 py-1 bg-gray-200 rounded"
+    <Dialog open onOpenChange={(open) => {
+      if (!open && !isPending) setConfirmDeleteId(null);
+    }}>
+      <DialogContent className="rounded-sm bg-card shadow-none sm:max-w-sm" showCloseButton={!isPending}>
+        <DialogHeader>
+          <DialogTitle>Eliminar equipo</DialogTitle>
+          <DialogDescription>
+            Esta acción no se puede deshacer. ¿Deseás eliminar este equipo?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            disabled={isPending}
             onClick={() => setConfirmDeleteId(null)}
           >
             Cancelar
-          </button>
-
-          <button
-            className="px-3 py-1 bg-red-600 text-white rounded"
-            onClick={() => {
-              handleDeleteNotebook(confirmDeleteId);
-              setConfirmDeleteId(null);
-            }}
+          </Button>
+          <Button
+            variant="destructive"
+            disabled={isPending}
+            onClick={() => handleDeleteNotebook(confirmDeleteId)}
           >
-            Eliminar
-          </button>
-        </div>
-      </div>
-    </div>
+            {isPending ? "Eliminando…" : "Eliminar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

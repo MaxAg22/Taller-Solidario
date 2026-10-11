@@ -8,10 +8,11 @@ import { useNotebooks } from "@/hooks";
 import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
 import {  DataTable } from "@/components/notebooks/table/DataTable";
 import { columns } from "@/components/notebooks/table/NotebookColumns";
-import type { NotebookStatus } from "@/interfaces";
+import type { Notebook, NotebookStatus } from "@/interfaces";
 
 export default function NotebookInventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<NotebookStatus | "all">("all");  
   const [pagination, setPagination] = useState({
@@ -37,7 +38,10 @@ export default function NotebookInventoryPage() {
     <div className="inventory-page">
       <div className="inventory-heading">
         <h1>Inventario de equipos</h1>
-        <Button className="inventory-add" onClick={() => setIsModalOpen(true)}>
+        <Button className="inventory-add" onClick={() => {
+          setSelectedNotebook(null);
+          setIsModalOpen(true);
+        }}>
           <Plus size={20} aria-hidden="true" /> Agregar equipo
         </Button>
       </div>
@@ -87,11 +91,21 @@ export default function NotebookInventoryPage() {
       </div>
 
       <div className="inventory-table-section">
-        <DataTable columns={columns} data={filteredNotebooks} pagination={pagination} setPagination={setPagination} rowCount={rowCount} />
+        <DataTable
+          columns={columns}
+          data={filteredNotebooks}
+          pagination={pagination}
+          setPagination={setPagination}
+          rowCount={rowCount}
+          onRowClick={(notebook) => {
+            setSelectedNotebook(notebook);
+            setIsModalOpen(true);
+          }}
+        />
       </div>
 
       {isModalOpen && (
-        <NotebookFormModal notebook={null} onSave={() => setIsModalOpen(false)} onClose={() => setIsModalOpen(false)} />
+        <NotebookFormModal notebook={selectedNotebook} onSave={() => setIsModalOpen(false)} onClose={() => setIsModalOpen(false)} />
       )}
     </div>
   );

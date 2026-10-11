@@ -25,6 +25,7 @@ interface DataTableProps<TData extends RowData> {
   pagination: PaginationState
   setPagination: OnChangeFn<PaginationState>
   rowCount?: number
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData extends RowData>({
@@ -33,6 +34,7 @@ export function DataTable<TData extends RowData>({
   pagination,
   setPagination,
   rowCount,
+  onRowClick,
 }: DataTableProps<TData>) {
   const table = useTable({
     features,
@@ -68,9 +70,22 @@ export function DataTable<TData extends RowData>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className={onRowClick ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2" : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                onClick={() => onRowClick?.(row.original)}
+                onKeyDown={(event) => {
+                  if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault()
+                    onRowClick?.(row.original)
+                  }
+                }}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} data-column={cell.column.id}>
+                  <TableCell
+                    key={cell.id}
+                    data-column={cell.column.id}
+                    onClick={cell.column.id === "actions" ? (event) => event.stopPropagation() : undefined}
+                  >
                     {cell.column.id === "status" ? (
                       <span className="inventory-table-status" data-status={String(cell.getValue())}>
                         <table.FlexRender cell={cell} />
