@@ -60,7 +60,7 @@ export function AttendanceReportModal({ selectedDate, onClose }: { selectedDate:
             <Input id="report-general" type="number" min="0" max="24" step="0.01" placeholder="Ej: 3" value={general} aria-invalid={invalidGeneral} disabled={isGenerating} onChange={(event) => setGeneral(event.target.value)} />
           </div>
         </div>
-        <p className="attendance-report-hint">Ambas fechas están incluidas. Un estimado individual reemplaza al general; dejalo vacío para usar el general.</p>
+        <p className="attendance-report-hint">Ambas fechas están incluidas. Un estimado individual reemplaza al general.</p>
         {!validRange && <p className="attendance-report-error" role="alert">Ingresá un rango válido: la fecha inicial debe ser anterior o igual a la final.</p>}
         {invalidGeneral && <p className="attendance-report-error" role="alert">Ingresá entre 0 y 24 horas por día, con hasta dos decimales.</p>}
         {(usersQuery.isError || attendanceQuery.isError) && (
@@ -93,7 +93,7 @@ export function AttendanceReportModal({ selectedDate, onClose }: { selectedDate:
                     <TableCell>
                       <Input type="number" min="0" max="24" step="0.01" aria-label={`Horas por día de ${row.name}`} aria-invalid={invalid} disabled={isGenerating} value={value} placeholder={estimatedHours(general) === null ? "Sin estimar" : general} onChange={(event) => setOverrides((prev) => ({ ...prev, [row.id]: event.target.value }))} />
                     </TableCell>
-                    <TableCell>{ready && row.totalHours !== null ? `${row.attendanceDays} × ${formatReportHours(row.hoursPerDay!)} = ${formatReportHours(row.totalHours)} h` : "—"}</TableCell>
+                    <TableCell>{ready && row.totalHours !== null ? `${formatReportHours(row.totalHours)}h` : "—"}</TableCell>
                   </TableRow>
                 );
               })}
