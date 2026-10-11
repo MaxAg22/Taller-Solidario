@@ -20,7 +20,7 @@ export default function NotebookInventoryPage() {
   });
   const from = pagination.pageIndex * pagination.pageSize;
   const to = from + pagination.pageSize - 1;
-  const { notebooks, rowCount,isLoading, isError, refetch } = useNotebooks(from, to);
+  const { notebooks, rowCount, isLoading, isError, refetch } = useNotebooks(from, to);
 
 
   const filteredNotebooks = useMemo(() => {
@@ -40,7 +40,7 @@ export default function NotebookInventoryPage() {
         <p>Gestión de netbooks del taller</p>
       </div>
 
-      <InventorySummary notebooks={notebooks ?? []} isLoading={isLoading} hasError={isError} />
+      <InventorySummary />
 
       <div className="inventory-toolbar">
         <div className="inventory-search">
@@ -82,7 +82,7 @@ export default function NotebookInventoryPage() {
         </p>
       )}
 
-      <div className="container mx-auto py-10">
+      <div className="inventory-table-section">
         <DataTable columns={columns} data={filteredNotebooks} pagination={pagination} setPagination={setPagination} rowCount={rowCount} />
       </div>
 

@@ -159,6 +159,29 @@
 .inventory-add { height: 32px; margin-left: auto; border-radius: 4px; font-size: 13px; font-weight: 500; box-shadow: none; }
 .inventory-results { margin-top: 12px; margin-bottom: 12px; font-size: 12px; line-height: 18px; color: var(--muted-foreground); }
 .inventory-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: var(--muted-foreground); }
+.inventory-table-section { width: 100%; margin-top: 4px; }
+.inventory-table-panel { overflow: hidden; border: 1px solid var(--border); border-radius: 6px; }
+.inventory-table-panel [data-slot="table"] { min-width: 700px; font-size: 13px; line-height: 20px; }
+.inventory-table-panel [data-slot="table-header"] { background: #0d1424; }
+.inventory-table-panel [data-slot="table-head"] { height: 38px; padding: 8px 16px; color: var(--muted-foreground); font-size: 11px; font-weight: 600; letter-spacing: 0.035em; text-transform: uppercase; }
+.inventory-table-panel [data-slot="table-cell"] { padding: 10px 16px; vertical-align: middle; }
+.inventory-table-panel [data-slot="table-body"] tr { background: #0d1220; }
+.inventory-table-panel [data-slot="table-body"] tr:nth-child(even) { background: #101727; }
+.inventory-table-panel [data-slot="table-body"] tr:hover { background: #172238; }
+.inventory-table-panel [data-slot="table-body"] tr[data-state="selected"] { background: #172c43; }
+.inventory-table-panel td[data-column="brand"] { font-weight: 500; }
+.inventory-table-panel td[data-column="serialNumber"], .inventory-table-panel td[data-column="entryDate"] { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.inventory-table-panel td[data-column="specs"] { min-width: 240px; max-width: 600px; white-space: normal; overflow-wrap: anywhere; color: #c0ccdf; }
+.inventory-table-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; line-height: 20px; font-weight: 500; color: var(--status-color, var(--muted-foreground)); background: color-mix(in srgb, var(--status-color, var(--muted-foreground)) 12%, transparent); white-space: nowrap; }
+.inventory-table-status[data-status="Listo para Donar"] { --status-color: #00d587; }
+.inventory-table-status[data-status="Recibido"] { --status-color: #60a5fa; }
+.inventory-table-status[data-status="Instalar SO"] { --status-color: #a78bfa; }
+.inventory-table-status[data-status="En Reparación"] { --status-color: #fb923c; }
+.inventory-table-status[data-status="Bloqueada"] { --status-color: #ff3654; }
+.inventory-table-status[data-status="Donado"] { --status-color: #94a3b8; }
+.inventory-table-panel .inventory-table-empty { height: 96px; text-align: center; color: var(--muted-foreground); }
+.inventory-table-pagination { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--border); background: #0d1424; }
+.inventory-table-pagination button { height: 30px; padding: 0 12px; border-radius: 4px; font-size: 12px; box-shadow: none; }
 [data-slot="dialog-overlay"] { backdrop-filter: blur(6px); }
 .notebook-form-modal [data-slot="card-header"] { padding-top: 28px; }
 .notebook-form-modal input, .notebook-form-modal [data-slot="select-trigger"] { min-height: 44px; }

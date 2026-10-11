@@ -11,6 +11,7 @@ export const useDeleteNotebook = () => {
       queryClient.invalidateQueries({
         queryKey: ["notebooks"],
       });
+      queryClient.invalidateQueries({ queryKey: ["inventory-summary"] });
       toast.success("Equipo eliminado correctamente!");
     },
     onError: (error) => {

@@ -1,6 +1,7 @@
 // Funciones que interactuan con la API de SUPABASE
 import type { UpdateNotebook } from "@/interfaces";
 import { supabase } from "@/supabase/client";
+import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
 
 export const getNotebooks = async (from: number, to: number) => {
   const { data: notebooks, count, error } = await supabase
@@ -19,6 +20,32 @@ export const getNotebooks = async (from: number, to: number) => {
     rowCount: count ?? 0,
   };
 };
+
+export const getInventorySummary = async () => {
+  const [perStatus, { count: rowCount, error: totalError }] = await Promise.all([
+    Promise.all(NOTEBOOK_STATUSES.map(async ({ value }) => {
+      const { count, error } = await supabase
+        .from("notebooks")
+        .select("*", { count: "exact", head: true })
+        .eq("status", value);
+
+      if (error) throw error;
+
+      return { status: value, count: count ?? 0 };
+    })),
+
+    supabase
+      .from("notebooks")
+      .select("*", { count: 'exact', head: true })
+  ]);
+
+  if (totalError) throw totalError;
+
+  return {
+    perStatus,
+    rowCount: rowCount ?? 0,
+  };
+}
 
 export const createNotebook = async (notebook: any) => {
   const { data: newNotebook, error } = await supabase

@@ -45,7 +45,7 @@ export function DataTable<TData extends RowData>({
   })
 
   return (
-    <div className="overflow-hidden rounded-md border">
+    <div className="inventory-table-panel">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -70,22 +70,28 @@ export function DataTable<TData extends RowData>({
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    <table.FlexRender cell={cell} />
+                  <TableCell key={cell.id} data-column={cell.column.id}>
+                    {cell.column.id === "status" ? (
+                      <span className="inventory-table-status" data-status={String(cell.getValue())}>
+                        <table.FlexRender cell={cell} />
+                      </span>
+                    ) : (
+                      <table.FlexRender cell={cell} />
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
+              <TableCell colSpan={columns.length} className="inventory-table-empty">
                 No hay equipos disponibles.
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="inventory-table-pagination">
         <Button
           variant="outline"
           size="sm"
