@@ -4,23 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { NotebookFormModal } from "@/components/forms/NotebookForm/NotebookFormModal";
-import { InventorySummary } from "@/components/notebooks/InventorySummary";
 import { useNotebooks } from "@/hooks";
 import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
 import {  DataTable } from "@/components/notebooks/table/DataTable";
 import { columns } from "@/components/notebooks/table/NotebookColumns";
+import type { NotebookStatus } from "@/interfaces";
 
 export default function NotebookInventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<NotebookStatus | "all">("all");  
   const [pagination, setPagination] = useState({
     pageIndex: 0, 
-    pageSize: 10,
+    pageSize: 15,
   });
   const from = pagination.pageIndex * pagination.pageSize;
   const to = from + pagination.pageSize - 1;
-  const { notebooks, rowCount, isLoading, isError, refetch } = useNotebooks(from, to);
+  const { notebooks, rowCount, isLoading, isError, refetch } = useNotebooks(from, to, statusFilter, searchTerm);
 
 
   const filteredNotebooks = useMemo(() => {
@@ -37,10 +37,10 @@ export default function NotebookInventoryPage() {
     <div className="inventory-page">
       <div className="inventory-heading">
         <h1>Inventario de equipos</h1>
-        <p>Gestión de netbooks del taller</p>
+        <Button className="inventory-add" onClick={() => setIsModalOpen(true)}>
+          <Plus size={20} aria-hidden="true" /> Agregar equipo
+        </Button>
       </div>
-
-      <InventorySummary />
 
       <div className="inventory-toolbar">
         <div className="inventory-search">
@@ -52,7 +52,15 @@ export default function NotebookInventoryPage() {
             onChange={(event) => setSearchTerm(event.target.value)}
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select 
+          value={statusFilter} 
+          onValueChange={(value) => {
+            if (value === "all" || NOTEBOOK_STATUSES.some((state) => state.value === value)) {
+              setStatusFilter(value as NotebookStatus | "all");
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }
+          }}
+          >
           <SelectTrigger className="inventory-filter" aria-label="Filtrar por estado">
             <SelectValue placeholder="Todos los estados" />
           </SelectTrigger>
@@ -66,21 +74,17 @@ export default function NotebookInventoryPage() {
             ))}
           </SelectContent>
         </Select>
-        <Button className="inventory-add" onClick={() => setIsModalOpen(true)}>
-          <Plus size={20} aria-hidden="true" /> Agregar equipo
-        </Button>
+        {isError ? (
+          <div className="inventory-feedback" role="alert">
+            <p>No se pudo cargar el inventario.</p>
+            <Button variant="outline" onClick={() => refetch()}>Reintentar</Button>
+          </div>
+        ) : (
+          <p className="inventory-results" role="status">
+            {isLoading ? "Cargando inventario…" : `${filteredNotebooks.length} de ${rowCount} equipos`}
+          </p>
+        )}
       </div>
-
-      {isError ? (
-        <div className="inventory-feedback" role="alert">
-          <p>No se pudo cargar el inventario.</p>
-          <Button variant="outline" onClick={() => refetch()}>Reintentar</Button>
-        </div>
-      ) : (
-        <p className="inventory-results" role="status">
-          {isLoading ? "Cargando inventario…" : `${filteredNotebooks.length} de ${rowCount} equipos`}
-        </p>
-      )}
 
       <div className="inventory-table-section">
         <DataTable columns={columns} data={filteredNotebooks} pagination={pagination} setPagination={setPagination} rowCount={rowCount} />

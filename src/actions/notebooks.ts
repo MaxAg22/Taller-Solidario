@@ -1,14 +1,37 @@
 // Funciones que interactuan con la API de SUPABASE
 import type { UpdateNotebook } from "@/interfaces";
 import { supabase } from "@/supabase/client";
-import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
+import type { NotebookStatus } from "@/interfaces";
 
-export const getNotebooks = async (from: number, to: number) => {
-  const { data: notebooks, count, error } = await supabase
+
+export const getNotebooks = async (from: number, to: number, status: NotebookStatus | "all", search: string) => {
+  let query = supabase
     .from("notebooks")
-    .select("*", { count: "exact" })
+    .select("*", { count: "exact" });
+  
+  if (status !== "all") {
+    query = query.eq("status", status);
+  }
+
+  const text = search.trim();
+
+  if (text) {
+    const pattern = JSON.stringify(`%${text}%`);
+    const filters = [
+      `brand.ilike.${pattern}`,
+      `model.ilike.${pattern}`,
+    ];
+
+    if (/^\d+$/.test(text)) {
+      filters.push(`serialNumber.eq.${text}`);
+    }
+
+    query = query.or(filters.join(","));
+  }
+
+  const { data: notebooks, count, error } = await query
     .order("entryDate", { ascending: false })
-    .range(from,to);
+    .range(from, to);
 
   if (error) {
     console.log(error.message);
@@ -20,32 +43,6 @@ export const getNotebooks = async (from: number, to: number) => {
     rowCount: count ?? 0,
   };
 };
-
-export const getInventorySummary = async () => {
-  const [perStatus, { count: rowCount, error: totalError }] = await Promise.all([
-    Promise.all(NOTEBOOK_STATUSES.map(async ({ value }) => {
-      const { count, error } = await supabase
-        .from("notebooks")
-        .select("*", { count: "exact", head: true })
-        .eq("status", value);
-
-      if (error) throw error;
-
-      return { status: value, count: count ?? 0 };
-    })),
-
-    supabase
-      .from("notebooks")
-      .select("*", { count: 'exact', head: true })
-  ]);
-
-  if (totalError) throw totalError;
-
-  return {
-    perStatus,
-    rowCount: rowCount ?? 0,
-  };
-}
 
 export const createNotebook = async (notebook: any) => {
   const { data: newNotebook, error } = await supabase
