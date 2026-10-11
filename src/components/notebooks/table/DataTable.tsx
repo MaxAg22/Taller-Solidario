@@ -26,6 +26,8 @@ interface DataTableProps<TData extends RowData> {
   setPagination: OnChangeFn<PaginationState>
   rowCount?: number
   onRowClick?: (row: TData) => void
+  emptyMessage?: string
+  isLoading?: boolean
 }
 
 export function DataTable<TData extends RowData>({
@@ -35,6 +37,8 @@ export function DataTable<TData extends RowData>({
   setPagination,
   rowCount,
   onRowClick,
+  emptyMessage = "No hay equipos disponibles.",
+  isLoading = false,
 }: DataTableProps<TData>) {
   const table = useTable({
     features,
@@ -100,7 +104,7 @@ export function DataTable<TData extends RowData>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="inventory-table-empty">
-                No hay equipos disponibles.
+                {isLoading ? "Cargando…" : emptyMessage}
               </TableCell>
             </TableRow>
           )}
@@ -111,7 +115,7 @@ export function DataTable<TData extends RowData>({
           variant="outline"
           size="sm"
           onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          disabled={isLoading || !table.getCanPreviousPage()}
         >
           Anterior
         </Button>
@@ -119,7 +123,7 @@ export function DataTable<TData extends RowData>({
           variant="outline"
           size="sm"
           onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          disabled={isLoading || !table.getCanNextPage()}
         >
           Siguiente
         </Button>

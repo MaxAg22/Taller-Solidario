@@ -49,7 +49,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/prettylogo.png"
+      "icon": "public/logo.png"
     },
     "files": [
       "dist/**/*",

@@ -7,6 +7,8 @@ export const ConfirmModal = ({
   handleDeleteNotebook,
   setConfirmDeleteId,
   isPending = false,
+  title = "Eliminar equipo",
+  description = "Esta acción no se puede deshacer. ¿Deseás eliminar este equipo?",
 }: ConfirmModalType) => {
   if (!confirmDeleteId) return null;
 
@@ -16,9 +18,9 @@ export const ConfirmModal = ({
     }}>
       <DialogContent className="rounded-sm bg-card shadow-none sm:max-w-sm" showCloseButton={!isPending}>
         <DialogHeader>
-          <DialogTitle>Eliminar equipo</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Esta acción no se puede deshacer. ¿Deseás eliminar este equipo?
+            {description}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

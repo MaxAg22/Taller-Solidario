@@ -176,6 +176,43 @@
 .notebook-form-modal [data-slot="textarea"] { min-height: 80px; resize: vertical; }
 .notebook-form-modal [data-slot="card-footer"] button { min-height: 44px; }
 
+.attendance-layout { display: grid; grid-template-columns: 272px minmax(0, 1fr); align-items: start; gap: 24px; margin-top: 16px; }
+.attendance-calendar-panel { overflow: hidden; border: 1px solid var(--border); border-radius: 4px; background: var(--card); }
+.attendance-calendar[data-slot="calendar"] { width: 100%; padding: 12px; background: var(--card); --cell-size: 32px; }
+.attendance-calendar .rdp-month { gap: 12px; }
+.attendance-calendar .rdp-day button { border-radius: 3px; font-size: 12px; }
+.attendance-calendar-week { background: var(--accent); }
+.attendance-calendar-hint { padding: 0 12px 12px; color: var(--muted-foreground); font-size: 12px; line-height: 18px; }
+.attendance-register { min-width: 0; }
+.attendance-week-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; }
+.attendance-week-label h2 { font-size: 14px; font-weight: 600; }
+.attendance-week-label p { font-size: 12px; color: var(--muted-foreground); }
+.attendance-toolbar { margin-top: 8px; }
+.attendance-feedback { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--destructive); }
+.attendance-table .inventory-table-panel [data-slot="table"] { min-width: 720px; }
+.attendance-table [data-slot="table-head"]:not(:first-child), .attendance-table [data-slot="table-cell"]:not(:first-child) { width: 64px; text-align: center; }
+.attendance-table [data-slot="table-head"]:first-child, .attendance-table [data-slot="table-cell"]:first-child { min-width: 224px; }
+.attendance-user-cell { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 500; }
+.attendance-user-cell > span { white-space: normal; overflow-wrap: anywhere; }
+.attendance-day-heading { display: flex; flex-direction: column; align-items: center; gap: 2px; width: calc(100% + 32px); margin: -8px -16px; padding: 8px 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.attendance-day-heading:hover { background: var(--accent); }
+.attendance-day-heading:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.attendance-day-heading > span:last-child { font-size: 11px; font-weight: 400; }
+.attendance-day-heading[data-selected="true"] { background: #dbeafe; color: #1d4ed8; }
+.attendance-day-cell { display: flex; align-items: center; justify-content: center; min-height: 44px; margin: -8px -16px; }
+.attendance-day-cell[data-selected="true"] { background: var(--accent); }
+.attendance-checkbox { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); cursor: pointer; }
+.attendance-checkbox:disabled { cursor: wait; opacity: 0.5; }
+.attendance-checkbox:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+
+@media (max-width: 1000px) {
+  .attendance-layout { grid-template-columns: 248px minmax(0, 1fr); gap: 16px; }
+}
+@media (max-width: 760px) {
+  .attendance-layout { grid-template-columns: minmax(0, 1fr); }
+  .attendance-calendar-panel { width: 272px; max-width: 100%; }
+}
+
 @media (max-width: 1000px) {
   .inventory-search { flex: 1; min-width: 200px; }
   .inventory-filter[data-slot="select-trigger"] { width: 190px; }
@@ -191,4 +228,10 @@
   .inventory-filter[data-slot="select-trigger"] { width: 100%; }
   .inventory-results { margin-left: 0; justify-self: end; }
   .inventory-feedback { grid-column: 1 / -1; margin-left: 0; }
+}
+
+@media (max-width: 420px) {
+  .inventory-header { flex-wrap: wrap; gap: 0; padding-top: 8px; }
+  .inventory-brand { flex-basis: 100%; }
+  .inventory-nav { min-height: 36px; margin-left: 0; }
 }
