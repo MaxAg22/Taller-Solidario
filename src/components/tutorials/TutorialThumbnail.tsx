@@ -1,5 +1,5 @@
 import { Play } from "lucide-react";
-import type { TutorialVideo } from "@/actions/tutorials";
+import type { TutorialVideo } from "@/interfaces/tutorial.interface";
 import { tutorialDuration } from "@/utils/tutorials";
 
 export function TutorialThumbnail({ video }: { video: TutorialVideo }) {

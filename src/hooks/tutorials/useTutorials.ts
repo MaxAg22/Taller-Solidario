@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getTutorials, tutorialsConfigured, tutorialsFolderId } from "@/actions/tutorials";
+import { getSavedVideos } from "@/actions/videos";
 
 export function useTutorials() {
   return useQuery({
-    queryKey: ["tutorials", tutorialsFolderId],
-    queryFn: ({ signal }) => getTutorials(signal),
-    enabled: tutorialsConfigured,
+    queryKey: ["saved-videos"],
+    queryFn: ({ signal }) => getSavedVideos(signal),
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });

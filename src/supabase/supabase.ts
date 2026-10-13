@@ -65,6 +65,27 @@ export type Database = {
           },
         ]
       }
+      videos: {
+        Row: {
+          id: number
+          created_at: string
+          title: string
+          link: string
+        }
+        Insert: {
+          id?: number
+          created_at?: string
+          title: string
+          link: string
+        }
+        Update: {
+          id?: number
+          created_at?: string
+          title?: string
+          link?: string
+        }
+        Relationships: []
+      }
       notebooks: {
         Row: {
           brand: string | null

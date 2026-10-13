@@ -1,5 +1,5 @@
 import { ExternalLink } from "lucide-react";
-import type { TutorialVideo } from "@/actions/tutorials";
+import type { TutorialVideo } from "@/interfaces/tutorial.interface";
 import { tutorialDuration, tutorialUrl } from "@/utils/tutorials";
 
 export function TutorialPlayer({ video }: { video: TutorialVideo }) {
