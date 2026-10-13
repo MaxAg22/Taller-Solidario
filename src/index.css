@@ -178,7 +178,14 @@
 .inventory-table-pagination { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 8px 16px; border-top: 1px solid var(--border); background: var(--card); }
 .inventory-table-pagination button { height: 30px; padding: 0 12px; border-radius: 4px; font-size: 13px; box-shadow: none; }
 [data-slot="dialog-overlay"] { backdrop-filter: blur(6px); }
-.notebook-form-modal [data-slot="card-header"] { padding-top: 28px; }
+.notebook-form-modal[data-slot="dialog-content"] { display: flex; max-height: calc(100dvh - 32px); overflow: hidden; gap: 0; }
+.notebook-form-modal form { display: flex; flex-direction: column; width: 100%; min-height: 0; max-height: inherit; }
+.notebook-form-modal [data-slot="card-header"] { flex-shrink: 0; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.notebook-form-modal [data-slot="card-content"] { min-height: 0; overflow-y: auto; overscroll-behavior: contain; gap: 16px; padding: 20px 24px; }
+.notebook-form-modal [data-slot="card-footer"] { flex-shrink: 0; padding: 16px 24px; background: var(--card); }
+@media (max-width: 767px) {
+  .notebook-form-modal [data-slot="card-header"], .notebook-form-modal [data-slot="card-content"], .notebook-form-modal [data-slot="card-footer"] { padding: 16px; }
+}
 .notebook-form-modal input, .notebook-form-modal [data-slot="select-trigger"] { min-height: 44px; }
 .notebook-form-modal [data-slot="textarea"] { min-height: 80px; resize: vertical; }
 .notebook-form-modal [data-slot="card-footer"] button { min-height: 44px; }

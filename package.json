@@ -51,7 +51,8 @@
       "target": [
         "nsis"
       ],
-      "icon": "public/logo.png"
+      "icon": "public/logo.ico",
+      "signAndEditExecutable": true
     },
     "files": [
       "dist/**/*",
@@ -60,6 +61,8 @@
       "public/**/*"
     ],
     "nsis": {
+      "installerIcon": "public/logo.ico",
+      "uninstallerIcon": "public/logo.ico",
       "uninstallDisplayName": "Taller Solidario",
       "license": "license.txt",
       "oneClick": false,

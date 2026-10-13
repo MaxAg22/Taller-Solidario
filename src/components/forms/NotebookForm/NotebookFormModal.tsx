@@ -80,7 +80,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
 
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent showCloseButton={false} className="notebook-form-modal max-h-[90dvh] overflow-y-auto p-0 sm:max-w-[940px] bg-card">
+      <DialogContent showCloseButton={false} className="notebook-form-modal p-0 sm:max-w-[940px] bg-card">
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardHeader>
             <div className="flex justify-between items-start">
@@ -105,7 +105,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8 pt-8">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="model">Modelo</Label>
               <Input
@@ -167,7 +167,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
                 <p className="text-red-500 text-sm">{errors.specs.message}</p>
               )}
             </div>
-            <div className="md:col-span-2 space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="repairNeeded">Tareas a Realizar</Label>
               <Textarea
                 id="repairNeeded"
@@ -180,7 +180,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
                 </p>
               )}
             </div>
-            <div className="md:col-span-2 space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="repairHistory">Historial de Reparaciones</Label>
               <Textarea
                 id="repairHistory"

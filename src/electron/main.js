@@ -5,7 +5,7 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
-    icon: path.join("public/logo.png"),
+    icon: path.join(app.getAppPath(), "public", process.platform === "win32" ? "logo.ico" : "logo.png"),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
