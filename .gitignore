@@ -26,3 +26,7 @@ releases
 
 package-lock.json
 .env
+
+# IA tools
+.agents
+.codex
