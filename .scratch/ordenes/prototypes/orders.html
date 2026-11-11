@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Órdenes — alternativa A</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #202b26; background: #edf1ed; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 26px; margin-bottom: 6px; }
+    .intro { color: #627069; max-width: 860px; margin-bottom: 24px; }
+    .alternatives { display: block; }
+    .alternative { min-width: 0; background: #fff; border: 1px solid #d9e1db; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 32px #1b382212; }
+    .alt-head { padding: 18px 20px 14px; border-bottom: 1px solid #e9eeea; }
+    .alt-head h2 { margin: 0 0 4px; font-size: 18px; }
+    .alt-head p { margin: 0; color: #69776f; font-size: 13px; }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; padding: 14px 20px; background: #f7f9f7; border-bottom: 1px solid #e9eeea; }
+    label { display: grid; gap: 5px; color: #5c6961; font-size: 11px; font-weight: 650; letter-spacing: .02em; }
+    select, input, textarea { min-width: 0; border: 1px solid #cbd6ce; border-radius: 8px; padding: 9px 10px; color: #26332b; background: #fff; font: inherit; font-size: 13px; }
+    .controls select { min-width: 155px; }
+    button { border: 1px solid #c6d1c9; border-radius: 8px; padding: 9px 12px; color: #26332b; background: #fff; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
+    button:hover { border-color: #668b72; background: #f4f8f4; }
+    button.primary { color: #fff; background: #286744; border-color: #286744; }
+    button.primary:hover { background: #205638; }
+    button.danger { color: #963f39; border-color: #e5c7c3; }
+    button.small { padding: 6px 9px; font-size: 12px; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .screen { padding: 20px; min-height: 520px; }
+    .app-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: -20px -20px 20px; padding: 12px 20px; border-bottom: 1px solid #e8ede9; color: #66736b; font-size: 12px; }
+    .brand { color: #294b36; font-weight: 800; font-size: 13px; }
+    .nav-links { display: flex; gap: 6px; }
+    .nav-links button { border: 0; padding: 6px 9px; color: #65736a; background: transparent; font-size: 12px; }
+    .nav-links button.active { color: #215d3b; background: #edf6ef; }
+    .page-title { display: flex; align-items: start; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+    .page-title h3 { margin: 0 0 4px; font-size: 21px; }
+    .muted { color: #718078; font-size: 12px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
+    .filters { display: grid; grid-template-columns: minmax(160px, 1fr) 150px 150px; gap: 9px; margin-bottom: 13px; }
+    .filters input { width: 100%; }
+    .table-wrap { overflow-x: auto; border: 1px solid #e1e8e2; border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { padding: 10px 12px; text-align: left; color: #6b786f; background: #f6f8f6; font-size: 11px; font-weight: 700; }
+    td { padding: 12px; border-top: 1px solid #edf0ed; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #f7faf7; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .badge.prep { color: #855414; background: #fff2d8; }
+    .badge.done { color: #24613d; background: #e1f3e6; }
+    .empty, .notice { padding: 22px 16px; border: 1px dashed #ccd8ce; border-radius: 10px; color: #69786e; text-align: center; font-size: 13px; background: #fafcfa; }
+    .error { padding: 13px 15px; color: #8b3d37; border: 1px solid #eccac6; border-radius: 9px; background: #fff4f2; font-size: 13px; }
+    .loading { display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 150px; color: #65736a; font-size: 13px; }
+    .spinner { width: 17px; height: 17px; border: 2px solid #d7e3da; border-top-color: #36754c; border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .field-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; border: 1px solid #e1e8e2; border-radius: 11px; background: #fbfcfb; }
+    .field-grid label, .inventory-fields label { font-size: 11px; }
+    .field-grid input, .field-grid textarea { width: 100%; margin-top: 3px; }
+    .field-grid .wide { grid-column: 1 / -1; }
+    .read-value { display: block; padding: 8px 0 3px; min-height: 28px; color: #26332b; font-size: 14px; font-weight: 600; }
+    .specs { font-size: 12px; color: #68756d; }
+    .section-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 20px 0 10px; }
+    .section-head h4 { margin: 0; font-size: 14px; }
+    .equipment-list { display: grid; gap: 8px; }
+    .equipment { display: grid; grid-template-columns: minmax(100px, 1fr) 100px 105px minmax(120px, 1.2fr) auto; gap: 10px; align-items: center; padding: 11px; border: 1px solid #e2e9e3; border-radius: 9px; font-size: 12px; }
+    .equip-name { font-weight: 700; }
+    .draft-tag { padding: 4px 7px; border-radius: 6px; color: #815615; background: #fff4dc; font-size: 10px; }
+    .order-overview { padding: 12px 14px; border: 1px solid #e1e8e2; border-radius: 10px; }
+    .order-overview .line { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid #eef1ee; font-size: 12px; }
+    .order-overview .line:last-child { border: 0; }
+    .inventory-order { padding: 13px 15px; border: 1px solid #b9d4c0; border-left: 4px solid #438257; border-radius: 9px; background: #f3f8f4; margin-bottom: 16px; }
+    .inventory-order strong { display: block; margin-bottom: 5px; color: #42604a; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; }
+    .inventory-order a { color: #245d39; font-size: 15px; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .inventory-order .muted { display: block; margin-top: 4px; }
+    .inventory-fields { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; padding: 15px; border: 1px solid #e1e8e2; border-radius: 10px; }
+    .inventory-fields input { width: 100%; margin-top: 3px; }
+    .toast { position: sticky; bottom: 10px; margin-top: 15px; padding: 10px 13px; border-radius: 8px; color: #225438; background: #e3f3e7; font-size: 12px; box-shadow: 0 6px 18px #20352820; }
+    .modal-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 18px; background: #14251dcc; z-index: 10; }
+    .modal { width: min(520px, 100%); max-height: 88vh; overflow: auto; padding: 20px; border-radius: 14px; background: white; box-shadow: 0 25px 70px #0004; }
+    .modal h3 { margin-bottom: 6px; font-size: 18px; }
+    .modal p { color: #69776f; font-size: 13px; line-height: 1.5; }
+    .modal-actions { display: flex; justify-content: end; gap: 8px; margin-top: 17px; }
+    .modal .field-grid { margin-top: 14px; }
+    .modal-search { width: 100%; margin: 10px 0; }
+    .select-list { display: grid; gap: 7px; max-height: 270px; overflow: auto; }
+    .select-row { display: grid; grid-template-columns: 18px 1fr; gap: 9px; padding: 10px; border: 1px solid #e2e9e3; border-radius: 8px; cursor: pointer; }
+    .select-row input { margin: 2px 0; }
+    .select-row b { display: block; font-size: 12px; }
+    .select-row small { color: #718078; font-size: 11px; }
+    .allstates { display: grid; gap: 8px; padding: 14px 20px 20px; border-top: 1px solid #e9eeea; background: #fafbfa; }
+    .allstates h3 { font-size: 13px; margin: 0; }
+    .state-mini { display: grid; grid-template-columns: 120px 1fr; gap: 9px; padding: 9px; border: 1px solid #e5ebe6; border-radius: 8px; font-size: 11px; }
+    .tradeoff { padding: 13px 20px 17px; color: #6c7971; border-top: 1px solid #e9eeea; font-size: 12px; line-height: 1.45; }
+    .hidden { display: none !important; }
+    @media (max-width: 650px) { body { padding: 12px; } .filters { grid-template-columns: 1fr 1fr; } .filters label:first-child { grid-column: 1 / -1; } .field-grid { grid-template-columns: 1fr 1fr; } .equipment { grid-template-columns: 1fr 1fr; } .equipment button { grid-column: 1 / -1; } .page-title { flex-direction: column; } .actions { justify-content: start; } }
+    @font-face { font-family: "Inter App"; src: url("./InterVariable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+    :root { font-family: "Inter App", Inter, sans-serif; color: #1e293b; background: #f5f6f8; --app-primary: #2563eb; --app-border: #dfe3e8; --app-muted: #64748b; }
+    body { padding: 16px 24px 24px; color: #1e293b; background: #f5f6f8; font-size: 17px; }
+    h1 { margin: 0 0 4px; color: #1e293b; font-size: 24px; font-weight: 600; line-height: 30px; }
+    .intro { margin-bottom: 14px; color: #64748b; font-size: 13px; line-height: 20px; }
+    .alternatives { display: block; }
+    .alternative { overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .alt-head { padding: 0 0 10px; border: 0; }
+    .alt-head h2 { margin: 0; color: #64748b; font-size: 13px; font-weight: 600; }
+    .alt-head p { display: none; }
+    .controls { gap: 8px; padding: 10px 12px; border: 1px solid #dfe3e8; border-bottom: 0; border-radius: 4px 4px 0 0; background: #fff; }
+    .controls label { gap: 0; color: #64748b; font-size: 13px; font-weight: 500; }
+    .controls select, select, input, textarea { min-height: 36px; padding: 0 10px; border: 1px solid #dfe3e8; border-radius: 4px; color: #1e293b; background: #fff; font-family: inherit; font-size: 15px; box-shadow: none; }
+    .controls select { min-width: 180px; }
+    button { min-height: 36px; padding: 0 12px; border: 1px solid #dfe3e8; border-radius: 4px; color: #1e293b; background: #fff; font-family: inherit; font-size: 15px; font-weight: 500; box-shadow: none; }
+    button:hover { border-color: #2563eb; color: #1e293b; background: #eff6ff; }
+    button.primary { border-color: #2563eb; color: #fff; background: #2563eb; }
+    button.primary:hover { border-color: #1d4ed8; background: #1d4ed8; }
+    button.danger { border-color: #dfe3e8; color: #dc2626; }
+    button.small { min-height: 32px; padding: 0 10px; font-size: 13px; }
+    .screen { min-height: 520px; padding: 0; border: 1px solid #dfe3e8; border-radius: 0 0 4px 4px; background: #f5f6f8; }
+    .app-nav, .inventory-header { display: flex; align-items: center; justify-content: flex-start; gap: 24px; min-height: 56px; margin: 0; padding: 0 24px; border-bottom: 1px solid #dfe3e8; background: #fff; color: #1e293b; }
+    .brand { display: flex; align-items: center; gap: 8px; color: #1e293b; font-size: 18px; font-weight: 600; }
+    .brand svg { width: 26px; height: 26px; color: #2563eb; stroke-width: 1.5; }
+    .nav-links, .inventory-nav { display: flex; align-self: stretch; gap: 0; }
+    .nav-links button { min-height: auto; padding: 0 8px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; color: #64748b; background: transparent; font-size: 15px; font-weight: 500; }
+    .nav-links button:hover { color: #2563eb; background: transparent; }
+    .nav-links button.active { border-bottom-color: #2563eb; color: #2563eb; background: transparent; }
+    .inventory-content { padding: 24px; }
+    .page-title { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; margin: 0; }
+    .page-title h3 { margin: 0; color: #1e293b; font-size: 24px; font-weight: 600; line-height: 30px; }
+    .muted { color: #64748b; font-size: 13px; line-height: 20px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
+    .filters { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 16px 0 12px; }
+    .filters label { display: flex; gap: 0; color: #64748b; font-size: 0; }
+    .filters label:first-child { position: relative; width: 360px; max-width: 100%; }
+    .filters label:first-child:before { content: ""; position: absolute; z-index: 1; left: 12px; top: 11px; width: 10px; height: 10px; border: 1.5px solid #64748b; border-radius: 50%; }
+    .filters label:first-child:after { content: ""; position: absolute; z-index: 1; left: 22px; top: 22px; width: 6px; height: 1.5px; transform: rotate(45deg); transform-origin: left; background: #64748b; }
+    .filters label:first-child input { width: 100%; padding-left: 34px; }
+    .filters label:not(:first-child) { width: 164px; }
+    .filters input { width: 100%; height: 36px; min-height: 36px; padding: 0 12px; border-radius: 4px; font-size: 15px; }
+    .filters label:not(:first-child) input { color: #64748b; }
+    .table-wrap { overflow: hidden; border: 1px solid #dfe3e8; border-radius: 4px; background: #fff; }
+    table { min-width: 600px; font-size: 15px; line-height: 22px; }
+    th { height: 40px; padding: 8px 16px; color: #64748b; background: #f1f3f6; font-size: 13px; font-weight: 600; }
+    td { height: 44px; padding: 8px 16px; border-top: 1px solid #dfe3e8; }
+    tbody tr { background: #fff; }
+    tbody tr:hover { background: #f8fafc; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 13px; line-height: 22px; font-weight: 500; }
+    .badge { color: var(--status-color, #64748b); background: color-mix(in srgb, var(--status-color, #64748b) 10%, white); }
+    .empty, .notice { min-height: 96px; padding: 32px 16px; border: 1px solid #dfe3e8; border-radius: 4px; color: #64748b; text-align: center; background: #fff; font-size: 15px; }
+    .error { padding: 12px 16px; border: 1px solid #fecaca; border-radius: 4px; color: #dc2626; background: #fff; font-size: 15px; }
+    .loading { min-height: 120px; color: #64748b; font-size: 15px; }
+    .spinner { width: 16px; height: 16px; border-color: #dfe3e8; border-top-color: #2563eb; }
+    .field-grid { gap: 16px; padding: 20px 24px; border-color: #dfe3e8; border-radius: 4px; background: #fff; }
+    .field-grid label { color: #64748b; font-size: 13px; font-weight: 500; }
+    .field-grid input, .field-grid textarea { min-height: 36px; margin-top: 6px; border-radius: 4px; font-size: 15px; }
+    .field-grid textarea { min-height: 68px; padding: 8px 10px; }
+    .read-value { color: #1e293b; font-size: 15px; font-weight: 400; }
+    .section-head { margin: 20px 0 10px; }
+    .section-head h4 { color: #1e293b; font-size: 15px; font-weight: 600; }
+    .equipment-list { overflow: hidden; border: 1px solid #dfe3e8; border-radius: 4px; background: #fff; }
+    .equipment { grid-template-columns: minmax(140px, 1.1fr) 135px 150px minmax(180px, 2fr) auto; gap: 12px; min-height: 44px; padding: 8px 16px; border: 0; border-top: 1px solid #dfe3e8; border-radius: 0; font-size: 15px; }
+    .equipment:first-child { border-top: 0; }
+    .equip-name { font-weight: 500; }
+    .specs { color: #475569; font-size: 14px; }
+    .inventory-order { padding: 12px 16px; border: 1px solid #dfe3e8; border-radius: 4px; background: #fff; }
+    .inventory-order strong { color: #64748b; font-size: 13px; font-weight: 600; }
+    .inventory-order a { color: #2563eb; font-size: 15px; font-weight: 500; }
+    .inventory-fields { padding: 20px 24px; border-color: #dfe3e8; border-radius: 4px; background: #fff; }
+    .inventory-fields label { color: #64748b; font-size: 13px; }
+    .inventory-fields input { width: 100%; height: 36px; min-height: 36px; margin-top: 6px; border-radius: 4px; font-size: 15px; }
+    .toast { border: 1px solid #bbf7d0; border-radius: 4px; color: #166534; background: #f0fdf4; box-shadow: none; }
+    .modal-backdrop { background: rgb(15 23 42 / 30%); backdrop-filter: blur(6px); }
+    .modal { border: 1px solid #dfe3e8; border-radius: 4px; box-shadow: 0 12px 32px rgb(15 23 42 / 16%); }
+    .modal h3 { color: #1e293b; font-size: 20px; font-weight: 600; }
+    .modal p { color: #64748b; font-size: 15px; }
+    .modal label { color: #64748b; font-size: 13px; }
+    .select-row { border-color: #dfe3e8; border-radius: 4px; }
+    .select-row:hover { background: #f8fafc; }
+    .tradeoff { padding: 10px 0; border: 0; color: #64748b; font-size: 12px; }
+    .allstates { border: 1px solid #dfe3e8; border-top: 0; border-radius: 0 0 4px 4px; background: #fff; }
+    .state-mini { border-color: #dfe3e8; border-radius: 4px; }
+    @media (max-width: 767px) { body { padding: 12px; } .inventory-content { padding: 16px; } .app-nav, .inventory-header { gap: 12px; padding: 0 16px; } .brand { font-size: 15px; } .filters { display: grid; grid-template-columns: 1fr 1fr; } .filters label:first-child { grid-column: 1 / -1; width: 100%; } .filters label:not(:first-child) { width: auto; } .field-grid { grid-template-columns: 1fr 1fr; padding: 16px; } .equipment { grid-template-columns: 1fr 1fr; } .equipment button { grid-column: 1 / -1; } .page-title { align-items: flex-start; } }
+  </style>
+</head>
+<body>
+  <h1>Alternativa A · Detalle en bloques</h1>
+  <p class="intro">Vista elegida con los estilos de la aplicación. Usá el control para recorrer las distintas situaciones de Órdenes e Inventario.</p>
+  <main class="alternatives" id="alternatives"></main>
+  <script>
+    const baseOrders = [
+      { id: 18, recipient: 'Escuela Ibarzabal', date: '2026-12-12', status: 'En Preparación', description: 'Equipamiento para el aula de informática.', teams: [
+        { id: 1, name: 'ThinkPad T480', serial: 'TS-24018', status: 'Listo para donar', specs: 'i5 · 16 GB RAM · 256 GB SSD' },
+        { id: 2, name: 'Dell Latitude 5400', serial: 'TS-24027', status: 'Listo para donar', specs: 'i5 · 8 GB RAM · 256 GB SSD' }
+      ] },
+      { id: 17, recipient: 'Biblioteca Popular Alberdi', date: '2026-11-20', status: 'Donado', description: 'Equipos para uso comunitario.', teams: [
+        { id: 3, name: 'HP ProBook 440', serial: 'TS-23104', status: 'Donado', specs: 'i5 · 8 GB RAM · 500 GB SSD' }
+      ] },
+      { id: 16, recipient: 'Centro Vecinal Norte', date: '2027-01-09', status: 'En Preparación', description: '', teams: [] }
+    ];
+    const availableTeams = [
+      { id: 4, name: 'Lenovo ThinkPad L14', serial: 'TS-24055', model: 'ThinkPad L14', specs: 'i5 · 16 GB RAM · 256 GB SSD' },
+      { id: 5, name: 'Dell Latitude 5410', serial: 'TS-24061', model: 'Latitude 5410', specs: 'i5 · 8 GB RAM · 256 GB SSD' },
+      { id: 6, name: 'HP EliteBook 840', serial: 'TS-24072', model: 'EliteBook 840', specs: 'i5 · 16 GB RAM · 512 GB SSD' }
+    ];
+    const states = [
+      ['normal', 'Datos de ejemplo'], ['empty-orders', 'Sin órdenes'], ['no-results', 'Sin coincidencias'],
+      ['no-teams', 'Orden sin equipos'], ['no-available', 'Sin equipos disponibles'],
+      ['loading', 'Cargando'], ['error', 'Error de consulta'], ['donated', 'Orden Donado']
+    ];
+    const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+    function makeApp(id, layout) {
+      return { id, layout, page: 'orders', mode: 'view', state: 'normal', orders: structuredClone(baseOrders), currentId: 18, draft: null, modal: null, toast: '', serial: 'TS-24018', search: '', dateFrom: '', dateTo: '', allStates: false };
+    }
+    const apps = [makeApp('a', 'layout-a')];
+    const root = document.getElementById('alternatives');
+    root.innerHTML = apps.map(app => `
+      <section class="alternative ${app.layout}" id="alt-${app.id}">
+        <header class="alt-head"><h2>Controles de vista previa</h2><p>Controles del prototipo</p></header>
+        <div class="controls">
+          <label>Estado de ejemplo<select data-action="state">${states.map(([v,l]) => `<option value="${v}">${l}</option>`).join('')}</select></label>
+          <button data-action="all">Ver todos los estados</button>
+        </div>
+        <div class="screen" data-screen></div>
+        <div class="tradeoff">Los campos de la orden aparecen antes que la lista completa de equipos asociados.</div>
+        <div class="allstates hidden" data-allstates></div>
+      </section>`).join('');
+    apps.forEach(app => {
+      root.querySelectorAll(`#alt-${app.id} [data-action="state"]`)[0].addEventListener('change', e => {
+        app.state = e.target.value; app.orders = structuredClone(baseOrders); app.mode = 'view'; app.draft = null; app.toast = '';
+        if (app.state === 'no-teams') app.orders[0].teams = [];
+        if (app.state === 'donated') { app.orders[0].status = 'Donado'; app.orders[0].teams.forEach(t => t.status = 'Donado'); }
+        render(app);
+      });
+      root.querySelector(`#alt-${app.id} [data-action="all"]`).addEventListener('click', () => { app.allStates = !app.allStates; render(app); });
+      render(app);
+    });
+
+    function current(app) { return app.orders.find(o => o.id === app.currentId) || app.orders[0]; }
+    function statusMarkup(app, status) {
+      const colors = { 'En Preparación': '#b45309', 'Listo para donar': '#15803d', 'Listo para Donar': '#15803d', 'Recibido': '#1d4ed8', 'Instalar SO': '#7e22ce', 'En reparación': '#b45309', 'En Reparación': '#b45309', 'Bloqueada': '#be123c', 'Donado': '#475569' };
+      return `<span class="badge" style="--status-color:${colors[status] || '#64748b'}">${esc(status)}</span>`;
+    }
+    function filteredOrders(app) {
+      const q = app.search.toLocaleLowerCase('es');
+      return app.orders.filter(o => {
+        const textMatch = !q || o.recipient.toLocaleLowerCase('es').includes(q) || o.teams.some(t => t.serial.toLocaleLowerCase('es').includes(q));
+        const from = !app.dateFrom || o.date >= app.dateFrom;
+        const to = !app.dateTo || o.date <= app.dateTo;
+        return textMatch && from && to;
+      });
+    }
+    function equipmentRows(app, order) {
+      if (!order.teams.length) return `<div class="empty">Aún no hay equipos asociados, edite la orden para vincularlos</div>`;
+      const teams = app.mode === 'edit' ? app.draft.teams : order.teams;
+      return `<div class="equipment-list">${teams.map(t => `<div class="equipment"><span class="equip-name">${esc(t.name)}${app.mode === 'edit' && t.added ? ' <span class="draft-tag">Pendiente</span>' : ''}${app.mode === 'edit' && t.removed ? ' <span class="draft-tag">Se quitará</span>' : ''}</span><span class="serial">${esc(t.serial)}</span><span>${statusMarkup(app, t.status)}</span><span class="specs">${esc(t.specs)}</span>${app.mode === 'edit' ? `<button class="small danger" data-action="remove-team" data-id="${t.id}" ${t.removed ? 'disabled' : ''}>Quitar</button>` : ''}</div>`).join('')}</div>`;
+    }
+    function contentFor(app) {
+      if (app.state === 'loading') return `<div class="loading"><span class="spinner"></span>Cargando</div>`;
+      if (app.state === 'error') return `<div class="error"><b>Error en la consulta.</b><br>No se pudieron cargar los datos. Volvé a intentarlo.</div>`;
+      if (app.page === 'inventory') return inventoryPage(app);
+      if (app.page === 'detail') return detailPage(app);
+      return ordersPage(app);
+    }
+    function ordersPage(app) {
+      const rows = app.state === 'empty-orders' ? [] : app.state === 'no-results' ? [] : filteredOrders(app);
+      let body = '';
+      if (app.state === 'empty-orders' || (!rows.length && !app.search && !app.dateFrom && !app.dateTo)) body = `<div class="empty">No hay órdenes disponibles</div>`;
+      else if (!rows.length) body = `<div class="empty">No se encontraron resultados</div>`;
+      else body = `<div class="table-wrap inventory-table-panel"><table><thead><tr><th>Destinatario</th><th>Fecha de entrega</th><th>Estado</th></tr></thead><tbody>${rows.map(o => `<tr data-action="open-order" data-id="${o.id}"><td><b>${esc(o.recipient)}</b></td><td>${new Date(o.date + 'T12:00:00').toLocaleDateString('es-AR')}</td><td>${statusMarkup(app, o.status)}</td></tr>`).join('')}</tbody></table></div>`;
+      return `<div class="page-title inventory-heading"><div><h3>Órdenes</h3><div class="muted">Órdenes de donación registradas</div></div><div class="actions"><button class="primary" data-action="create">Crear orden</button></div></div><div class="filters inventory-toolbar"><label>Buscar<input data-input="search" placeholder="Destinatario o número de serie" value="${esc(app.search)}"></label><label>Fecha desde<input data-input="from" type="date" value="${app.dateFrom}"></label><label>Fecha hasta<input data-input="to" type="date" value="${app.dateTo}"></label></div>${body}`;
+    }
+    function detailPage(app) {
+      const order = current(app); if (!order) return '<div class="empty">No hay órdenes disponibles</div>';
+      const editable = app.mode === 'edit' && order.status !== 'Donado';
+      const d = editable ? app.draft : order;
+      const actions = order.status === 'Donado'
+        ? `<button data-action="return-prep">Volver a En Preparación</button>`
+        : app.mode === 'edit'
+          ? `<button data-action="cancel-edit">Cancelar</button><button class="primary" data-action="save">Guardar Cambios</button>`
+          : `<button data-action="edit">Editar</button><button data-action="mark-donated">Marcar como Donado</button>${!order.teams.length ? '<button class="danger" data-action="delete">Eliminar orden</button>' : ''}`;
+      const fields = `<section class="field-grid"><label>Destinatario${editable ? `<input data-field="recipient" value="${esc(d.recipient)}">` : `<span class="read-value">${esc(order.recipient)}</span>`}</label><label>Fecha de entrega${editable ? `<input data-field="date" type="date" value="${d.date}">` : `<span class="read-value">${new Date(order.date + 'T12:00:00').toLocaleDateString('es-AR')}</span>`}</label><label>Estado<span class="read-value">${statusMarkup(app, order.status)}</span></label><label class="wide">Descripción${editable ? `<textarea data-field="description" rows="2">${esc(d.description)}</textarea>` : `<span class="read-value">${esc(order.description || '—')}</span>`}</label></section>`;
+      const teams = `<section><div class="section-head"><h4>Equipos asociados <span class="muted">(${editable ? app.draft.teams.filter(t => !t.removed).length : order.teams.length})</span></h4>${editable ? '<button class="small" data-action="add-team">Agregar equipo</button>' : ''}</div>${equipmentRows(app, order)}</section>`;
+      const inner = `${fields}${teams}`;
+      return `<div class="page-title inventory-heading"><div><button class="small" data-action="back">← Órdenes</button><h3 style="margin-top:12px">${esc(order.recipient)}</h3><div class="muted">Orden #${order.id} · ${statusMarkup(app, order.status)}</div></div><div class="actions">${actions}</div></div>${inner}`;
+    }
+    function inventoryPage(app) {
+      const team = baseOrders[0].teams[0];
+      const order = baseOrders[0];
+      return `<div class="page-title inventory-heading"><div><h3>Equipo · ${esc(team.serial)}</h3><div class="muted">Inventario / detalle del equipo</div></div><button data-action="back">Volver</button></div><div class="inventory-order"><div><strong>Orden de donación</strong><a data-action="open-inventory-order">${esc(order.recipient)}</a><span class="muted">Fecha de entrega: ${new Date(order.date + 'T12:00:00').toLocaleDateString('es-AR')}</span></div>${statusMarkup(app, order.status)}</div><div class="inventory-fields"><label>Modelo<input value="ThinkPad T480" readonly></label><label>Marca<input value="Lenovo" readonly></label><label>Número de serie<input value="${esc(team.serial)}" readonly></label><label>Estado<input value="${esc(team.status)}" readonly></label><label style="grid-column:1/-1">Especificaciones<input value="${esc(team.specs)}" readonly></label></div>`;
+    }
+    function modalMarkup(app) {
+      if (!app.modal) return '';
+      if (app.modal.type === 'add') {
+        const q = app.modal.query.toLocaleLowerCase('es');
+        const choices = (app.state === 'no-available' ? [] : availableTeams).filter(t => !app.draft.teams.some(x => x.id === t.id && !x.removed) && `${t.name} ${t.model} ${t.serial}`.toLocaleLowerCase('es').includes(q));
+        return `<div class="modal-backdrop"><div class="modal"><h3>Agregar equipos a la orden</h3><p>Buscá por número de serie, modelo o nombre y seleccioná uno o varios equipos. La asociación se guarda al pulsar Guardar Cambios en la orden.</p><input class="modal-search" data-input="modal-search" placeholder="Buscar equipo" value="${esc(app.modal.query)}">${choices.length ? `<div class="select-list">${choices.map(t => `<label class="select-row"><input type="checkbox" data-choice="${t.id}" ${app.modal.selected.has(t.id) ? 'checked' : ''}><span><b>${esc(t.name)} · ${esc(t.serial)}</b><small>${esc(t.model)} · ${esc(t.specs)}</small></span></label>`).join('')}</div>` : `<div class="empty">Aún no hay equipos asociados, edite la orden para vincularlos</div>`}<div class="modal-actions"><button data-action="close-modal">Cancelar</button><button class="primary" data-action="stage-add">Agregar selección</button></div></div></div>`;
+      }
+      if (app.modal.type === 'remove') return `<div class="modal-backdrop"><div class="modal"><h3>Quitar equipo</h3><p>Elegí el estado con el que el equipo volverá al Inventario al guardar los cambios de la orden.</p><label>Estado de retorno<select data-input="return-status"><option>Listo para donar</option><option>Recibido</option><option>Instalar SO</option><option>En reparación</option><option>Bloqueada</option><option>Donado</option></select></label><div class="modal-actions"><button data-action="close-modal">Cancelar</button><button class="primary" data-action="stage-remove">Quitar de la orden</button></div></div></div>`;
+      if (app.modal.type === 'leave') return `<div class="modal-backdrop"><div class="modal"><h3>Se perderán los cambios</h3><p>Si salís ahora, se descartarán las modificaciones sin guardar.</p><div class="modal-actions"><button data-action="stay-editing">Seguir editando</button><button class="danger" data-action="leave-discard">Salir sin guardar</button></div></div></div>`;
+      if (app.modal.type === 'return-prep') return `<div class="modal-backdrop"><div class="modal"><h3>Volver a En Preparación</h3><p>Los equipos asociados volverán al estado Listo para donar y la orden podrá editarse otra vez.</p><div class="modal-actions"><button data-action="close-modal">Cerrar</button><button class="primary" data-action="confirm-return">Cambiar</button></div></div></div>`;
+      if (app.modal.type === 'create') return `<div class="modal-backdrop"><div class="modal"><h3>Crear orden</h3><div class="field-grid"><label>Destinatario<input data-input="new-recipient" placeholder="Nombre del destinatario"></label><label>Fecha de entrega<input data-input="new-date" type="date"></label><label class="wide">Descripción<textarea data-input="new-description" rows="2"></textarea></label></div><div class="modal-actions"><button data-action="close-modal">Cancelar</button><button class="primary" data-action="save-create">Crear orden</button></div></div></div>`;
+      if (app.modal.type === 'delete') return `<div class="modal-backdrop"><div class="modal"><h3>Eliminar orden</h3><p>Esta orden no tiene equipos asociados. ¿Querés eliminarla?</p><div class="modal-actions"><button data-action="close-modal">Cancelar</button><button class="danger" data-action="confirm-delete">Eliminar orden</button></div></div></div>`;
+      return '';
+    }
+    function allStatesMarkup() {
+      return `<h3>Vista rápida de estados</h3><div class="state-mini"><b>Tabla sin órdenes</b><span>No hay órdenes disponibles</span></div><div class="state-mini"><b>Sin coincidencias</b><span>No se encontraron resultados</span></div><div class="state-mini"><b>Detalle sin equipos</b><span>Aún no hay equipos asociados, edite la orden para vincularlos</span></div><div class="state-mini"><b>Cargando</b><span>Indicador de carga acorde a la página</span></div><div class="state-mini"><b>Error de lectura</b><span>Error en la consulta</span></div>`;
+    }
+    function render(app) {
+      const rootApp = document.getElementById(`alt-${app.id}`);
+      const nav = `<header class="app-nav inventory-header"><span class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="1"></rect><path d="M8 21h8M12 17v4"></path></svg>Taller Solidario</span><nav class="nav-links inventory-nav" aria-label="Navegación principal"><button data-action="go-inventory" class="${app.page === 'inventory' ? 'active' : ''}">Inventario</button><button>Asistencias</button><button>Tutoriales</button><button data-action="go-orders" class="${app.page !== 'inventory' ? 'active' : ''}">Órdenes</button></nav></header>`;
+      rootApp.querySelector('[data-screen]').innerHTML = nav + `<main class="inventory-content">${contentFor(app)}${app.toast ? `<div class="toast">${esc(app.toast)}</div>` : ''}</main>` + modalMarkup(app);
+      const all = rootApp.querySelector('[data-allstates]'); all.innerHTML = allStatesMarkup(); all.classList.toggle('hidden', !app.allStates);
+      rootApp.querySelectorAll('[data-action]').forEach(el => el.addEventListener('click', () => act(app, el.dataset.action, el.dataset.id)));
+      rootApp.querySelectorAll('[data-input]').forEach(el => el.addEventListener('input', () => {
+        if (el.dataset.input === 'search') { app.search = el.value; const pos = el.selectionStart; render(app); const n = rootApp.querySelector('[data-input="search"]'); n.focus(); n.setSelectionRange(pos, pos); }
+        if (el.dataset.input === 'from') { app.dateFrom = el.value; render(app); }
+        if (el.dataset.input === 'to') { app.dateTo = el.value; render(app); }
+        if (el.dataset.input === 'modal-search') { app.modal.query = el.value; render(app); const n = rootApp.querySelector('[data-input="modal-search"]'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); }
+        if (el.dataset.input === 'return-status') app.modal.returnStatus = el.value;
+        if (el.dataset.input === 'new-recipient') app.modal.recipient = el.value;
+        if (el.dataset.input === 'new-date') app.modal.date = el.value;
+        if (el.dataset.input === 'new-description') app.modal.description = el.value;
+      }));
+      rootApp.querySelectorAll('[data-field]').forEach(el => el.addEventListener('input', () => { app.draft[el.dataset.field] = el.value; }));
+      rootApp.querySelectorAll('[data-choice]').forEach(el => el.addEventListener('change', () => { const id = Number(el.dataset.choice); el.checked ? app.modal.selected.add(id) : app.modal.selected.delete(id); }));
+    }
+    function act(app, action, value) {
+      const order = current(app);
+      if (action === 'go-orders') { app.page = 'orders'; app.mode = 'view'; }
+      if (action === 'go-inventory') app.page = 'inventory';
+      if (action === 'back') { if (app.mode === 'edit') app.modal = { type: 'leave' }; else app.page = 'orders'; }
+      if (action === 'open-order') { app.currentId = Number(value); app.page = 'detail'; app.mode = 'view'; }
+      if (action === 'open-inventory-order') { app.currentId = 18; app.page = 'detail'; app.mode = 'view'; }
+      if (action === 'edit') { app.mode = 'edit'; app.draft = structuredClone(order); }
+      if (action === 'cancel-edit') app.modal = { type: 'leave' };
+      if (action === 'stay-editing' || action === 'close-modal') app.modal = null;
+      if (action === 'leave-discard') { app.modal = null; app.mode = 'view'; app.draft = null; app.page = 'orders'; }
+      if (action === 'add-team') app.modal = { type: 'add', query: '', selected: new Set() };
+      if (action === 'stage-add') { app.modal.selected.forEach(id => { const t = availableTeams.find(x => x.id === id); app.draft.teams.push({ ...t, status: 'Listo para donar', added: true }); }); app.modal = null; }
+      if (action === 'remove-team') { app.modal = { type: 'remove', teamId: Number(value), returnStatus: 'Listo para donar' }; }
+      if (action === 'stage-remove') { const team = app.draft.teams.find(t => t.id === app.modal.teamId); if (team) { team.removed = true; team.status = app.modal.returnStatus || 'Listo para donar'; } app.modal = null; }
+      if (action === 'save') {
+        if (!app.draft.recipient || !app.draft.date) app.toast = 'Falta destinatario o fecha; no se guardó la edición.';
+        else { app.draft.teams = app.draft.teams.filter(t => !t.removed); app.draft.status = order.status; app.orders = app.orders.map(o => o.id === order.id ? structuredClone(app.draft) : o); app.mode = 'view'; app.draft = null; app.toast = 'Cambios guardados en una sola operación.'; }
+      }
+      if (action === 'mark-donated') { order.status = 'Donado'; order.teams.forEach(t => t.status = 'Donado'); app.toast = 'Orden y equipos actualizados.'; }
+      if (action === 'return-prep') app.modal = { type: 'return-prep' };
+      if (action === 'confirm-return') { order.status = 'En Preparación'; order.teams.forEach(t => t.status = 'Listo para donar'); app.modal = null; app.toast = 'La orden volvió a En Preparación.'; }
+      if (action === 'create') app.modal = { type: 'create', recipient: '', date: '', description: '' };
+      if (action === 'save-create') { const m = app.modal; if (m.recipient && m.date) { const created = { id: 19, recipient: m.recipient, date: m.date, status: 'En Preparación', description: m.description || '', teams: [] }; app.orders.unshift(created); app.currentId = created.id; app.page = 'detail'; app.modal = null; } else app.toast = 'Completá destinatario y fecha de entrega.'; }
+      if (action === 'delete') app.modal = { type: 'delete' };
+      if (action === 'confirm-delete') { app.orders = app.orders.filter(o => o.id !== order.id); app.page = 'orders'; app.modal = null; app.toast = 'Orden eliminada.'; }
+      render(app);
+    }
+  </script>
+</body>
+</html>

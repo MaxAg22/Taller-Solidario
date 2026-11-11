@@ -2,7 +2,7 @@
 
 ## Stage
 
-Shape resuelto: las ramas de comportamiento de Órdenes están asentadas; sigue el diseño del sistema.
+Diseño del sistema completo: datos, flujos, ciclo de estados e interacción aprobados.
 
 ## Links
 
@@ -16,7 +16,9 @@ Shape resuelto: las ramas de comportamiento de Órdenes están asentadas; sigue 
 - `canvas/explore.svg` — export del canvas.
 - `canvas/mockups/` — carpeta vacía creada por el scaffold del canvas.
 - `shape.md` — árbol y decisiones de alcance resueltas.
+- `design.md` — árbol de diseño y representación asentada de datos de órdenes.
+- `prototypes/` — prototipos interactivos de la rama de interfaz.
+- `prototypes/orders.html` — prototipo de la alternativa A para la tabla de órdenes, detalle, asociación e indicador en Inventario.
+- `prototypes/InterVariable.woff2` — copia local de la tipografía de la aplicación para el prototipo.
 
 ## Tracking
-
-Ningún pendiente dentro de Shape.
