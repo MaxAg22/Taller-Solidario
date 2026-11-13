@@ -105,14 +105,22 @@ export type Database = {
           specs?: string | null
           status?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notebooks_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
           created_at: string
           deliveryDate: string
           description: string | null
-          id: number
+          id: string
           recipient: string
           status: string
         }
@@ -120,7 +128,7 @@ export type Database = {
           created_at?: string
           deliveryDate: string
           description?: string | null
-          id?: number
+          id?: string
           recipient?: string
           status: string
         }
@@ -128,7 +136,7 @@ export type Database = {
           created_at?: string
           deliveryDate?: string
           description?: string | null
-          id?: number
+          id?: string
           recipient?: string
           status?: string
         }

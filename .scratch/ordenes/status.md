@@ -2,7 +2,7 @@
 
 ## Stage
 
-Diseño del programa en curso: primera rama abierta; luego, diseño del programa asentado.
+Diseño del programa en curso: restaurada la edición compuesta y confirmada la atomicidad de transiciones mediante RPC definidas en migraciones; falta cerrar contratos e interfaces de persistencia y el resto de las ramas.
 
 ## Links
 
@@ -23,4 +23,4 @@ Diseño del programa en curso: primera rama abierta; luego, diseño del programa
 - `prototypes/InterVariable.woff2` — copia local de la tipografía de la aplicación para el prototipo.
 
 ## Tracking
-- Revisar el tipo generado en la ruta que importa el cliente después de alinear la FK y los tipos de `orders.id` / `notebooks.order_id` — `program-design.md`.
+- Especificar contratos e interfaces de las operaciones transaccionales de edición y cambio de estado, incluidas sus migraciones SQL — `program-design.md`.

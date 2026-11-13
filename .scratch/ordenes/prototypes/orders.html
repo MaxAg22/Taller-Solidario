@@ -255,7 +255,7 @@
     function filteredOrders(app) {
       const q = app.search.toLocaleLowerCase('es');
       return app.orders.filter(o => {
-        const textMatch = !q || o.recipient.toLocaleLowerCase('es').includes(q) || o.teams.some(t => t.serial.toLocaleLowerCase('es').includes(q));
+        const textMatch = !q || o.recipient.toLocaleLowerCase('es').includes(q);
         const from = !app.dateFrom || o.date >= app.dateFrom;
         const to = !app.dateTo || o.date <= app.dateTo;
         return textMatch && from && to;
@@ -279,7 +279,7 @@
       if (app.state === 'empty-orders' || (!rows.length && !app.search && !app.dateFrom && !app.dateTo)) body = `<div class="empty">No hay órdenes disponibles</div>`;
       else if (!rows.length) body = `<div class="empty">No se encontraron resultados</div>`;
       else body = `<div class="table-wrap inventory-table-panel"><table><thead><tr><th>Destinatario</th><th>Fecha de entrega</th><th>Estado</th></tr></thead><tbody>${rows.map(o => `<tr data-action="open-order" data-id="${o.id}"><td><b>${esc(o.recipient)}</b></td><td>${new Date(o.date + 'T12:00:00').toLocaleDateString('es-AR')}</td><td>${statusMarkup(app, o.status)}</td></tr>`).join('')}</tbody></table></div>`;
-      return `<div class="page-title inventory-heading"><div><h3>Órdenes</h3><div class="muted">Órdenes de donación registradas</div></div><div class="actions"><button class="primary" data-action="create">Crear orden</button></div></div><div class="filters inventory-toolbar"><label>Buscar<input data-input="search" placeholder="Destinatario o número de serie" value="${esc(app.search)}"></label><label>Fecha desde<input data-input="from" type="date" value="${app.dateFrom}"></label><label>Fecha hasta<input data-input="to" type="date" value="${app.dateTo}"></label></div>${body}`;
+      return `<div class="page-title inventory-heading"><div><h3>Órdenes</h3><div class="muted">Órdenes de donación registradas</div></div><div class="actions"><button class="primary" data-action="create">Crear orden</button></div></div><div class="filters inventory-toolbar"><label>Buscar por destinatario<input data-input="search" placeholder="Destinatario" value="${esc(app.search)}"></label><label>Fecha desde<input data-input="from" type="date" value="${app.dateFrom}"></label><label>Fecha hasta<input data-input="to" type="date" value="${app.dateTo}"></label></div>${body}`;
     }
     function detailPage(app) {
       const order = current(app); if (!order) return '<div class="empty">No hay órdenes disponibles</div>';

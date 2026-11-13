@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.18"
   }
   graphql_public: {
     Tables: {
@@ -65,27 +65,6 @@ export type Database = {
           },
         ]
       }
-      videos: {
-        Row: {
-          id: number
-          created_at: string
-          title: string
-          link: string
-        }
-        Insert: {
-          id?: number
-          created_at?: string
-          title: string
-          link: string
-        }
-        Update: {
-          id?: number
-          created_at?: string
-          title?: string
-          link?: string
-        }
-        Relationships: []
-      }
       notebooks: {
         Row: {
           brand: string | null
@@ -126,6 +105,41 @@ export type Database = {
           specs?: string | null
           status?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "notebooks_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          deliveryDate: string
+          description: string | null
+          id: string
+          recipient: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          deliveryDate: string
+          description?: string | null
+          id?: string
+          recipient?: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          deliveryDate?: string
+          description?: string | null
+          id?: string
+          recipient?: string
+          status?: string
+        }
         Relationships: []
       }
       users: {
@@ -143,6 +157,27 @@ export type Database = {
           created_at?: string
           id?: number
           name?: string
+        }
+        Relationships: []
+      }
+      videos: {
+        Row: {
+          created_at: string
+          id: number
+          link: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          link: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          link?: string
+          title?: string
         }
         Relationships: []
       }

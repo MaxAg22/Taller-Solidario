@@ -15,7 +15,7 @@ Diseño del sistema
 │  │  ✓ Si la transacción falla, nada cambia en la base; se notifica el error y se conservan los cambios en el formulario.
 │  │  ✓ El formulario bloquea el guardado si falta destinatario o fecha.
 │  ├─ 2.3 Asociar un equipo — resuelta
-│  │  ✓ El selector múltiple permite elegir equipos Listos para donar durante la edición.
+│  │  ✓ El selector múltiple permite elegir equipos Listos para donar desde la gestión de equipos.
 │  │  ✓ La asociación queda pendiente hasta Guardar Cambios y se persiste junto con el resto.
 │  ├─ 2.4 Desvincular un equipo — resuelta
 │  │  ✓ El modal permite elegir el estado de retorno; la desvinculación queda pendiente hasta Guardar Cambios.
@@ -42,7 +42,7 @@ Diseño del sistema
 │  ✓ Los equipos asociados muestran su estado propio y la orden con su fecha de entrega en Inventario.
 │  ✓ Q9 Llegar a la fecha de entrega no cambia el estado de la orden.
 └─ 4 Interacción de las personas con Órdenes e Inventario — resuelta
-   ✓ La entrada a Órdenes es una tabla con destinatario, fecha y estado; permite buscar por destinatario o número de serie y filtrar fechas.
+   ✓ La entrada a Órdenes es una tabla con destinatario, fecha y estado; permite buscar por destinatario y filtrar fechas. La búsqueda por número de serie queda fuera por ahora.
    ✓ El detalle de una orden muestra campos editables y equipos con nombre, número de serie, estado y especificaciones.
    ✓ Si está En Preparación, el detalle ofrece Guardar Cambios; en Donado no permite editar.
    ✓ Agregar equipo abre un modal con selector múltiple y búsqueda por número de serie, modelo y nombre.
@@ -52,7 +52,7 @@ Diseño del sistema
    ✓ En el formulario del equipo, sobre modelo y marca, se muestran destinatario y fecha; destinatario enlaza al detalle de la orden.
    ✓ Se incluyen estados sin órdenes, orden sin equipos, sin equipos disponibles, carga y error.
    ✓ Q10–Q14 Se asentaron la tabla, el detalle, el selector múltiple, el vínculo desde Inventario y los estados de pantalla.
-   ✓ Q15 La búsqueda por número de serie muestra la orden que tiene asociado el equipo coincidente.
+   ✓ Q15 La búsqueda de la tabla se limita al destinatario por ahora; no busca órdenes por número de serie.
    ✓ Q16 Los cambios de campos, equipos agregados y equipos quitados se aplican juntos al guardar la edición.
    ✓ Q17 La tabla sin coincidencias muestra «No se encontraron resultados»; el detalle sin equipos muestra «Aún no hay equipos asociados, edite la orden para vincularlos»; el selector sin equipos disponibles muestra ese mensaje.
    ✓ Q18 Si falla una lectura (por ejemplo, 404), se informa un error de consulta.
@@ -114,11 +114,11 @@ La sección Órdenes permite crear y gestionar órdenes y los equipos asociados,
 ### Decisiones asentadas
 
 - La entrada a Órdenes es una tabla; cada fila muestra destinatario, fecha de entrega y estado.
-- La tabla permite buscar por destinatario o número de serie y filtrar por rango de fechas, inclusive.
-- Buscar por número de serie muestra la orden que tiene asociado el equipo coincidente.
+- La tabla permite buscar por destinatario y filtrar por rango de fechas, inclusive.
+- La búsqueda por número de serie queda fuera del alcance actual de la tabla.
 - Al abrir una orden se muestra una página de detalle en modo consulta con sus campos y su lista de equipos asociados.
 - Cada equipo asociado muestra nombre, número de serie, estado y especificaciones.
-- El botón Editar habilita cambiar campos, agregar equipos y quitar equipos; Guardar Cambios aplica todo en una transacción.
+- El botón Editar habilita cambiar destinatario, fecha de entrega, descripción y equipos asociados; Guardar Cambios aplica todo en una transacción.
 - Agregar equipo abre un modal con un selector múltiple que busca por número de serie, modelo y nombre. Los cambios seleccionados quedan pendientes hasta guardar la edición.
 - Al quitar un equipo se elige el estado de retorno; el cambio también queda pendiente hasta guardar.
 - Si falla la transacción, nada cambia en la base, se notifica el fallo y se conservan los cambios en el formulario para reintentar.
