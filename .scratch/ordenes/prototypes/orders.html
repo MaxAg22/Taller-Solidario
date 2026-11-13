@@ -87,6 +87,20 @@
     .select-row input { margin: 2px 0; }
     .select-row b { display: block; font-size: 12px; }
     .select-row small { color: #718078; font-size: 11px; }
+    .modal.add-modal { width: min(724px, 100%); padding: 24px 28px 0; overflow: hidden; }
+    .add-modal h3 { margin-bottom: 8px; font-size: 25px; line-height: 1.3; }
+    .add-modal .modal-copy { margin-bottom: 18px; color: #475569; font-size: 18px; line-height: 1.5; }
+    .add-modal .modal-search { height: 54px; margin: 0 0 24px; padding: 0 16px; border: 1.5px solid #2563eb; border-radius: 7px; font-size: 18px; }
+    .selection-summary { display: flex; align-items: center; gap: 14px; min-height: 56px; margin-bottom: 10px; padding: 8px 14px; border: 1px solid #c8d8f7; border-radius: 7px; background: #eff5ff; color: #475569; font-size: 16px; }
+    .selection-count { padding: 7px 12px; border-radius: 7px; background: #dce9ff; color: #2563eb; font-weight: 700; white-space: nowrap; }
+    .add-modal .select-list { gap: 0; max-height: 364px; border: 1px solid #dfe3e8; border-radius: 7px; overflow: auto; }
+    .add-modal .select-row { grid-template-columns: 26px 1fr; align-items: center; gap: 14px; min-height: 39px; padding: 6px 16px; border: 0; border-radius: 0; font-size: 18px; }
+    .add-modal .select-row:hover { background: #f1f5f9; }
+    .add-modal .select-row input { width: 23px; height: 23px; margin: 0; accent-color: #2563eb; }
+    .add-modal .select-row b { font-size: 18px; font-weight: 400; }
+    .add-modal .select-row small { display: none; }
+    .add-modal .modal-actions { margin: 16px -28px 0; padding: 16px 22px; border-top: 1px solid #dfe3e8; }
+    .add-modal .modal-actions button { min-height: 46px; padding: 0 16px; font-size: 16px; }
     .allstates { display: grid; gap: 8px; padding: 14px 20px 20px; border-top: 1px solid #e9eeea; background: #fafbfa; }
     .allstates h3 { font-size: 13px; margin: 0; }
     .state-mini { display: grid; grid-template-columns: 120px 1fr; gap: 9px; padding: 9px; border: 1px solid #e5ebe6; border-radius: 8px; font-size: 11px; }
@@ -159,7 +173,7 @@
     .equipment:first-child { border-top: 0; }
     .equip-name { font-weight: 500; }
     .specs { color: #475569; font-size: 14px; }
-    .inventory-order { padding: 12px 16px; border: 1px solid #dfe3e8; border-radius: 4px; background: #fff; }
+    .inventory-order { padding: 12px 16px; border: 1px solid #c8d8f7; border-radius: 4px; background: rgb(37 99 235 / 7%); }
     .inventory-order strong { color: #64748b; font-size: 13px; font-weight: 600; }
     .inventory-order a { color: #2563eb; font-size: 15px; font-weight: 500; }
     .inventory-fields { padding: 20px 24px; border-color: #dfe3e8; border-radius: 4px; background: #fff; }
@@ -284,14 +298,17 @@
     function inventoryPage(app) {
       const team = baseOrders[0].teams[0];
       const order = baseOrders[0];
-      return `<div class="page-title inventory-heading"><div><h3>Equipo · ${esc(team.serial)}</h3><div class="muted">Inventario / detalle del equipo</div></div><button data-action="back">Volver</button></div><div class="inventory-order"><div><strong>Orden de donación</strong><a data-action="open-inventory-order">${esc(order.recipient)}</a><span class="muted">Fecha de entrega: ${new Date(order.date + 'T12:00:00').toLocaleDateString('es-AR')}</span></div>${statusMarkup(app, order.status)}</div><div class="inventory-fields"><label>Modelo<input value="ThinkPad T480" readonly></label><label>Marca<input value="Lenovo" readonly></label><label>Número de serie<input value="${esc(team.serial)}" readonly></label><label>Estado<input value="${esc(team.status)}" readonly></label><label style="grid-column:1/-1">Especificaciones<input value="${esc(team.specs)}" readonly></label></div>`;
+      return `<div class="page-title inventory-heading"><div><h3>Detalle del equipo</h3><div class="muted">Vista previa del modal que se abre desde una fila de Inventario</div></div><button data-action="back">Volver a Órdenes</button></div><section class="field-grid inventory-fields"><label>Nombre<input value="${esc(team.name)}"></label><label>Modelo<input value="ThinkPad T480"></label><label>Marca<input value="Lenovo"></label><label>Número de serie<input value="${esc(team.serial)}"></label><label>Estado<input value="${esc(team.status)}"></label><label>Especificaciones<input value="${esc(team.specs)}"></label><div class="inventory-order wide"><strong>Orden de donación</strong><a data-action="open-inventory-order">${esc(order.recipient)}</a><span class="muted">Fecha de entrega: ${new Date(order.date + 'T12:00:00').toLocaleDateString('es-AR')}</span></div></section>`;
     }
     function modalMarkup(app) {
       if (!app.modal) return '';
       if (app.modal.type === 'add') {
         const q = app.modal.query.toLocaleLowerCase('es');
         const choices = (app.state === 'no-available' ? [] : availableTeams).filter(t => !app.draft.teams.some(x => x.id === t.id && !x.removed) && `${t.name} ${t.model} ${t.serial}`.toLocaleLowerCase('es').includes(q));
-        return `<div class="modal-backdrop"><div class="modal"><h3>Agregar equipos a la orden</h3><p>Buscá por número de serie, modelo o nombre y seleccioná uno o varios equipos. La asociación se guarda al pulsar Guardar Cambios en la orden.</p><input class="modal-search" data-input="modal-search" placeholder="Buscar equipo" value="${esc(app.modal.query)}">${choices.length ? `<div class="select-list">${choices.map(t => `<label class="select-row"><input type="checkbox" data-choice="${t.id}" ${app.modal.selected.has(t.id) ? 'checked' : ''}><span><b>${esc(t.name)} · ${esc(t.serial)}</b><small>${esc(t.model)} · ${esc(t.specs)}</small></span></label>`).join('')}</div>` : `<div class="empty">Aún no hay equipos asociados, edite la orden para vincularlos</div>`}<div class="modal-actions"><button data-action="close-modal">Cancelar</button><button class="primary" data-action="stage-add">Agregar selección</button></div></div></div>`;
+        const selectedCount = app.modal.selected.size;
+        const selectedTeams = [...app.modal.selected].map(id => availableTeams.find(t => t.id === id)).filter(Boolean);
+        const selectionSummary = selectedCount ? `<div class="selection-summary"><span>${selectedTeams.slice(0, 3).map(t => `${esc(t.name)} · ${esc(t.serial)}`).join(' &nbsp; · &nbsp; ')}${selectedCount > 3 ? ` <span class="selection-count">+${selectedCount - 3} más</span>` : ''}</span></div>` : '';
+        return `<div class="modal-backdrop"><div class="modal add-modal"><h3>Agregar notebooks a la orden</h3><p class="modal-copy">Buscá por nombre o serie, modelo o marca y seleccioná uno o varios notebooks. La asociación se guarda al pulsar Guardar Cambios en la orden.</p><input class="modal-search" data-input="modal-search" placeholder="⌕  Buscar notebooks..." value="${esc(app.modal.query)}">${selectionSummary}${choices.length ? `<div class="select-list">${choices.map(t => `<label class="select-row"><input type="checkbox" data-choice="${t.id}" ${app.modal.selected.has(t.id) ? 'checked' : ''}><span><b>${esc(t.name)} - ${esc(t.serial)}</b><small>${esc(t.model)} · ${esc(t.specs)}</small></span></label>`).join('')}</div>` : `<div class="empty">Aún no hay equipos disponibles para asociar</div>`}<div class="modal-actions"><button data-action="close-modal">Cancelar</button><button class="primary" data-action="stage-add">Agregar selección</button></div></div></div>`;
       }
       if (app.modal.type === 'remove') return `<div class="modal-backdrop"><div class="modal"><h3>Quitar equipo</h3><p>Elegí el estado con el que el equipo volverá al Inventario al guardar los cambios de la orden.</p><label>Estado de retorno<select data-input="return-status"><option>Listo para donar</option><option>Recibido</option><option>Instalar SO</option><option>En reparación</option><option>Bloqueada</option><option>Donado</option></select></label><div class="modal-actions"><button data-action="close-modal">Cancelar</button><button class="primary" data-action="stage-remove">Quitar de la orden</button></div></div></div>`;
       if (app.modal.type === 'leave') return `<div class="modal-backdrop"><div class="modal"><h3>Se perderán los cambios</h3><p>Si salís ahora, se descartarán las modificaciones sin guardar.</p><div class="modal-actions"><button data-action="stay-editing">Seguir editando</button><button class="danger" data-action="leave-discard">Salir sin guardar</button></div></div></div>`;
