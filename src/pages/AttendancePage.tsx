@@ -5,7 +5,7 @@ import { FileDown, Plus, Search } from "lucide-react";
 import { useAttendances, useUsers } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DataTable } from "@/components/notebooks/table/DataTable";
+import { DataTable } from "@/components/shared/table/DataTable";
 import { AttendanceCalendar } from "@/components/attendance/AttendanceCalendar";
 import { attendanceColumns } from "@/components/attendance/AttendanceColumns";
 import { UserFormModal } from "@/components/attendance/UserFormModal";

@@ -37,14 +37,18 @@ export function UserActions({ id, name }: AttendanceUser) {
       </Button>
       </div>
       {isEditing && <UserFormModal user={{ id, name }} onClose={() => setIsEditing(false)} />}
-      <ConfirmModal
-        confirmDeleteId={confirmId}
-        setConfirmDeleteId={setConfirmId}
-        title="Eliminar alumno"
-        description={`Se eliminará a ${name} y su historial de asistencias. Esta acción no se puede deshacer.`}
-        isPending={isPending}
-        handleDeleteNotebook={() => mutate(id, { onSuccess: () => setConfirmId(null) })}
-      />
+      {confirmId !== null && (
+        <ConfirmModal
+          id={confirmId}
+          onClose={() => setConfirmId(null)}
+          confirmLabel="Eliminar"
+          destructive
+          title="Eliminar alumno"
+          description={`Se eliminará a ${name} y su historial de asistencias. Esta acción no se puede deshacer.`}
+          isPending={isPending}
+          onConfirm={() => mutate(id, { onSuccess: () => setConfirmId(null) })}
+        />
+      )}
     </>
   );
 }

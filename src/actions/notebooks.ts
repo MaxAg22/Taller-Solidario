@@ -44,6 +44,22 @@ export const getNotebooks = async (from: number, to: number, status: NotebookSta
   };
 };
 
+export const getAvailableNotebooks = async () => {
+  const { data: notebooks, error } = await supabase
+    .from("notebooks")
+    .select("*")
+    .eq("status", "Listo para Donar")
+    .is("order_id", null)
+    .order("serialNumber", { ascending: true });
+
+  if (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  }
+
+  return notebooks ?? [];
+};
+
 export const createNotebook = async (notebook: any) => {
   const { data: newNotebook, error } = await supabase
     .from("notebooks")

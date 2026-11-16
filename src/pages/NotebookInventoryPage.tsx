@@ -1,12 +1,12 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { NotebookFormModal } from "@/components/forms/NotebookForm/NotebookFormModal";
+import { NotebookFormModal } from "@/components/notebooks/NotebookFormModal";
 import { useNotebooks } from "@/hooks";
 import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
-import {  DataTable } from "@/components/notebooks/table/DataTable";
+import {  DataTable } from "@/components/shared/table/DataTable";
 import { columns } from "@/components/notebooks/table/NotebookColumns";
 import type { Notebook, NotebookStatus } from "@/interfaces";
 
@@ -22,17 +22,6 @@ export default function NotebookInventoryPage() {
   const from = pagination.pageIndex * pagination.pageSize;
   const to = from + pagination.pageSize - 1;
   const { notebooks, rowCount, isLoading, isError, refetch } = useNotebooks(from, to, statusFilter, searchTerm);
-
-
-  const filteredNotebooks = useMemo(() => {
-    const term = searchTerm.trim().toLocaleLowerCase("es");
-    return (notebooks ?? []).filter((notebook) =>
-      (statusFilter === "all" || notebook.status === statusFilter) &&
-      [notebook.serialNumber, notebook.brand, notebook.model].some((value) =>
-        value.toLocaleLowerCase("es").includes(term)
-      )
-    );
-  }, [notebooks, searchTerm, statusFilter]);
 
   return (
     <div className="inventory-page">
@@ -53,7 +42,10 @@ export default function NotebookInventoryPage() {
             aria-label="Buscar equipos por serie, marca o modelo"
             placeholder="Buscar por serie, marca o modelo..."
             value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+            onChange={(event) => {
+              setSearchTerm(event.target.value);
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }}
           />
         </div>
         <Select 
@@ -85,7 +77,7 @@ export default function NotebookInventoryPage() {
           </div>
         ) : (
           <p className="inventory-results" role="status">
-            {isLoading ? "Cargando inventario…" : `${filteredNotebooks.length} de ${rowCount} equipos`}
+            {isLoading ? "Cargando inventario…" : `${notebooks?.length ?? 0} de ${rowCount ?? 0} equipos`}
           </p>
         )}
       </div>
@@ -93,7 +85,7 @@ export default function NotebookInventoryPage() {
       <div className="inventory-table-section">
         <DataTable
           columns={columns}
-          data={filteredNotebooks}
+          data={notebooks ?? []}
           pagination={pagination}
           setPagination={setPagination}
           rowCount={rowCount}

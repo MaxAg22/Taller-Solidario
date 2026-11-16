@@ -3,18 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const ConfirmModal = ({
-  confirmDeleteId,
-  handleDeleteNotebook,
-  setConfirmDeleteId,
-  isPending = false,
+  id,
+  onConfirm,
+  onClose,
+  confirmLabel,
+  destructive = false,
   title = "Eliminar equipo",
   description = "Esta acción no se puede deshacer. ¿Deseás eliminar este equipo?",
+  isPending = false,
 }: ConfirmModalType) => {
-  if (!confirmDeleteId) return null;
+  if (!id) return null;
 
   return (
     <Dialog open onOpenChange={(open) => {
-      if (!open && !isPending) setConfirmDeleteId(null);
+      if (!open && !isPending) onClose();
     }}>
       <DialogContent className="rounded-sm bg-card shadow-none sm:max-w-sm" showCloseButton={!isPending}>
         <DialogHeader>
@@ -27,16 +29,16 @@ export const ConfirmModal = ({
           <Button
             variant="outline"
             disabled={isPending}
-            onClick={() => setConfirmDeleteId(null)}
+            onClick={onClose}
           >
             Cancelar
           </Button>
           <Button
-            variant="destructive"
+            variant={destructive ? "destructive" : "default"}
             disabled={isPending}
-            onClick={() => handleDeleteNotebook(confirmDeleteId)}
+            onClick={() => onConfirm(id)}
           >
-            {isPending ? "Eliminando…" : "Eliminar"}
+            {isPending ? "Procesando…" : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

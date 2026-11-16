@@ -16,6 +16,7 @@ export interface Notebook {
   repairNeeded: string;
   repairHistory: string;
   entryDate: string;
+  orderId: string | null;
 }
 
 export interface UpdateNotebook {

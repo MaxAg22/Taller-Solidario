@@ -186,7 +186,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      change_order_status: {
+        Args: {
+          p_order_id: string
+          p_status: string
+        }
+        Returns: undefined
+      }
+      save_order_changes: {
+        Args: {
+          p_attach: Json
+          p_delivery_date: string
+          p_description: string | null
+          p_detach: Json
+          p_order_id: string
+          p_recipient: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

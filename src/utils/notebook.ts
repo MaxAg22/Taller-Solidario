@@ -13,5 +13,6 @@ export function mapNotebook(row: NotebookRow): Notebook {
     repairNeeded: row.repairNeeded ?? "",
     repairHistory: row.repairHistory ?? "",
     entryDate: row.entryDate ?? "",
+    orderId: row.order_id ?? null,
   };
 }

@@ -49,7 +49,7 @@ Diseño del sistema
    ✓ Al desvincular, se elige el estado con el que el equipo vuelve al Inventario.
    ✓ Se puede cambiar la orden entre En Preparación y Donado; el regreso muestra un aviso confirmable.
    ✓ Se elimina una orden solo si está vacía y no está Donado.
-   ✓ En el formulario del equipo, sobre modelo y marca, se muestran destinatario y fecha; destinatario enlaza al detalle de la orden.
+   ✓ En el formulario del equipo, al final, se muestran destinatario y fecha; destinatario enlaza al detalle de la orden.
    ✓ Se incluyen estados sin órdenes, orden sin equipos, sin equipos disponibles, carga y error.
    ✓ Q10–Q14 Se asentaron la tabla, el detalle, el selector múltiple, el vínculo desde Inventario y los estados de pantalla.
    ✓ Q15 La búsqueda de la tabla se limita al destinatario por ahora; no busca órdenes por número de serie.
@@ -122,7 +122,7 @@ La sección Órdenes permite crear y gestionar órdenes y los equipos asociados,
 - Agregar equipo abre un modal con un selector múltiple que busca por número de serie, modelo y nombre. Los cambios seleccionados quedan pendientes hasta guardar la edición.
 - Al quitar un equipo se elige el estado de retorno; el cambio también queda pendiente hasta guardar.
 - Si falla la transacción, nada cambia en la base, se notifica el fallo y se conservan los cambios en el formulario para reintentar.
-- En el formulario de equipo, encima de modelo y marca, se muestra el destinatario y la fecha de entrega; el destinatario es un enlace al detalle de la orden.
+- En el formulario de equipo, al final, se muestra el destinatario y la fecha de entrega; el destinatario es un enlace al detalle de la orden.
 - La tabla sin coincidencias muestra «No se encontraron resultados».
 - Si todavía no hay órdenes, la tabla muestra «No hay órdenes disponibles».
 - El detalle sin equipos muestra «Aún no hay equipos asociados, edite la orden para vincularlos»; el selector sin equipos disponibles muestra ese mismo mensaje.
@@ -144,17 +144,17 @@ erDiagram
   ORDERS o|--o{ NOTEBOOKS : "asocia"
   ORDERS {
     identifier id PK
-    text destinatario
-    date fecha_entrega
-    text descripcion "nullable"
-    order_status estado
+    text recipient
+    date deliveryDate
+    text description "nullable"
+    text status
   }
   NOTEBOOKS {
     identifier order_id FK "nullable"
   }
 ```
 
-`ORDERS` es una entidad nueva. `NOTEBOOKS` ya existe y recibe el campo nullable `order_id`; vacío significa que el equipo no está asociado a una orden. La relación permite varios equipos por orden y como máximo una orden actual por equipo. `descripcion` puede quedar vacía; `destinatario` y `fecha_entrega` no. La fecha representa un día, sin hora. `estado` pertenece a la orden y contiene En Preparación o Donado.
+`ORDERS` es una entidad nueva. `NOTEBOOKS` ya existe y recibe el campo nullable `order_id`; vacío significa que el equipo no está asociado a una orden. La relación permite varios equipos por orden y como máximo una orden actual por equipo. `description` puede quedar vacía; `recipient` y `deliveryDate` no. La fecha representa un día, sin hora. `status` pertenece a la orden y contiene En Preparación o Donado.
 
 ### Decisiones asentadas
 
@@ -162,7 +162,7 @@ erDiagram
 - La fecha de entrega sustituye el concepto anterior de deadline y guarda día, mes y año.
 - Los vínculos de órdenes anteriores no se conservan tras desvincular un equipo.
 - La propuesta anterior de una tabla de asociación con `notebook_id` como PK queda reemplazada por el `order_id` nullable en `notebooks`.
-- El campo `descripcion` es opcional; el destinatario y la fecha son obligatorios.
+- El campo `description` es opcional; `recipient` y `deliveryDate` son obligatorios.
 
 ### Fuera de esta rama
 

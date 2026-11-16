@@ -1,7 +1,7 @@
 "use client"
 
 import { createColumnHelper } from "@tanstack/react-table"
-import { type DataTableFeatures } from "./data-table-features"
+import { type DataTableFeatures } from "@/components/shared/table/data-table-features"
 import type { Notebook } from "@/interfaces"
 import { NotebookActions } from "@/components/notebooks/NotebookActions"
 

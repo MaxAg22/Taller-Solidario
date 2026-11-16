@@ -25,14 +25,18 @@ export function NotebookActions({ notebook }: { notebook: Notebook }) {
         </Button>
       </div>
 
-      <ConfirmModal
-        confirmDeleteId={confirmDeleteId}
-        setConfirmDeleteId={setConfirmDeleteId}
-        isPending={isPending}
-        handleDeleteNotebook={(id) => deleteNotebook(id, {
-          onSuccess: () => setConfirmDeleteId(null),
-        })}
-      />
+      {confirmDeleteId !== null && (
+        <ConfirmModal
+          id={confirmDeleteId}
+          onClose={() => setConfirmDeleteId(null)}
+          confirmLabel="Eliminar"
+          destructive
+          isPending={isPending}
+          onConfirm={(id) => deleteNotebook(id, {
+            onSuccess: () => setConfirmDeleteId(null),
+          })}
+        />
+      )}
     </>
   );
 }

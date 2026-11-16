@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Validación manual — Órdenes</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 60rem; line-height: 1.5; color: #1f2937; }
+  h1 { margin-bottom: 0.2rem; }
+  h2 { margin-top: 2.4rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.3rem; }
+  h3 { margin-bottom: 0.2rem; }
+  table { border-collapse: collapse; width: 100%; margin: 0.6rem 0 1.4rem; }
+  th, td { border: 1px solid #d1d5db; padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; font-size: 0.92rem; }
+  th { background: #f3f4f6; }
+  code, pre { background: #f3f4f6; border-radius: 3px; }
+  pre { padding: 0.6rem; overflow-x: auto; font-size: 0.85rem; }
+  .pass { color: #15803d; font-weight: 600; }
+  .blocked { color: #b45309; font-weight: 600; }
+  .mut { background: #fffbeb; border-left: 3px solid #d97706; padding: 0.5rem 0.8rem; margin: 0.5rem 0; }
+  figure { margin: 0.8rem 0; }
+  figure img { max-width: 100%; border: 1px solid #d1d5db; }
+  figcaption { font-size: 0.85rem; color: #4b5563; }
+</style>
+</head>
+<body>
+
+<h1>Validación manual — sección Órdenes</h1>
+<p><strong>Rama:</strong> <code>feature/ordenes</code> &nbsp;·&nbsp; <strong>Superficie:</strong> navegador (Vite dev server + Supabase enlazado) &nbsp;·&nbsp; <strong>Fecha:</strong> 2026-11-16</p>
+
+<h2>1. Cómo se levantó el sistema</h2>
+<ul>
+  <li>Servidor de desarrollo: <code>npm run dev</code> (Vite 7.2.4) en <code>http://localhost:5174</code>, levantado por esta corrida. El puerto 5173 ya estaba ocupado por otra instancia.</li>
+  <li>Backend: proyecto Supabase enlazado <code>Taller-Solidario-Pruebas</code> (<code>biedfvxlnwmapqiwlgtr</code>), credenciales en <code>.env</code> (<code>VITE_PROJECT_URL_SUPABASE</code>, <code>VITE_SUPABASE_API_KEY</code>).</li>
+  <li>Navegador: agent-browser (Chrome headless, sesión <code>ordenes-7646666018db</code>).</li>
+  <li>Identidad: ninguna. La aplicación no tiene autenticación y el esquema no tiene RLS.</li>
+</ul>
+<p><strong>Estado inicial de los datos:</strong> la tabla <code>orders</code> estaba vacía; los equipos con estado «Listo para Donar» y sin orden eran 18 (de un total de 139 equipos).</p>
+
+<div class="mut">
+<strong>Salvedad que atraviesa toda la corrida:</strong> la migración <code>supabase/migrations/20261116120000_order_transactions.sql</code> no está aplicada en la base (decisión del usuario), así que las RPC <code>save_order_changes</code> y <code>change_order_status</code> no existen en el esquema desplegado. La llamada directa devuelve <code>PGRST202 Could not find the function public.save_order_changes(...)</code>. Las cinco filas que dependen de esas transacciones quedan bloqueadas: <strong>V4, V7, V8, V9</strong> y el resultado esperado de <strong>V12</strong> se exertuta con esa falla real.
+</div>
+
+<h2>2. Mutaciones y su reversión</h2>
+<table>
+<thead><tr><th>#</th><th>Registro</th><th>Antes</th><th>Durante</th><th>Reversión</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Orden <code>89a201dd-bd0d-4c6f-a22f-a76dfe82f385</code> (creada por la UI en V2)</td><td>no existía</td><td><code>recipient</code> «Escuela de Prueba Validación», <code>deliveryDate</code> 2026-12-01, <code>status</code> «En Preparación»</td><td>Eliminada por la UI en V11. La tabla <code>orders</code> quedó vacía.</td></tr>
+<tr><td>2</td><td>Estado de esa misma orden</td><td>«En Preparación»</td><td>«Donado» (PATCH por REST, para alcanzar la ruta de V10 y V9)</td><td>Revertido a «En Preparación»; la orden terminó eliminada en V11.</td></tr>
+<tr><td>3</td><td>Orden <code>5f5e6f73-2196-4aa7-b532-f98576a4f946</code> «Colegio Alfa»</td><td>no existía</td><td><code>deliveryDate</code> 2026-01-15, «En Preparación» (sembrada por REST para los filtros de V13)</td><td>Eliminada por REST al final de la corrida.</td></tr>
+<tr><td>4</td><td>Orden <code>94f1f896-a1e0-4a7d-afd1-d1a0b88e3016</code> «Instituto Beta»</td><td>no existía</td><td><code>deliveryDate</code> 2026-06-20, «En Preparación» (sembrada por REST para los filtros de V13)</td><td>Eliminada por REST al final de la corrida.</td></tr>
+<tr><td>5</td><td>Equipo <code>dad86b41-9cef-4abb-9f27-ed2f2d5c8673</code> (N.° de serie 27, «Acer Aspire One»)</td><td><code>order_id</code> null, <code>status</code> «Listo para Donar»</td><td><code>order_id</code> = 5f5e6f73… (asociado a «Colegio Alfa», para V15 y V7)</td><td><code>order_id</code> vuelve a null; <code>status</code> nunca cambió. Verificado por REST al final.</td></tr>
+</tbody>
+</table>
+<p>No se modificó ningún otro registro. La tabla <code>orders</code> quedó vacía y el equipo 27 volvió a su estado original.</p>
+
+<h2>3. Fila por fila</h2>
+
+<h3>V1 — Crear orden sin destinatario o sin fecha <span class="pass">PASS</span></h3>
+<p>Se abrió «Crear orden» y se envió el formulario vacío. La consola de la app no registró ninguna llamada de escritura; el formulario mostró «El destinatario es requerido» y «La fecha de entrega es requerida». No se creó ninguna orden (la tabla <code>orders</code> siguió vacía).</p>
+<figure><img src="V1-01-validacion-requeridos.png" alt="Formulario con los errores de campos requeridos"><figcaption>Errores de validación en el modal de alta.</figcaption></figure>
+
+<h3>V2 — Crear orden válida <span class="pass">PASS</span></h3>
+<p>Con destinatario «Escuela de Prueba Validación», fecha 2026-12-01 y descripción, el alta creó la orden en «En Preparación», sin equipos, mostró el aviso «Orden creada correctamente» y navegó al detalle de la orden nueva (<code>/#/ordenes/89a201dd-bd0d-4c6f-a22f-a76dfe82f385</code>).</p>
+<figure><img src="V2-02-detalle-nueva-orden.png" alt="Detalle de la orden recién creada"><figcaption>Detalle de la orden nueva con las acciones Editar, Marcar como Donado y Eliminar orden.</figcaption></figure>
+
+<h3>V3 — Detalle de una orden sin equipos <span class="pass">PASS</span></h3>
+<p>La lista de equipos del detalle muestra «Aún no hay equipos asociados, edite la orden para vincularlos» y el encabezado «Equipos asociados (0)».</p>
+
+<h3>V4 — Editar campos, agregar y quitar un equipo, luego Guardar Cambios <span class="blocked">BLOQUEADA</span></h3>
+<p>Lo que sí quedó comprobado: el borrador se arma en el formulario (el equipo agregado aparece en la tabla con la etiqueta «Pendiente» y «Guardar Cambios» se habilita), y al guardar se dispara <code>updateOrder</code> → RPC <code>save_order_changes</code>. La llamada falla con <code>PGRST202</code> porque la función no está desplegada, así que el resultado esperado — que campos, asociación y desvinculación se apliquen juntos en una sola operación — no se puede observar. El orden guardado y el equipo no cambian.</p>
+<figure><img src="V4-01-fila-pendiente.png" alt="Fila del equipo agregado marcado Pendiente"><figcaption>El equipo agregado aparece marcado «Pendiente» antes de guardar.</figcaption></figure>
+<p><strong>Qué haría falta para desbloquearla:</strong> aplicar la migración en la base. Sin ella no hay operación transaccional que validar.</p>
+
+<h3>V5 — Editar dejando destinatario o fecha vacíos <span class="pass">PASS</span></h3>
+<p>Con el destinatario vacío, «Guardar Cambios» no llama a la base: aparece el aviso «Completá el destinatario y la fecha de entrega» y el campo sigue vacío. La orden guardada conserva su destinatario.</p>
+<figure><img src="V5-01-guardado-bloqueado.png" alt="Aviso de guardado bloqueado por falta de destinatario"><figcaption>El guardado se bloquea en el formulario.</figcaption></figure>
+
+<h3>V6 — Selector de equipos <span class="pass">PASS</span></h3>
+<p>El selector «Agregar equipo» ofrece 18 equipos, todos con estado «Listo para Donar» y sin orden (coincide con la consulta <code>getAvailableNotebooks</code>: <code>status = 'Listo para Donar'</code> y <code>order_id is null</code>). Al elegir uno, la fila se suma a la tabla del detalle marcada «Pendiente».</p>
+<figure><img src="V6-01-selector-equipos.png" alt="Selector múltiple con los equipos disponibles"><figcaption>Selector de equipos disponibles.</figcaption></figure>
+
+<h3>V7 — Quitar un equipo eligiendo estado de retorno <span class="blocked">BLOQUEADA</span></h3>
+<p>Lo que sí quedó comprobado: el modal «Quitar equipo» ofrece el <code>Select</code> «Estado de retorno» con los seis estados de equipo de la aplicación (Listo para donar, Recibido, Instalar SO, En reparación, Bloqueada, Donado); al confirmar, la fila queda marcada «Se quitará» y el borrador queda pendiente. El guardado, que es donde el equipo vuelve al Inventario con el estado elegido, depende de la RPC y no se puede observar: la llamada falla con <code>PGRST202</code> y el equipo sigue asociado a la orden, con su estado intacto.</p>
+<figure><img src="V7-01-modal-quitar-equipo.png" alt="Modal para quitar un equipo con el estado de retorno"><figcaption>Modal «Quitar equipo» con el estado de retorno.</figcaption></figure>
+<figure><img src="V7-02-fila-se-quitara.png" alt="Fila del equipo marcada Se quitará"><figcaption>La fila queda marcada «Se quitará», pendiente de guardar.</figcaption></figure>
+
+<h3>V8 — Marcar como Donado <span class="blocked">BLOQUEADA</span></h3>
+<p>El botón existe en consulta sobre una orden «En Preparación». Al pulsarlo, la RPC <code>change_order_status</code> falla con <code>PGRST202</code>, la app avisa «Ocurrió un error al cambiar el estado de la orden» y la orden sigue «En Preparación». La transición de la orden y la de sus equipos en una sola operación no se puede observar sin la función desplegada.</p>
+<figure><img src="V8-01-marcar-donado-error.png" alt="Aviso de error al marcar como donado"><figcaption>El cambio de estado falla porque la RPC no existe en la base.</figcaption></figure>
+
+<h3>V9 — Volver a En Preparación <span class="blocked">BLOQUEADA</span></h3>
+<p>Lo que sí quedó comprobado: sobre una orden «Donado» el único botón es «Volver a En Preparación»; el aviso modal aparece con el texto «Los equipos asociados volverán al estado Listo para donar y la orden podrá editarse otra vez» y los botones «Cancelar» y «Cambiar»; cerrar el aviso no cambia nada (la orden sigue «Donado» en la base). Confirmar dispara la RPC, que falla con <code>PGRST202</code>: el regreso no se puede observar.</p>
+<figure><img src="V9-01-aviso-regreso.png" alt="Aviso de regreso a En Preparación"><figcaption>Aviso de regreso a En Preparación.</figcaption></figure>
+<figure><img src="V9-02-confirmar-error.png" alt="Aviso de error al confirmar el regreso"><figcaption>Al confirmar, la RPC ausente hace fallar la operación.</figcaption></figure>
+
+<h3>V10 — Una orden Donado no se edita <span class="pass">PASS</span></h3>
+<p>Con la orden en «Donado», el detalle muestra únicamente «Volver a En Preparación»: no aparecen «Editar», «Marcar como Donado», «Eliminar orden», el selector de equipos ni el botón «Quitar» en la tabla de equipos.</p>
+<figure><img src="V10-01-orden-donado.png" alt="Detalle de una orden donado"><figcaption>En «Donado» solo queda la acción de volver a En Preparación.</figcaption></figure>
+
+<h3>V11 — Eliminar una orden vacía <span class="pass">PASS</span></h3>
+<p>Sobre una orden «En Preparación» y sin equipos aparece «Eliminar orden»; el aviso «Esta orden no tiene equipos asociados. ¿Querés eliminarla?» pide confirmación y, al confirmar, la orden se elimina, se avisa «Orden eliminada correctamente!» y se vuelve a la lista. Por REST la orden ya no existe. En cambio, una orden con equipos asociados no muestra ese botón, y una orden «Donado» tampoco.</p>
+<figure><img src="V11-01-confirmar-eliminar.png" alt="Aviso de confirmación para eliminar la orden"><figcaption>Confirmación de eliminación.</figcaption></figure>
+<figure><img src="V11-02-orden-eliminada.png" alt="Lista de órdenes tras eliminar"><figcaption>Lista de órdenes tras la eliminación.</figcaption></figure>
+
+<h3>V12 — Falla la operación: nada cambia, se avisa y el formulario conserva los cambios <span class="pass">PASS</span></h3>
+<p>Con la descripción modificada y un equipo agregado en el borrador, «Guardar Cambios» falla: la app avisa «Ocurrió un error al actualizar la orden», sigue en modo edición, el campo de descripción conserva el texto nuevo y la fila del equipo sigue marcada «Pendiente». Por REST, la orden conserva su destinatario, su descripción original y su estado. La falla real del sistema es la ausencia de la RPC en la base, que es el mecanismo que la fila debe soportar: nada se escribe, se notifica y el formulario conserva lo que la persona escribió.</p>
+<figure><img src="V12-01-error-guardado.png" alt="Aviso de error al guardar con el formulario intacto"><figcaption>El fallo se avisa y el formulario conserva los cambios.</figcaption></figure>
+
+<h3>V13 — Búsqueda por destinatario y filtro de fechas <span class="pass">PASS</span></h3>
+<p>Con dos órdenes sembradas («Colegio Alfa» 15/01/2026 e «Instituto Beta» 20/06/2026): la búsqueda por destinatario «Alfa» deja solo «Colegio Alfa»; el rango 01/01/2026–31/01/2026 deja solo «Colegio Alfa»; el rango con ambos extremos en la fecha exacta (15/01/2026–15/01/2026) incluye el registro, o sea que el rango es inclusivo. En la tabla el orden es por fecha de entrega descendente y la fecha se muestra como dd/MM/yyyy.</p>
+<p>En Inventario, desde la tercera página la búsqueda «Latitude 3190» devolvió los 15 equipos que coinciden en toda la base («14 de 119 equipos» antes, «14 de 15 equipos» después) y no una tabla vacía: la búsqueda alcanza todos los registros y el cambio de búsqueda devuelve a la primera página.</p>
+<figure><img src="V13-02-busqueda-destinatario.png" alt="Tabla filtrada por destinatario"><figcaption>Búsqueda por destinatario en la tabla de órdenes.</figcaption></figure>
+<figure><img src="V13-03-filtro-fechas.png" alt="Tabla filtrada por rango de fechas"><figcaption>Filtro por rango de fechas.</figcaption></figure>
+<figure><img src="V13-04-inventario-busqueda-global.png" alt="Búsqueda en inventario desde otra página"><figcaption>La búsqueda del inventario alcanza toda la base y resetea la página.</figcaption></figure>
+
+<h3>V14 — Mensajes de tabla vacía <span class="pass">PASS</span></h3>
+<p>Sin órdenes y sin filtros, la tabla muestra «No hay órdenes disponibles». Con filtros que no coinciden (rango 01/01/2027–31/01/2027), muestra «No se encontraron resultados».</p>
+<figure><img src="V14-01-tabla-vacia.png" alt="Tabla sin órdenes"><figcaption>Tabla sin órdenes.</figcaption></figure>
+<figure><img src="V14-02-sin-resultados.png" alt="Tabla sin coincidencias"><figcaption>Tabla con filtros sin coincidencias.</figcaption></figure>
+
+<h3>V15 — En Inventario, el equipo con orden <span class="pass">PASS</span></h3>
+<p>El equipo 27 asociado a «Colegio Alfa» muestra, al final del formulario, el bloque «Orden de donación» con el destinatario enlazado al detalle de la orden (<code>#/ordenes/5f5e6f73-2196-4aa7-b532-f98576a4f946</code>) y «Fecha de entrega: 15/01/2026»; el <code>Select</code> de estado del equipo aparece deshabilitado. El enlace abre el detalle de la orden.</p>
+<figure><img src="V15-02-formulario-equipo-con-orden.png" alt="Formulario del equipo con el bloque de la orden"><figcaption>El bloque de la orden al final del formulario, con el estado deshabilitado.</figcaption></figure>
+<figure><img src="V15-03-enlace-orden.png" alt="Detalle de la orden abierto desde el inventario"><figcaption>El enlace del bloque abre el detalle de la orden.</figcaption></figure>
+
+<h3>V16 — Navegación <span class="pass">PASS</span></h3>
+<p>La entrada «Órdenes» del menú lleva a <code>/#/ordenes</code> y la fila de la tabla a <code>/#/ordenes/:id</code>. El enlace del menú queda activo (<code>aria-current="page"</code> y clase <code>active</code>) tanto en la lista como en el detalle. El botón «← Órdenes» del detalle vuelve a la lista.</p>
+
+<h2>4. Errores fuera de la matriz</h2>
+<p>No se encontraron errores ajenos a las filas. Se registran dos observaciones que no son fallos de la fila ni del cambio:</p>
+<ul>
+  <li>El detalle de una orden inexistente muestra el estado de error de consulta, pero recién a los ~7 s, por los reintentos por defecto de React Query. El diseño no fija la política de reintentos.</li>
+  <li>En Inventario, la columna «Equipo» muestra solo la marca. Es comportamiento previo al cambio (la columna no se tocó).</li>
+</ul>
+
+<h2>5. Resumen</h2>
+<table>
+<thead><tr><th>Fila</th><th>Resultado</th><th>Motivo</th></tr></thead>
+<tbody>
+<tr><td>V1</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V2</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V3</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V4</td><td class="blocked">BLOQUEADA</td><td>Requiere la RPC <code>save_order_changes</code>, no desplegada.</td></tr>
+<tr><td>V5</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V6</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V7</td><td class="blocked">BLOQUEADA</td><td>Requiere la RPC <code>save_order_changes</code>, no desplegada.</td></tr>
+<tr><td>V8</td><td class="blocked">BLOQUEADA</td><td>Requiere la RPC <code>change_order_status</code>, no desplegada.</td></tr>
+<tr><td>V9</td><td class="blocked">BLOQUEADA</td><td>El aviso y la cancelación sí se comprobaron; el cambio requiere la RPC <code>change_order_status</code>.</td></tr>
+<tr><td>V10</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V11</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V12</td><td class="pass">PASS</td><td>Verificado con la falla real del sistema (RPC ausente).</td></tr>
+<tr><td>V13</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V14</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V15</td><td class="pass">PASS</td><td></td></tr>
+<tr><td>V16</td><td class="pass">PASS</td><td></td></tr>
+</tbody>
+</table>
+<p><strong>12 filas pasaron, 4 quedaron bloqueadas</strong> y ninguna falló. Las cuatro bloqueadas dependen de la misma causa: la migración de las dos RPC no está aplicada en la base.</p>
+
+</body>
+</html>
