@@ -1,0 +1,425 @@
+import { useCallback, useMemo, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { DataTable } from "@/components/shared/table/DataTable";
+import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { OrderRemoveTeamModal } from "@/components/orders/OrderRemoveTeamModal";
+import { orderNotebookColumns } from "@/components/orders/table/OrderNotebookColumns";
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectItem,
+  MultiSelectTrigger,
+} from "@/components/ui/multi-select";
+import { useAvailableNotebooks } from "@/hooks/notebooks/useAvailableNotebooks";
+import { useChangeOrderStatus } from "@/hooks/orders/useChangeOrderStatus";
+import { useDeleteOrder } from "@/hooks/orders/useDeleteOrder";
+import { useOrder } from "@/hooks/orders/useOrder";
+import { useUpdateOrder } from "@/hooks/orders/useUpdateOrder";
+import { formatDeliveryDate } from "@/utils/order";
+import type {
+  NotebookStatus,
+  OrderDraft,
+  OrderStatus,
+  OrderTeam,
+} from "@/interfaces";
+
+type ConfirmKind = "leave" | "return-prep" | "delete" | null;
+
+export default function OrderDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { order, notebooks: orderNotebooks, isLoading, isError, refetch } = useOrder(id);
+  const { notebooks: availableNotebooks } = useAvailableNotebooks();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState<OrderDraft | null>(null);
+  const [teamToRemove, setTeamToRemove] = useState<OrderTeam | null>(null);
+  const [confirmKind, setConfirmKind] = useState<ConfirmKind>(null);
+  const [leaveTarget, setLeaveTarget] = useState<"cancel" | "back">("cancel");
+
+  const { mutate: saveOrder, isPending: isSaving } = useUpdateOrder({
+    onSuccess: () => {
+      setIsEditing(false);
+      setDraft(null);
+    },
+  });
+  const { mutate: changeStatus, isPending: isChangingStatus } = useChangeOrderStatus();
+  const { mutate: removeOrder, isPending: isDeleting } = useDeleteOrder();
+
+  const status = (order?.status ?? "") as OrderStatus;
+  const isDonated = status === "Donado";
+
+  const hasChanges = useMemo(() => {
+    if (!draft || !order) return false;
+
+    return (
+      draft.recipient !== order.recipient ||
+      draft.deliveryDate !== order.deliveryDate ||
+      (draft.description ?? "") !== (order.description ?? "") ||
+      draft.attach.length > 0 ||
+      draft.detach.length > 0
+    );
+  }, [draft, order]);
+
+  const rows = useMemo<OrderTeam[]>(() => {
+    const base: OrderTeam[] = (orderNotebooks ?? []).map((notebook) => ({
+      id: notebook.id,
+      name: [notebook.brand, notebook.model].filter(Boolean).join(" ") || "Equipo",
+      serialNumber: notebook.serialNumber?.toString() ?? "",
+      status: notebook.status ?? "",
+      specs: notebook.specs ?? "",
+      pending: null,
+    }));
+
+    if (!draft) return base;
+
+    const detached = new Set(draft.detach.map((item) => item.notebookId));
+
+    const current = base.map((team) =>
+      detached.has(team.id) ? { ...team, pending: "Se quitará" as const } : team
+    );
+
+    const attached: OrderTeam[] = [];
+
+    draft.attach.forEach((item) => {
+      const notebook = (availableNotebooks ?? []).find(
+        (candidate) => candidate.id === item.notebookId
+      );
+
+      if (!notebook) return;
+
+      attached.push({
+        id: notebook.id,
+        name: [notebook.brand, notebook.model].filter(Boolean).join(" ") || "Equipo",
+        serialNumber: notebook.serialNumber?.toString() ?? "",
+        status: notebook.status ?? "",
+        specs: notebook.specs ?? "",
+        pending: "Pendiente",
+      });
+    });
+
+    return [...current, ...attached];
+  }, [orderNotebooks, draft, availableNotebooks]);
+
+  const handleRemoveTeam = useCallback((notebook: OrderTeam) => {
+    setTeamToRemove(notebook);
+  }, []);
+
+  const columns = useMemo(
+    () => orderNotebookColumns(isEditing ? handleRemoveTeam : undefined),
+    [isEditing, handleRemoveTeam]
+  );
+
+  const handleEdit = () => {
+    if (!order) return;
+
+    setDraft({
+      recipient: order.recipient,
+      deliveryDate: order.deliveryDate,
+      description: order.description ?? "",
+      attach: [],
+      detach: [],
+    });
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    if (!draft || !order) return;
+
+    if (!draft.recipient.trim() || !draft.deliveryDate) {
+      toast.error("Completá el destinatario y la fecha de entrega");
+      return;
+    }
+
+    saveOrder({
+      id: order.id,
+      recipient: draft.recipient.trim(),
+      deliveryDate: draft.deliveryDate,
+      description: draft.description ? draft.description : null,
+      attach: draft.attach,
+      detach: draft.detach,
+    });
+  };
+
+  const handleCancel = () => {
+    if (!hasChanges) {
+      setIsEditing(false);
+      setDraft(null);
+      return;
+    }
+
+    setLeaveTarget("cancel");
+    setConfirmKind("leave");
+  };
+
+  const handleBack = () => {
+    if (isEditing && hasChanges) {
+      setLeaveTarget("back");
+      setConfirmKind("leave");
+      return;
+    }
+
+    navigate("/ordenes");
+  };
+
+  const handleConfirmRemoveTeam = (returnStatus: NotebookStatus) => {
+    if (!draft || !teamToRemove) return;
+
+    const team = teamToRemove;
+    setDraft((prev) =>
+      prev
+        ? {
+            ...prev,
+            detach: [
+              ...prev.detach.filter((item) => item.notebookId !== team.id),
+              { notebookId: team.id, status: returnStatus },
+            ],
+          }
+        : prev
+    );
+    setTeamToRemove(null);
+  };
+
+  const handleAttach = (values: string[]) => {
+    setDraft((prev) =>
+      prev
+        ? { ...prev, attach: values.map((notebookId) => ({ notebookId })) }
+        : prev
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="inventory-page">
+        <div className="orders-notice" role="status">
+          <Spinner />
+          <p>Cargando orden…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !order) {
+    return (
+      <div className="inventory-page">
+        <div className="orders-notice" role="alert">
+          <p>Error en la consulta. No se pudo cargar la orden.</p>
+          <Button variant="outline" onClick={() => refetch()}>Reintentar</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const teamsCount = rows.filter((team) => team.pending !== "Se quitará").length;
+
+  return (
+    <div className="inventory-page">
+      <div className="inventory-heading">
+        <div>
+          <Button variant="ghost" className="orders-back" onClick={handleBack}>
+            <ArrowLeft aria-hidden="true" /> Órdenes
+          </Button>
+          <h1>{order.recipient}</h1>
+          <div className="orders-meta">
+            <span>Orden #{order.id.slice(0, 8)}</span>
+            <span className="inventory-table-status" data-status={status}>{status}</span>
+          </div>
+        </div>
+        <div className="orders-actions">
+          {isEditing ? (
+            <>
+              <Button variant="outline" onClick={handleCancel}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSave} disabled={!hasChanges || isSaving}>
+                {isSaving && <Spinner />}
+                Guardar Cambios
+              </Button>
+            </>
+          ) : isDonated ? (
+            <Button variant="outline" onClick={() => setConfirmKind("return-prep")}>
+              Volver a En Preparación
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" onClick={handleEdit}>
+                Editar
+              </Button>
+              <Button
+                onClick={() => changeStatus({ id: order.id, status: "Donado" })}
+                disabled={isChangingStatus}
+              >
+                Marcar como Donado
+              </Button>
+              {(orderNotebooks ?? []).length === 0 && (
+                <Button variant="destructive" onClick={() => setConfirmKind("delete")}>
+                  Eliminar orden
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="orders-fields">
+        <div className="orders-field">
+          <Label htmlFor="recipient">Destinatario</Label>
+          {isEditing ? (
+            <Input
+              id="recipient"
+              value={draft?.recipient ?? ""}
+              onChange={(event) =>
+                setDraft((prev) =>
+                  prev ? { ...prev, recipient: event.target.value } : prev
+                )
+              }
+            />
+          ) : (
+            <span className="orders-value">{order.recipient}</span>
+          )}
+        </div>
+        <div className="orders-field">
+          <Label htmlFor="deliveryDate">Fecha de entrega</Label>
+          {isEditing ? (
+            <Input
+              id="deliveryDate"
+              type="date"
+              value={draft?.deliveryDate ?? ""}
+              onChange={(event) =>
+                setDraft((prev) =>
+                  prev ? { ...prev, deliveryDate: event.target.value } : prev
+                )
+              }
+            />
+          ) : (
+            <span className="orders-value">{formatDeliveryDate(order.deliveryDate)}</span>
+          )}
+        </div>
+        <div className="orders-field">
+          <Label>Estado</Label>
+          <span className="orders-value">
+            <span className="inventory-table-status" data-status={status}>{status}</span>
+          </span>
+        </div>
+        <div className="orders-field orders-field-wide">
+          <Label htmlFor="description">Descripción</Label>
+          {isEditing ? (
+            <Textarea
+              id="description"
+              value={draft?.description ?? ""}
+              onChange={(event) =>
+                setDraft((prev) =>
+                  prev ? { ...prev, description: event.target.value } : prev
+                )
+              }
+            />
+          ) : (
+            <span className="orders-value">{order.description || "—"}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="orders-section-head">
+        <h2>
+          Equipos asociados <span>({teamsCount})</span>
+        </h2>
+        {isEditing && (
+          <MultiSelect
+            values={draft?.attach.map((item) => item.notebookId) ?? []}
+            onValuesChange={handleAttach}
+          >
+            <MultiSelectTrigger>Agregar equipo</MultiSelectTrigger>
+            <MultiSelectContent
+              search={{
+                placeholder: "Buscar por número de serie, modelo o nombre...",
+                emptyMessage: "Aún no hay equipos asociados, edite la orden para vincularlos",
+              }}
+            >
+              {(availableNotebooks ?? []).map((notebook) => (
+                <MultiSelectItem key={notebook.id} value={notebook.id}>
+                  {`${[notebook.brand, notebook.model].filter(Boolean).join(" ")} · ${notebook.serialNumber}`}
+                </MultiSelectItem>
+              ))}
+            </MultiSelectContent>
+          </MultiSelect>
+        )}
+      </div>
+
+      <div className="inventory-table-section">
+        <DataTable
+          columns={columns}
+          data={rows}
+          emptyMessage="Aún no hay equipos asociados, edite la orden para vincularlos"
+        />
+      </div>
+
+      {teamToRemove && (
+        <OrderRemoveTeamModal
+          notebook={teamToRemove}
+          onConfirm={handleConfirmRemoveTeam}
+          onClose={() => setTeamToRemove(null)}
+        />
+      )}
+
+      {confirmKind === "leave" && (
+        <ConfirmModal
+          id={order.id}
+          onClose={() => setConfirmKind(null)}
+          onConfirm={() => {
+            setConfirmKind(null);
+            setIsEditing(false);
+            setDraft(null);
+            if (leaveTarget === "back") navigate("/ordenes");
+          }}
+          confirmLabel="Salir sin guardar"
+          destructive
+          title="Se perderán los cambios"
+          description="Si salís ahora, se descartarán las modificaciones sin guardar."
+        />
+      )}
+
+      {confirmKind === "return-prep" && (
+        <ConfirmModal
+          id={order.id}
+          onClose={() => setConfirmKind(null)}
+          onConfirm={() =>
+            changeStatus(
+              { id: order.id, status: "En Preparación" },
+              { onSuccess: () => setConfirmKind(null) }
+            )
+          }
+          confirmLabel="Cambiar"
+          title="Volver a En Preparación"
+          description="Los equipos asociados volverán al estado Listo para donar y la orden podrá editarse otra vez."
+          isPending={isChangingStatus}
+        />
+      )}
+
+      {confirmKind === "delete" && (
+        <ConfirmModal
+          id={order.id}
+          onClose={() => setConfirmKind(null)}
+          onConfirm={() =>
+            removeOrder(order.id, {
+              onSuccess: () => {
+                setConfirmKind(null);
+                navigate("/ordenes");
+              },
+            })
+          }
+          confirmLabel="Eliminar orden"
+          destructive
+          title="Eliminar orden"
+          description="Esta orden no tiene equipos asociados. ¿Querés eliminarla?"
+          isPending={isDeleting}
+        />
+      )}
+    </div>
+  );
+}
