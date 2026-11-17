@@ -323,36 +323,41 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="orders-section-head">
-        <h2>
-          Equipos asociados <span>({teamsCount})</span>
-        </h2>
-        {isEditing && (
-          <MultiSelect
-            values={draft?.attach.map((item) => item.notebookId) ?? []}
-            onValuesChange={handleAttach}
-          >
-            <MultiSelectTrigger>Agregar equipo</MultiSelectTrigger>
-            <MultiSelectContent
-              search={{
-                placeholder: "Buscar por número de serie, modelo o nombre...",
-                emptyMessage: "Aún no hay equipos asociados, edite la orden para vincularlos",
-              }}
+        <div className="orders-section-head-left">
+          <h2>
+            Equipos asociados <span>({teamsCount})</span>
+          </h2>
+          {isEditing && (
+            <MultiSelect
+              values={draft?.attach.map((item) => item.notebookId) ?? []}
+              onValuesChange={handleAttach}
             >
-              {(availableNotebooks ?? []).map((notebook) => (
-                <MultiSelectItem key={notebook.id} value={notebook.id}>
-                  {`${[notebook.brand, notebook.model].filter(Boolean).join(" ")} · ${notebook.serialNumber}`}
-                </MultiSelectItem>
-              ))}
-            </MultiSelectContent>
-          </MultiSelect>
-        )}
+              <MultiSelectTrigger>Agregar equipo</MultiSelectTrigger>
+              <MultiSelectContent
+                search={{
+                  placeholder: "Buscar por número de serie, modelo o nombre...",
+                  emptyMessage: "No hay equipos disponibles",
+                }}
+                filter={(value: string, search: string) =>
+                  search ? (value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0) : 1
+                }
+              >
+                {(availableNotebooks ?? []).map((notebook) => (
+                  <MultiSelectItem key={notebook.id} value={notebook.id}>
+                    {`${[notebook.brand, notebook.model].filter(Boolean).join(" ")} · ${notebook.serialNumber}`}
+                  </MultiSelectItem>
+                ))}
+              </MultiSelectContent>
+            </MultiSelect>
+          )}
+        </div>
       </div>
 
       <div className="inventory-table-section">
         <DataTable
           columns={columns}
           data={rows}
-          emptyMessage="Aún no hay equipos asociados, edite la orden para vincularlos"
+          emptyMessage="No hay equipos disponibles"
         />
       </div>
 

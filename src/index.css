@@ -212,6 +212,7 @@
 .orders-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 0 10px; }
 .orders-section-head h2 { font-size: 15px; font-weight: 600; }
 .orders-section-head span { font-size: 13px; color: var(--muted-foreground); }
+.orders-section-head-left { display: flex; align-items: center; gap: 12px; }
 .orders-row-removing td { opacity: 0.5; background: #fee2e2; }
 .orders-row-removing .orders-remove-icon { opacity: 1; }
 .orders-removing-status { font-size: 13px; font-weight: 500; color: #b91c1c; }
