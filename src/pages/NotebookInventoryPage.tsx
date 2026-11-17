@@ -44,7 +44,7 @@ export default function NotebookInventoryPage() {
             value={searchTerm}
             onChange={(event) => {
               setSearchTerm(event.target.value);
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+              setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
             }}
           />
         </div>
@@ -53,7 +53,7 @@ export default function NotebookInventoryPage() {
           onValueChange={(value) => {
             if (value === "all" || NOTEBOOK_STATUSES.some((state) => state.value === value)) {
               setStatusFilter(value as NotebookStatus | "all");
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+              setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
             }
           }}
           >

@@ -62,7 +62,9 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
     useCreateNotebook({ onSuccess: () => onSave() });
   const { mutate: updateNotebook, isPending: isPendingUpdate } =
     useUpdateNotebook({ onSuccess: () => onSave() });
-  const { order: notebookOrder } = useOrder(notebook?.orderId ?? undefined);
+  const { order: notebookOrder } = useOrder(notebook?.orderId ?? undefined, {
+    enabled: !!notebook?.orderId,
+  });
 
   const onSubmit = (data: NotebookForm) => {
     const isEdit = !!notebook?.id;

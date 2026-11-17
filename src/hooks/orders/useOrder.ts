@@ -1,11 +1,11 @@
 import { getOrder } from "@/actions";
 import { useQuery } from "@tanstack/react-query";
 
-export const useOrder = (id?: string) => {
+export const useOrder = (id?: string, options: { enabled?: boolean } = {}) => {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["orders", id],
     queryFn: () => getOrder(id as string),
-    enabled: !!id,
+    enabled: !!id && (options.enabled ?? true),
     staleTime: 1000 * 60 * 5,
   });
 

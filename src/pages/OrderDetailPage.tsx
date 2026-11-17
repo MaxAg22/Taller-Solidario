@@ -55,17 +55,14 @@ export default function OrderDetailPage() {
   const status = (order?.status ?? "") as OrderStatus;
   const isDonated = status === "Donado";
 
-  const hasChanges = useMemo(() => {
-    if (!draft || !order) return false;
-
-    return (
-      draft.recipient !== order.recipient ||
+  const hasChanges =
+    !!draft &&
+    !!order &&
+    (draft.recipient !== order.recipient ||
       draft.deliveryDate !== order.deliveryDate ||
       (draft.description ?? "") !== (order.description ?? "") ||
       draft.attach.length > 0 ||
-      draft.detach.length > 0
-    );
-  }, [draft, order]);
+      draft.detach.length > 0);
 
   const rows = useMemo<OrderTeam[]>(() => {
     const detachById = new Map(draft?.detach.map((item) => [item.notebookId, item.status] as const));
@@ -233,7 +230,14 @@ export default function OrderDetailPage() {
           <Button variant="ghost" className="orders-back" onClick={handleBack}>
             <ArrowLeft aria-hidden="true" /> Órdenes
           </Button>
-          <h1>{order.recipient}</h1>
+          <div className="orders-heading-title">
+            <h1>{order.recipient}</h1>
+            <div className="orders-field">
+              <span className="orders-value">
+                <span className="inventory-table-status" data-status={status}>{status}</span>
+              </span>
+            </div>
+          </div>
         </div>
         <div className="orders-actions">
           {isEditing ? (
@@ -292,12 +296,6 @@ export default function OrderDetailPage() {
           ) : (
             <span className="orders-value">{formatDeliveryDate(order.deliveryDate)}</span>
           )}
-        </div>
-        <div className="orders-field">
-          <Label>Estado</Label>
-          <span className="orders-value">
-            <span className="inventory-table-status" data-status={status}>{status}</span>
-          </span>
         </div>
         <div className="orders-field orders-field-wide">
           <Label htmlFor="description">Descripción</Label>

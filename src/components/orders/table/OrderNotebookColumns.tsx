@@ -43,44 +43,22 @@ export const orderNotebookColumns = (onRemove?: (notebook: OrderTeam) => void) =
       id: "actions",
       header: "Acciones",
       cell: ({ row }) => {
-        if (!onRemove) {
-          return (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="orders-remove-icon size-7 text-muted-foreground/50 hover:text-muted-foreground"
-              aria-label={`Quitar equipo ${row.original.serialNumber}`}
-              title="Quitar de la orden (solo disponible en modo edición)"
-              disabled
-            >
-              <Trash2 aria-hidden="true" />
-            </Button>
-          );
-        }
-
-        if (row.original.pending === "Se quitará") {
-          return (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="orders-remove-icon size-7 text-destructive hover:text-destructive"
-              aria-label={`Quitar equipo ${row.original.serialNumber}`}
-              title="Quitar de la orden"
-              onClick={() => onRemove(row.original)}
-            >
-              <Trash2 aria-hidden="true" />
-            </Button>
-          );
-        }
+        const className =
+          row.original.pending === "Se quitará"
+            ? "orders-remove-icon size-7 text-destructive hover:text-destructive"
+            : onRemove
+              ? "orders-remove-icon size-7 text-muted-foreground hover:text-destructive"
+              : "orders-remove-icon size-7 text-muted-foreground/50 hover:text-muted-foreground";
 
         return (
           <Button
             variant="ghost"
             size="icon-sm"
-            className="orders-remove-icon size-7 text-muted-foreground hover:text-destructive"
+            className={className}
             aria-label={`Quitar equipo ${row.original.serialNumber}`}
-            title="Quitar de la orden"
-            onClick={() => onRemove(row.original)}
+            title={onRemove ? "Quitar de la orden" : "Quitar de la orden (solo disponible en modo edición)"}
+            disabled={!onRemove}
+            onClick={() => onRemove?.(row.original)}
           >
             <Trash2 aria-hidden="true" />
           </Button>

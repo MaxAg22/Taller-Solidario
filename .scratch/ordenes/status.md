@@ -2,7 +2,7 @@
 
 ## Stage
 
-Implementación: implementado, validado y revisado por el usuario. Las 16 filas de la matriz manual V1–V16 pasan (12 en la corrida del 2026-11-16, las 4 bloqueadas V4, V7, V8, V9 revalidadas el 2026-11-17 tras aplicar la migración). Los cambios de UI y bug de post-validación están documentados en `pre-human-review.md` y validados por el usuario. Siguiente etapa: revisión agéntica.
+Implementación: implementado, validado y revisado por el usuario. Las 16 filas de la matriz manual V1–V16 pasan (12 en la corrida del 2026-11-16, las 4 bloqueadas V4, V7, V8, V9 revalidadas el 2026-11-17 tras aplicar la migración). Los cambios de UI y bug de post-validación están documentados en `pre-human-review.md` y validados por el usuario. Revisión agéntica completa (3 rondas), reporte en `agentic-review.md`. Siguiente etapa: revisión humana.
 
 ## Links
 
@@ -22,6 +22,7 @@ Implementación: implementado, validado y revisado por el usuario. Las 16 filas 
 - `implementation-tree.md` — árbol de tareas T0–T9, matriz de validación manual V1–V16 y decisiones tomadas para la implementación.
 - `implementation-status.md` — estado de la corrida de implementación.
 - `pre-human-review.md` — cambios de UI y bug aplicados tras la validación, validados por el usuario.
+- `agentic-review.md` — reporte de la revisión agéntica (4 facetas, 3 rondas) con fixes y skips.
 - `prototypes/` — prototipos interactivos de la rama de interfaz.
 - `prototypes/orders.html` — prototipo de la alternativa A para la tabla de órdenes, detalle, asociación e indicador en Inventario.
 - `prototypes/InterVariable.woff2` — copia local de la tipografía de la aplicación para el prototipo.

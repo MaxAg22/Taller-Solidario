@@ -9,12 +9,7 @@ import { DataTable } from "@/components/shared/table/DataTable";
 import { orderColumns } from "@/components/orders/table/OrderColumns";
 import { OrderFormModal } from "@/components/orders/OrderFormModal";
 import { useOrders } from "@/hooks";
-import type { OrderStatus } from "@/interfaces";
-
-const STATUS_OPTIONS: { value: string; label: string; color: string }[] = [
-  { value: "En Preparación", label: "En Preparación", color: "#b45309" },
-  { value: "Donado", label: "Donado", color: "#475569" },
-];
+import { ORDER_STATUSES } from "@/utils/orderStatus";
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -35,10 +30,10 @@ export default function OrdersPage() {
     searchTerm,
     dateFrom,
     dateTo,
-    statusFilter === "todos" ? null : (statusFilter as OrderStatus),
+    statusFilter === "todos" ? null : (statusFilter as (typeof ORDER_STATUSES)[number]["value"]),
   );
 
-  const resetPagination = () => setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  const resetPagination = () => setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
   const hasFilters = searchTerm.trim() !== "" || dateFrom !== "" || dateTo !== "" || statusFilter !== "todos";
   const emptyMessage = hasFilters
     ? "No se encontraron resultados"
@@ -85,7 +80,7 @@ export default function OrdersPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos los estados</SelectItem>
-              {STATUS_OPTIONS.map((option) => (
+              {ORDER_STATUSES.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   <span className="inventory-status-dot" style={{ backgroundColor: option.color }} aria-hidden="true" />
                   {option.label}
