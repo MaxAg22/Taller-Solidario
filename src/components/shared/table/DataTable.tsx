@@ -78,6 +78,7 @@ export function DataTable<TData extends RowData>({
                 className={cn(
                   onRowClick ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2" : undefined,
                   ("pending" in row.original && row.original.pending === "Se quitará") && "orders-row-removing",
+                  ("pending" in row.original && row.original.pending === "Pendiente") && "orders-row-pending",
                 )}
                 tabIndex={onRowClick ? 0 : undefined}
                 onClick={() => onRowClick?.(row.original)}

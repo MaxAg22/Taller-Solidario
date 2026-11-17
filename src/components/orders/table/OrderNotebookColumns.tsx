@@ -13,6 +13,14 @@ export const orderNotebookColumns = (onRemove?: (notebook: OrderTeam) => void) =
   columnHelper.columns([
     columnHelper.accessor("name", {
       header: "Nombre de equipo",
+      cell: ({ row }) => (
+        <span>
+          {row.original.name}
+          {row.original.pending === "Pendiente" && (
+            <span className="orders-pending-tag">Pendiente</span>
+          )}
+        </span>
+      ),
     }),
     columnHelper.accessor("serialNumber", {
       header: "N.° de Serie",
