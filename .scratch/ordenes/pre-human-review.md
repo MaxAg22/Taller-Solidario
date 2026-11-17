@@ -4,6 +4,8 @@ Rama: `feature/ordenes`. Cambios implementados tras la validación 16/16, listos
 revisión humana. No se corrió validación en navegador: la validación es manual, por el
 usuario, sobre el servidor de desarrollo.
 
+**Estado: validado por el usuario.**
+
 ## Cambios
 
 ### 1. Fila de retiro: roja con baja opacidad, sin etiqueta «Se quitará»
@@ -12,7 +14,7 @@ usuario, sobre el servidor de desarrollo.
   `orders-row-removing` cuando `row.original.pending === "Se quitará"` (con un
   guard `"pending" in row.original` porque el componente es genérico sobre
   `RowData`).
-- [[src/index.css]]: `.orders-row-removing td { opacity: 0.55; background: #fef2f2; }` —
+- [[src/index.css]]: `.orders-row-removing td { opacity: 0.5; background: #fee2e2; }` —
   la fila entera queda roja con baja opacidad. El icono de retiro se resalta con
   `.orders-row-removing .orders-remove-icon { opacity: 1; }` para que siga visible.
 - La etiqueta amarilla de texto «Se quitará» se retira del todo: no se pinta en el
@@ -68,20 +70,21 @@ usuario, sobre el servidor de desarrollo.
   `12px 16px`, y el padding de `.orders-value` de `8px 0` a `2px 0`. El label baja de
   13px a 12px. El bloque queda más plano y la tabla gana protagonismo.
 
-### 6. Orden «Donado»: datos visibles pero bloqueados, con nota
+### 6. Orden «Donado»: datos visibles pero bloqueados, con nota en rojo
 
 - [[src/pages/OrderDetailPage.tsx#OrderDetailPage]]: el bloque `.orders-fields` toma
   la clase `orders-fields-locked` cuando `isDonated`. Los campos se ven igual (la
   información no se oculta) pero el contenedor queda con opacidad reducida y cursor
-  `not-allowed` en inputs/textareas, y **dentro del mismo contenedor** (como última
-  fila de la grilla, ocupando el ancho completo) aparece una nota en rojo:
+  `not-allowed` en inputs/textareas.
+- **Dentro del mismo contenedor** (como última fila de la grilla, ocupando el ancho
+  completo) aparece una nota en rojo (`.orders-locked-note`, `color: #b91c1c`):
   «Esta orden está donada: no se pueden editar sus datos ni sus equipos. Usá
   «Volver a En Preparación» para habilitarla otra vez.»
 - Justificación: antes, una orden Donado mostraba el bloque vacío (los inputs del
   modo edición solo existen con `isEditing` y el botón Editar no aparece en Donado,
   así que el bloque quedaba en blanco). Ahora la información se lee y queda claro por
   qué no se puede editar.
-- [[src/index.css]]: `.orders-fields-locked input, .orders-fields-locked textarea { opacity: 0.6; cursor: not-allowed; }` y `.orders-locked-note`.
+- [[src/index.css]]: `.orders-fields-locked input, .orders-fields-locked textarea { opacity: 0.6; cursor: not-allowed; }` y `.orders-locked-note` como `grid-area: locked-note` dentro de `.orders-fields`.
 
 ### 7. Bug: «quitar un equipo pendiente de vincular abría el modal de estado y no cambiaba nada»
 
@@ -105,9 +108,10 @@ usuario, sobre el servidor de desarrollo.
 
 ### 8. Filtro por estado en la lista de órdenes
 
-- [[src/pages/OrdersPage.tsx]]: se agrega un `Select` «Estado» (Todos / En
-  Preparación / Donado) a la par de búsqueda y fecha. El estado se pasa a
-  `useOrders` → `getOrders`.
+- [[src/pages/OrdersPage.tsx]]: se agrega un `Select` «Estado» (Todos los estados /
+  En Preparación / Donado) a la par de búsqueda y fecha. Los estados usan puntos de
+  colores (`inventory-status-dot`) igual que el filtro de estado del inventario de
+  equipos: `En Preparación` → `#b45309`, `Donado` → `#475569`.
 - [[src/hooks/orders/useOrders.ts]]: gana el parámetro `status?: OrderStatus | null`.
 - [[src/actions/orders.ts#getOrders]]: si `status` no es `null`, agrega
   `query.eq("status", status)`. No toca la API ni la RPC.
@@ -115,7 +119,29 @@ usuario, sobre el servidor de desarrollo.
   hasta, estado) ahora es un `div` con un `Label` arriba y el control abajo, todos
   alineados al borde inferior con `align-items: flex-end` en `.inventory-toolbar`.
 
-### 9. «Eliminar orden» deshabilitado en Donado (consistencia)
+### 9. Fila «Pendiente»: verde con etiqueta
+
+- [[src/components/shared/table/DataTable.tsx#DataTable]]: el `TableRow` toma la clase
+  `orders-row-pending` cuando `row.original.pending === "Pendiente"`.
+- [[src/index.css]]: `.orders-row-pending td { background: #f0fdf4; }` — fondo verde
+  claro, el texto sigue siendo negro para que se lea bien.
+- [[src/components/orders/table/OrderNotebookColumns.tsx]]: se agrega una etiqueta
+  «Pendiente» (`.orders-pending-tag`, verde `#dcfce7` con texto `#166534`) al nombre
+  del equipo cuando está en estado pendiente.
+
+### 10. MultiSelect «Agregar equipo»: filtro contiguo y posición
+
+- [[src/pages/OrderDetailPage.tsx#OrderDetailPage]]: el `MultiSelect` se mueve de la
+  derecha a la izquierda de la fila «Equipos asociados», al lado del título.
+- [[src/pages/OrderDetailPage.tsx#OrderDetailPage]]: el `MultiSelectContent` ahora
+  pasa un `filter` custom a `Command` (cmdk) que hace búsqueda por substring contiguo
+  en vez de la búsqueda por tokenización de cmdk. Ejemplo: buscar `30` solo trae
+  equipos que tengan "30" contiguo en el nombre, modelo o número de serie; ya no
+  coincide con "3190".
+- [[src/index.css]]: `.orders-section-head-left` agrupa el título y el MultiSelect a
+  la izquierda de la fila.
+
+### 11. «Eliminar orden» deshabilitado en Donado (consistencia)
 
 - [[src/pages/OrderDetailPage.tsx#OrderDetailPage]]: el botón «Eliminar orden» toma
   `disabled={isDonated}`. La acción `deleteOrder` ([[src/actions/orders.ts#deleteOrder]])
@@ -143,7 +169,6 @@ usuario, sobre el servidor de desarrollo.
 
 ## Pendiente del usuario
 
-- Validación manual en el navegador sobre el servidor de desarrollo (no se corrió en
-  esta rama, por decisión del usuario para ahorrar tokens).
+- ~~Validación manual en el navegador sobre el servidor de desarrollo~~ — **hecha por el usuario.**
 - El punto de «Agregar equipo» fuera de Edición no se tocó y queda como decisión de
   diseño abierta.
