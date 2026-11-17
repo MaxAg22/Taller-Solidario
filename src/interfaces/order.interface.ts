@@ -41,6 +41,7 @@ export interface OrderTeam {
   status: string;
   specs: string;
   pending: "Pendiente" | "Se quitará" | null;
+  removeStatus: NotebookStatus | null;
 }
 
 export interface OrderFormModalProps {

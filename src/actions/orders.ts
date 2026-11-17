@@ -3,6 +3,7 @@ import { supabase } from "@/supabase/client";
 import type {
   ChangeOrderStatusPayload,
   CreateOrderPayload,
+  OrderStatus,
   UpdateOrderPayload,
 } from "@/interfaces";
 
@@ -12,6 +13,7 @@ export const getOrders = async (
   search: string,
   deliveryDateFrom?: string,
   deliveryDateTo?: string,
+  status?: OrderStatus | null,
 ) => {
   let query = supabase.from("orders").select("*", { count: "exact" });
 
@@ -28,6 +30,10 @@ export const getOrders = async (
 
   if (deliveryDateTo) {
     query = query.lte("deliveryDate", deliveryDateTo);
+  }
+
+  if (status) {
+    query = query.eq("status", status);
   }
 
   const { data: orders, count, error } = await query

@@ -3,16 +3,25 @@ import { Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DataTable } from "@/components/shared/table/DataTable";
 import { orderColumns } from "@/components/orders/table/OrderColumns";
 import { OrderFormModal } from "@/components/orders/OrderFormModal";
 import { useOrders } from "@/hooks";
+import type { OrderStatus } from "@/interfaces";
+
+const STATUS_OPTIONS: { value: string; label: string; color: string }[] = [
+  { value: "En Preparación", label: "En Preparación", color: "#b45309" },
+  { value: "Donado", label: "Donado", color: "#475569" },
+];
 
 export default function OrdersPage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 14,
@@ -26,10 +35,11 @@ export default function OrdersPage() {
     searchTerm,
     dateFrom,
     dateTo,
+    statusFilter === "todos" ? null : (statusFilter as OrderStatus),
   );
 
   const resetPagination = () => setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  const hasFilters = searchTerm.trim() !== "" || dateFrom !== "" || dateTo !== "";
+  const hasFilters = searchTerm.trim() !== "" || dateFrom !== "" || dateTo !== "" || statusFilter !== "todos";
   const emptyMessage = hasFilters
     ? "No se encontraron resultados"
     : "No hay órdenes disponibles";
@@ -47,20 +57,45 @@ export default function OrdersPage() {
       </div>
 
       <div className="inventory-toolbar">
-        <div className="inventory-search">
-          <Search size={20} aria-hidden="true" />
-          <Input
-            aria-label="Buscar órdenes por destinatario"
-            placeholder="Buscar por destinatario..."
-            value={searchTerm}
-            onChange={(event) => {
-              setSearchTerm(event.target.value);
+        <div className="inventory-search-filter">
+          <div className="inventory-search">
+            <Search size={20} aria-hidden="true" />
+            <Input
+              aria-label="Buscar órdenes por destinatario"
+              placeholder="Buscar por destinatario..."
+              value={searchTerm}
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+                resetPagination();
+              }}
+            />
+          </div>
+        </div>
+        <div className="inventory-status-filter">
+          <Label>Estado</Label>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => {
+              setStatusFilter(value);
               resetPagination();
             }}
-          />
+          >
+            <SelectTrigger aria-label="Filtrar por estado" className="inventory-filter">
+              <SelectValue placeholder="Todos los estados" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos los estados</SelectItem>
+              {STATUS_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  <span className="inventory-status-dot" style={{ backgroundColor: option.color }} aria-hidden="true" />
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <label className="inventory-date-filter">
-          Fecha desde
+        <div className="inventory-date-filter">
+          <Label>Fecha desde</Label>
           <Input
             type="date"
             aria-label="Filtrar por fecha de entrega desde"
@@ -70,9 +105,9 @@ export default function OrdersPage() {
               resetPagination();
             }}
           />
-        </label>
-        <label className="inventory-date-filter">
-          Fecha hasta
+        </div>
+        <div className="inventory-date-filter">
+          <Label>Fecha hasta</Label>
           <Input
             type="date"
             aria-label="Filtrar por fecha de entrega hasta"
@@ -82,7 +117,7 @@ export default function OrdersPage() {
               resetPagination();
             }}
           />
-        </label>
+        </div>
         {isError ? (
           <div className="inventory-feedback" role="alert">
             <p>No se pudo cargar la lista de órdenes.</p>
@@ -94,6 +129,9 @@ export default function OrdersPage() {
           </p>
         )}
       </div>
+
+
+
 
       <div className="inventory-table-section">
         <DataTable

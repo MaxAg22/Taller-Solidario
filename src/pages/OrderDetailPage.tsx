@@ -68,22 +68,19 @@ export default function OrderDetailPage() {
   }, [draft, order]);
 
   const rows = useMemo<OrderTeam[]>(() => {
+    const detachById = new Map(draft?.detach.map((item) => [item.notebookId, item.status] as const));
+
     const base: OrderTeam[] = (orderNotebooks ?? []).map((notebook) => ({
       id: notebook.id,
       name: [notebook.brand, notebook.model].filter(Boolean).join(" ") || "Equipo",
       serialNumber: notebook.serialNumber?.toString() ?? "",
       status: notebook.status ?? "",
       specs: notebook.specs ?? "",
-      pending: null,
+      pending: detachById.has(notebook.id) ? ("Se quitará" as const) : null,
+      removeStatus: detachById.get(notebook.id) ?? null,
     }));
 
     if (!draft) return base;
-
-    const detached = new Set(draft.detach.map((item) => item.notebookId));
-
-    const current = base.map((team) =>
-      detached.has(team.id) ? { ...team, pending: "Se quitará" as const } : team
-    );
 
     const attached: OrderTeam[] = [];
 
@@ -101,13 +98,20 @@ export default function OrderDetailPage() {
         status: notebook.status ?? "",
         specs: notebook.specs ?? "",
         pending: "Pendiente",
+        removeStatus: null,
       });
     });
 
-    return [...current, ...attached];
+    return [...base, ...attached];
   }, [orderNotebooks, draft, availableNotebooks]);
 
   const handleRemoveTeam = useCallback((notebook: OrderTeam) => {
+    if (notebook.pending === "Pendiente") {
+      setDraft((prev) =>
+        prev ? { ...prev, attach: prev.attach.filter((item) => item.notebookId !== notebook.id) } : prev
+      );
+      return;
+    }
     setTeamToRemove(notebook);
   }, []);
 
@@ -172,17 +176,21 @@ export default function OrderDetailPage() {
     if (!draft || !teamToRemove) return;
 
     const team = teamToRemove;
-    setDraft((prev) =>
-      prev
-        ? {
-            ...prev,
-            detach: [
-              ...prev.detach.filter((item) => item.notebookId !== team.id),
-              { notebookId: team.id, status: returnStatus },
-            ],
-          }
-        : prev
-    );
+    setDraft((prev) => {
+      if (!prev) return prev;
+
+      if (prev.attach.some((item) => item.notebookId === team.id)) {
+        return { ...prev, attach: prev.attach.filter((item) => item.notebookId !== team.id) };
+      }
+
+      return {
+        ...prev,
+        detach: [
+          ...prev.detach.filter((item) => item.notebookId !== team.id),
+          { notebookId: team.id, status: returnStatus },
+        ],
+      };
+    });
     setTeamToRemove(null);
   };
 
@@ -226,10 +234,6 @@ export default function OrderDetailPage() {
             <ArrowLeft aria-hidden="true" /> Órdenes
           </Button>
           <h1>{order.recipient}</h1>
-          <div className="orders-meta">
-            <span>Orden #{order.id.slice(0, 8)}</span>
-            <span className="inventory-table-status" data-status={status}>{status}</span>
-          </div>
         </div>
         <div className="orders-actions">
           {isEditing ? (
@@ -258,7 +262,11 @@ export default function OrderDetailPage() {
                 Marcar como Donado
               </Button>
               {(orderNotebooks ?? []).length === 0 && (
-                <Button variant="destructive" onClick={() => setConfirmKind("delete")}>
+                <Button
+                  variant="destructive"
+                  disabled={isDonated}
+                  onClick={() => setConfirmKind("delete")}
+                >
                   Eliminar orden
                 </Button>
               )}
@@ -267,23 +275,7 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
-      <div className="orders-fields">
-        <div className="orders-field">
-          <Label htmlFor="recipient">Destinatario</Label>
-          {isEditing ? (
-            <Input
-              id="recipient"
-              value={draft?.recipient ?? ""}
-              onChange={(event) =>
-                setDraft((prev) =>
-                  prev ? { ...prev, recipient: event.target.value } : prev
-                )
-              }
-            />
-          ) : (
-            <span className="orders-value">{order.recipient}</span>
-          )}
-        </div>
+      <div className={`orders-fields${isDonated ? " orders-fields-locked" : ""}`}>
         <div className="orders-field">
           <Label htmlFor="deliveryDate">Fecha de entrega</Label>
           {isEditing ? (
@@ -323,6 +315,11 @@ export default function OrderDetailPage() {
             <span className="orders-value">{order.description || "—"}</span>
           )}
         </div>
+        {isDonated && (
+          <p className="orders-locked-note" role="note">
+            Esta orden está donada: no se pueden editar sus datos ni sus equipos. Usá «Volver a En Preparación» para habilitarla otra vez.
+          </p>
+        )}
       </div>
 
       <div className="orders-section-head">

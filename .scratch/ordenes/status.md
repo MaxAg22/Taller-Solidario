@@ -2,7 +2,7 @@
 
 ## Stage
 
-Implementación: el árbol de tareas y la matriz de validación manual están asentados; la implementación arranca sobre la rama `feature/ordenes`.
+Implementación: implementado y validado. Las 16 filas de la matriz manual V1–V16 pasan (12 en la corrida del 2026-11-16, las 4 bloqueadas V4, V7, V8, V9 revalidadas el 2026-11-17 tras aplicar la migración). Siguiente etapa: revisión agéntica.
 
 ## Links
 
@@ -21,11 +21,12 @@ Implementación: el árbol de tareas y la matriz de validación manual están as
 - `program-design.md` — cobertura, decisiones técnicas por especificar y árbol de ramas del diseño del programa.
 - `implementation-tree.md` — árbol de tareas T0–T9, matriz de validación manual V1–V16 y decisiones tomadas para la implementación.
 - `implementation-status.md` — estado de la corrida de implementación.
+- `pre-human-review.md` — cambios de UI y bug aplicados tras la validación, listos para la revisión humana.
 - `prototypes/` — prototipos interactivos de la rama de interfaz.
 - `prototypes/orders.html` — prototipo de la alternativa A para la tabla de órdenes, detalle, asociación e indicador en Inventario.
 - `prototypes/InterVariable.woff2` — copia local de la tipografía de la aplicación para el prototipo.
 
 ## Tracking
 
-- La migración de las dos RPC no se aplica al proyecto remoto enlazado; queda solo el archivo `.sql`. Las filas V4, V7, V8, V9 y V12 quedan bloqueadas por esa causa.
-- Las firmas de las dos RPC se declaran a mano en los tipos generados, como desviación del programa de diseño.
+- Las firmas de las dos RPC se declaran a mano en `src/supabase/supabase.ts` y `supabase/supabase.ts` (desviación del programa de diseño). Hay que regenerar los tipos con `npx supabase gen types typescript --linked` para reemplazar lo escrito a mano.
+- Hallazgo fuera de la matriz: la UI no marca «Se quitará» al retirar un equipo ya asociado a la orden. Ver `.scratch/ordenes/reports/browser/index.html` (sección V4).

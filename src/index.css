@@ -146,14 +146,15 @@
 .inventory-heading h1 { font-size: 24px; font-weight: 600; line-height: 30px; }
 .inventory-heading-subtitle { margin-top: 2px; font-size: 13px; line-height: 20px; color: var(--muted-foreground); }
 .inventory-status-dot { display: inline-block; width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; }
-.inventory-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.inventory-toolbar { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.inventory-search-filter { display: flex; flex-direction: column; gap: 4px; }
 .inventory-search { position: relative; width: 360px; max-width: 100%; }
 .inventory-search > svg { position: absolute; top: 10px; left: 12px; width: 16px; height: 16px; color: var(--muted-foreground); pointer-events: none; }
 .inventory-search input { height: 36px; padding: 0 12px 0 36px; background: var(--card); border-radius: 4px; font-size: 15px; box-shadow: none; }
 .inventory-search input::placeholder { color: var(--muted-foreground); }
-.inventory-filter[data-slot="select-trigger"] { width: 220px; height: 36px; padding: 0 12px; background: var(--card); border-radius: 4px; font-size: 15px; box-shadow: none; }
-.inventory-date-filter { display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 18px; color: var(--muted-foreground); }
+.inventory-date-filter, .inventory-status-filter { display: flex; flex-direction: column; gap: 4px; }
 .inventory-date-filter input { width: 164px; height: 36px; padding: 0 12px; background: var(--card); border-radius: 4px; font-size: 15px; box-shadow: none; }
+.inventory-filter[data-slot="select-trigger"] { width: 220px; height: 36px; padding: 0 12px; background: var(--card); border-radius: 4px; font-size: 15px; box-shadow: none; }
 .inventory-add { height: 36px; padding: 0 12px; border-radius: 4px; font-size: 15px; font-weight: 500; box-shadow: none; }
 .inventory-results { margin-left: auto; font-size: 13px; line-height: 20px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .inventory-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; font-size: 15px; color: var(--muted-foreground); }
@@ -196,26 +197,31 @@
 
 .orders-back { display: inline-flex; align-items: center; gap: 6px; height: 32px; margin-bottom: 12px; padding: 0 10px; border: 1px solid transparent; border-radius: 4px; background: transparent; font-size: 13px; color: var(--muted-foreground); }
 .orders-back:hover { color: var(--primary); background: var(--accent); }
-.orders-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px; font-size: 13px; line-height: 20px; color: var(--muted-foreground); }
 .orders-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .orders-actions button { height: 36px; padding: 0 12px; border-radius: 4px; font-size: 15px; font-weight: 500; box-shadow: none; }
-.orders-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; padding: 20px 24px; border: 1px solid var(--border); border-radius: 4px; background: var(--card); }
-.orders-field { display: flex; flex-direction: column; gap: 6px; }
-.orders-field > label { font-size: 13px; font-weight: 500; color: var(--muted-foreground); }
+.orders-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) 2fr; grid-template-areas: "date status description" "locked-note locked-note locked-note"; gap: 12px 16px; margin-top: 16px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 4px; background: var(--card); }
+.orders-field { display: flex; flex-direction: column; gap: 2px; }
+.orders-field:nth-child(1) { grid-area: date; }
+.orders-field:nth-child(2) { grid-area: status; }
+.orders-field:nth-child(3) { grid-area: description; }
+.orders-field > label { font-size: 12px; font-weight: 500; color: var(--muted-foreground); }
 .orders-field input, .orders-field textarea { min-height: 36px; border-radius: 4px; font-size: 15px; }
-.orders-field-wide { grid-column: 1 / -1; }
-.orders-value { padding: 8px 0; font-size: 15px; line-height: 22px; }
+.orders-value { padding: 2px 0; font-size: 15px; line-height: 22px; overflow-wrap: anywhere; }
+.orders-fields-locked input, .orders-fields-locked textarea { opacity: 0.6; cursor: not-allowed; }
+.orders-locked-note { grid-area: locked-note; margin: 0; font-size: 13px; line-height: 20px; color: #b91c1c; }
 .orders-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 0 10px; }
 .orders-section-head h2 { font-size: 15px; font-weight: 600; }
 .orders-section-head span { font-size: 13px; color: var(--muted-foreground); }
-.orders-team-tag { margin-left: 8px; padding: 2px 6px; border-radius: 4px; background: #fff4dc; color: #815615; font-size: 11px; font-weight: 600; }
+.orders-row-removing td { opacity: 0.55; background: #fef2f2; }
+.orders-row-removing .orders-remove-icon { opacity: 1; }
+.orders-removing-status { font-size: 13px; font-weight: 500; color: #b91c1c; }
 .orders-notice { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 48px 16px; text-align: center; color: var(--muted-foreground); }
 .notebook-order-block { grid-column: 1 / -1; padding: 12px 16px; border: 1px solid #c8d8f7; border-radius: 4px; background: rgb(37 99 235 / 7%); }
 .notebook-order-block strong { display: block; margin-bottom: 4px; font-size: 13px; font-weight: 600; color: var(--muted-foreground); }
 .notebook-order-block a { font-size: 15px; font-weight: 500; color: var(--primary); }
 .notebook-order-block span { display: block; margin-top: 4px; font-size: 13px; color: var(--muted-foreground); }
 @media (max-width: 760px) {
-  .orders-fields { grid-template-columns: minmax(0, 1fr); }
+  .orders-fields { grid-template-columns: minmax(0, 1fr); grid-template-areas: "date" "status" "description" "locked-note"; }
 }
 
 .attendance-layout { display: grid; grid-template-columns: 272px minmax(0, 1fr); align-items: start; gap: 24px; margin-top: 16px; }

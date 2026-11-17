@@ -1,5 +1,6 @@
 import { getOrders } from "@/actions";
 import { useQuery } from "@tanstack/react-query";
+import type { OrderStatus } from "@/interfaces";
 
 export const useOrders = (
   from: number,
@@ -7,10 +8,11 @@ export const useOrders = (
   search: string,
   deliveryDateFrom?: string,
   deliveryDateTo?: string,
+  status?: OrderStatus | null,
 ) => {
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["orders", from, to, search, deliveryDateFrom, deliveryDateTo],
-    queryFn: () => getOrders(from, to, search, deliveryDateFrom, deliveryDateTo),
+    queryKey: ["orders", from, to, search, deliveryDateFrom, deliveryDateTo, status],
+    queryFn: () => getOrders(from, to, search, deliveryDateFrom, deliveryDateTo, status),
     staleTime: 1000 * 60 * 5,
   });
 

@@ -8,6 +8,7 @@ import {
   type RowData,
 } from "@tanstack/react-table"
 
+import { cn } from "@/lib/utils"
 import { features, type DataTableFeatures } from "./data-table-features"
 import { Button } from "@/components/ui/button"
 import {
@@ -74,7 +75,10 @@ export function DataTable<TData extends RowData>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className={onRowClick ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2" : undefined}
+                className={cn(
+                  onRowClick ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2" : undefined,
+                  ("pending" in row.original && row.original.pending === "Se quitará") && "orders-row-removing",
+                )}
                 tabIndex={onRowClick ? 0 : undefined}
                 onClick={() => onRowClick?.(row.original)}
                 onKeyDown={(event) => {
