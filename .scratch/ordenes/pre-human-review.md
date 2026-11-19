@@ -170,5 +170,7 @@ usuario, sobre el servidor de desarrollo.
 ## Pendiente del usuario
 
 - ~~Validación manual en el navegador sobre el servidor de desarrollo~~ — **hecha por el usuario.**
-- El punto de «Agregar equipo» fuera de Edición no se tocó y queda como decisión de
-  diseño abierta.
+- ~~El punto de «Agregar equipo» fuera de Edición no se tocó y queda como decisión de
+  diseño abierta.~~ — **Resuelto: mantener el flujo actual.** Agregar equipos solo se
+  hace dentro de Edición. El usuario entra en Edición, agrega, guarda. No se agrega
+  un acceso directo fuera de Edición.

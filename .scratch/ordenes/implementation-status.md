@@ -23,6 +23,4 @@
 
 ## Open items
 
-- Sin resolver por el usuario: el texto «Se perderán los cambios» y el formato del número de orden, y las cuatro decisiones propias del subagente que quedan listadas en Highlights.
-- Los tipos manuales de `public.Functions` en `src/supabase/supabase.ts` y `supabase/supabase.ts` quedan declarados a mano todavía; hay que regenerarlos con `npx supabase gen types typescript --linked --project-ref <PROJECT_REF>` para reemplazar lo escrito a mano (desviación asentada en la corrida de implementación).
-- El punto de «Agregar equipo» fuera de Edición no se tocó y queda como decisión de diseño abierta.
+- Ninguno. Los 4 skips de la revisión agéntica se resolvieron en la revisión humana (commits individuales). Los tipos de RPC se regeneraron desde el proyecto remoto. «Agregar equipo» fuera de Edición se resolvió como decisión tomada: mantener el flujo actual (solo disponible dentro de Edición).

@@ -2,7 +2,7 @@
 
 ## Stage
 
-Implementación: implementado, validado y revisado por el usuario. Las 16 filas de la matriz manual V1–V16 pasan (12 en la corrida del 2026-11-16, las 4 bloqueadas V4, V7, V8, V9 revalidadas el 2026-11-17 tras aplicar la migración). Los cambios de UI y bug de post-validación están documentados en `pre-human-review.md` y validados por el usuario. Revisión agéntica completa (3 rondas), reporte en `agentic-review.md`. Siguiente etapa: revisión humana.
+Implementación: implementado, validado, revisado agénticamente y revisado por el usuario. Las 16 filas de la matriz manual V1–V16 pasan. Los 4 skips de la revisión agéntica se resolvieron en la revisión humana (commiteados individualmente). Los tipos de RPC se regeneraron desde el proyecto remoto. «Agregar equipo» fuera de Edición se resolvió como decisión tomada: mantener el flujo actual (solo disponible dentro de Edición). Siguiente etapa: merge a main.
 
 ## Links
 
@@ -29,5 +29,4 @@ Implementación: implementado, validado y revisado por el usuario. Las 16 filas 
 
 ## Tracking
 
-- Las firmas de las dos RPC se declaran a mano en `src/supabase/supabase.ts` y `supabase/supabase.ts` (desviación del programa de diseño). Hay que regenerar los tipos con `npx supabase gen types typescript --linked` para reemplazar lo escrito a mano.
-- Los cambios de UI de post-validación (11 puntos en `pre-human-review.md`) son ajustes de presentación y un bug de comportamiento; no cambian la API ni las RPC.
+- Revisión humana completada: los 4 skips de la agentic review se resolvieron (commits individuales), los tipos de RPC se regeneraron, y «Agregar equipo» fuera de Edición se resolvió como mantener el flujo actual.
