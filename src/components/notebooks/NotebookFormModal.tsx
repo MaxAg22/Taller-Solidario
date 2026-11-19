@@ -10,10 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X } from "lucide-react";
-import type {
-  NotebookFormModalProps,
-  UpdateNotebook,
-} from "@/interfaces/notebook.interface";
+import type { NotebookFormModalProps } from "@/interfaces/notebook.interface";
 import { Label } from "@/components/ui/label";
 import {
   CardContent,
@@ -72,9 +69,13 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
     if (isEdit) {
       updateNotebook({
         id: notebook.id,
-        ...data,
-        // Error here
-      } as UpdateNotebook);
+        brand: data.brand ?? "",
+        model: data.model,
+        status: data.status,
+        specs: data.specs ?? "",
+        repairNeeded: data.repairNeeded ?? "",
+        repairHistory: data.repairHistory ?? "",
+      });
     } else {
       createNotebook({
         ...data,
