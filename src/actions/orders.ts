@@ -52,32 +52,26 @@ export const getOrders = async (
 };
 
 export const getOrder = async (id: string) => {
-  const { data: order, error: orderError } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  const [orderResult, notebooksResult] = await Promise.all([
+    supabase.from("orders").select("*").eq("id", id).maybeSingle(),
+    supabase.from("notebooks").select("*").eq("order_id", id),
+  ]);
 
-  if (orderError) {
-    throw new Error(orderError.message);
+  if (orderResult.error) {
+    throw new Error(orderResult.error.message);
   }
 
-  if (!order) {
+  if (!orderResult.data) {
     throw new Error("No se encontró la orden");
   }
 
-  const { data: notebooks, error: notebooksError } = await supabase
-    .from("notebooks")
-    .select("*")
-    .eq("order_id", id);
-
-  if (notebooksError) {
-    throw new Error(notebooksError.message);
+  if (notebooksResult.error) {
+    throw new Error(notebooksResult.error.message);
   }
 
   return {
-    order,
-    notebooks: notebooks ?? [],
+    order: orderResult.data,
+    notebooks: notebooksResult.data ?? [],
   };
 };
 
