@@ -355,6 +355,13 @@ export default function OrderDetailPage() {
         <DataTable
           columns={columns}
           data={rows}
+          rowState={{
+            get: (row) => row.pending,
+            style: {
+              "Se quitará": "orders-row-removing",
+              "Pendiente": "orders-row-pending",
+            },
+          }}
           emptyMessage="No hay equipos disponibles"
         />
       </div>

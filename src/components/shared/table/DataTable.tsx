@@ -20,9 +20,15 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+interface RowState<TData> {
+  get: (row: TData) => string | null
+  style: Record<string, string>
+}
+
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<DataTableFeatures, TData>[]
   data: TData[]
+  rowState?: RowState<TData>
   pagination?: PaginationState
   setPagination?: OnChangeFn<PaginationState>
   rowCount?: number
@@ -34,6 +40,7 @@ interface DataTableProps<TData extends RowData> {
 export function DataTable<TData extends RowData>({
   columns,
   data,
+  rowState,
   pagination,
   setPagination,
   rowCount,
@@ -77,8 +84,7 @@ export function DataTable<TData extends RowData>({
                 data-state={row.getIsSelected() && "selected"}
                 className={cn(
                   onRowClick ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-primary focus-visible:-outline-offset-2" : undefined,
-                  ("pending" in row.original && row.original.pending === "Se quitará") && "orders-row-removing",
-                  ("pending" in row.original && row.original.pending === "Pendiente") && "orders-row-pending",
+                  rowState?.style[rowState.get(row.original) ?? ""],
                 )}
                 tabIndex={onRowClick ? 0 : undefined}
                 onClick={() => onRowClick?.(row.original)}
