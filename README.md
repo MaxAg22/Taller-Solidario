@@ -36,6 +36,50 @@ npm run electron:dev
 
 # buildar y generar instalador
 npm run dist
+
+# ejecutar los tests
+npm run test
+```
+
+## Tests
+
+El proyecto usa **Vitest** para los tests unit e integración, y Playwright (o similar) para los tests E2E.
+
+```bash
+# correr todos los tests una vez
+npm run test
+
+# correr en modo watch (re-ejecuta al guardar cambios)
+npx vitest
+
+# correr un archivo específico
+npx vitest run tests/unit/actions/orders.test.ts
+
+# correr en un patrón (ej: todos los tests de actions)
+npx vitest run tests/unit/actions/
+
+# correr solo unit / solo integración
+npx vitest run tests/unit/
+npx vitest run tests/integration/
+```
+
+### Estructura
+
+```
+tests/
+  unit/                       # lógica aislada: actions, utils, validators (sin DOM)
+    supabase/mock.ts          # mock del cliente Supabase (cola de resultados, registro de llamadas)
+    utils/                    # tests de utils (formatDeliveryDate, mapNotebook, etc.)
+    validators/               # tests de schemas Zod (orderFormSchema, etc.)
+    actions/                  # tests de actions (orders, notebooks, etc.) con Supabase mockeado
+  integration/                # componentes React renderizados en jsdom (con hooks mockeados)
+    setup.ts                  # import de jest-dom matchers + cleanup entre tests
+    helpers/                  # renderWithProviders (QueryClientProvider + MemoryRouter)
+    components/               # tests por componente (orders/, notebooks/, shared/, etc.)
+    pages/                    # tests por página (OrdersPage, OrderDetailPage, etc.)
+  e2e/                        # sistema completo: browser real + servidor + base (sin mocks)
+    db/                       # tests de RPCs y lógica de base de datos
+    app/                      # flujos de usuario end-to-end (navegar, interactuar, assert)
 ```
 
 ## Variables de entorno
@@ -43,17 +87,19 @@ Crear un .env (o .env.local) con las variables necesarias para conectarse a Supa
 ```bash
 VITE_PROJECT_URL_SUPABASE=https://tu-proyecto.supabase.co
 VITE_SUPABASE_API_KEY=eyJhbGciOi...
+PROJECT_REF=...
 ```
+
+## Cómo obtener las credenciales en Supabase
+
+1. `VITE_PROJECT_URL_SUPABASE`: En el proyecto Supabase → Project Settings → Data API: copiar Project URL.
+2. `VITE_SUPABASE_API_KEY`: En Project Settings → API o API Keys: copiar la anon public key (o la legacy anon si corresponde).
+3. `PROJECT_REF`: Es la referencia del proyecto en Supabase (Project ID), se encuentra en Project Settings → General.
 
 ## Proyectos Supabase
 
 - Taller-Solidario-Equipos → Producción (NO USAR para desarrollo)
 - Taller-Solidario-Pruebas → Desarrollo
-
-## Cómo obtener las credenciales en Supabase
-
-1. En el proyecto Supabase → Project Settings → Data API: copiar Project URL → asignar a VITE_PROJECT_URL_SUPABASE.
-2. En Project Settings → API o API Keys: copiar la anon public key (o la legacy anon si corresponde) → asignar a VITE_SUPABASE_API_KEY.
 
 ## Cambios en la base de datos y generación de tipos
 
@@ -85,7 +131,6 @@ npx supabase gen types typescript --linked --project-ref <PROJECT_REF>
 ```
 
 **Notas:**
-- `<PROJECT_REF>` es la referencia del proyecto en Supabase (Project ID), se encuentra en Project Settings → General.
 - El comando `supabase link` guarda el enlace en el **keychain del sistema operativo** (no en un archivo del proyecto). Por lo tanto, **cada máquina debe ejecutarlo una vez** después de clonar el repo. Si cambiás de máquina o borrás el keychain, deberás repetirlo.
 - No confundir con la API key: el `PROJECT_REF` es un identificador corto de 20 caracteres, no es una credencial secreta. La API key sí es sensible y debe mantenerse en `.env`.
 - La bandera `--remote` es necesaria en `db push` porque el CLI por defecto apunta a la base de datos local (Docker).

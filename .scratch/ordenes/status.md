@@ -23,6 +23,7 @@ Implementación: implementado, validado, revisado agénticamente y revisado por 
 - `implementation-status.md` — estado de la corrida de implementación.
 - `pre-human-review.md` — cambios de UI y bug aplicados tras la validación, validados por el usuario.
 - `agentic-review.md` — reporte de la revisión agéntica (4 facetas, 3 rondas) con fixes y skips.
+- `testing.md` — testing de Órdenes: paso 1 unit (hecho, 38 tests), paso 2 integración (propuesto), paso 3 E2E (pendiente).
 - `prototypes/` — prototipos interactivos de la rama de interfaz.
 - `prototypes/orders.html` — prototipo de la alternativa A para la tabla de órdenes, detalle, asociación e indicador en Inventario.
 - `prototypes/InterVariable.woff2` — copia local de la tipografía de la aplicación para el prototipo.
