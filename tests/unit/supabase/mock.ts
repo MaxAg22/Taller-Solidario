@@ -6,13 +6,18 @@ type QueryResult = {
   count?: number | null;
 };
 
+
+//   supabase.from("orders").select("*").eq("id", id).maybeSingle()
+//   => mock guarda en fromCalls: { table: "orders", query: { select: [["*"]], eq: [["id", id]], maybeSingle: [] } }
+
+
 export function createSupabaseMock() {
   const fromCalls: { table: string; query: Record<string, unknown> }[] = [];
   const rpcCalls: { fn: string; args: Record<string, unknown> }[] = [];
   let resultQueue: QueryResult[] = [];
 
   const chain = (table: string) => {
-    const record: Record<string, unknown> = { table };
+    const record: Record<string, unknown> = {};
     fromCalls.push({ table, query: record });
 
     const builder: Record<string, unknown> = {};
@@ -28,6 +33,7 @@ export function createSupabaseMock() {
       addMethod(method);
     }
 
+    // Esto sirve para el await supabase.from("orders").select("*").eq("id", id).maybeSingle() que devuelve una promesa
     builder.then = (
       resolve: (value: QueryResult) => void,
       reject: (error: Error) => void
