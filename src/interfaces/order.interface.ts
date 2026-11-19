@@ -34,7 +34,7 @@ export interface OrderDraft {
   detach: OrderDetach[];
 }
 
-export interface OrderTeam {
+export interface OrderNotebookRow {
   id: string;
   name: string;
   serialNumber: string;
@@ -49,8 +49,8 @@ export interface OrderFormModalProps {
   onCreated: (id: string) => void;
 }
 
-export interface OrderRemoveTeamModalProps {
-  notebook: OrderTeam;
+export interface OrderRemoveNotebookModalProps {
+  notebook: OrderNotebookRow;
   onConfirm: (status: NotebookStatus) => void;
   onClose: () => void;
 }

@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DataTable } from "@/components/shared/table/DataTable";
 import { orderNotebookColumns } from "@/components/orders/table/OrderNotebookColumns";
-import type { OrderTeam } from "@/interfaces";
+import type { OrderNotebookRow } from "@/interfaces";
 
-function makeTeam(overrides: Partial<OrderTeam> = {}): OrderTeam {
+function makeTeam(overrides: Partial<OrderNotebookRow> = {}): OrderNotebookRow {
   return {
     id: "nb-1",
     name: "Dell Latitude 3400",

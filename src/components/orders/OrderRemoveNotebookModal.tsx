@@ -17,9 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus";
-import type { NotebookStatus, OrderRemoveTeamModalProps } from "@/interfaces";
+import type { NotebookStatus, OrderRemoveNotebookModalProps } from "@/interfaces";
 
-export const OrderRemoveTeamModal: React.FC<OrderRemoveTeamModalProps> = ({
+export const OrderRemoveNotebookModal: React.FC<OrderRemoveNotebookModalProps> = ({
   notebook,
   onConfirm,
   onClose,

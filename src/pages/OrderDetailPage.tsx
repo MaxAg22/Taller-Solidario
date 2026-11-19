@@ -9,7 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { DataTable } from "@/components/shared/table/DataTable";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
-import { OrderRemoveTeamModal } from "@/components/orders/OrderRemoveTeamModal";
+import { OrderRemoveNotebookModal } from "@/components/orders/OrderRemoveNotebookModal";
 import { orderNotebookColumns } from "@/components/orders/table/OrderNotebookColumns";
 import {
   MultiSelect,
@@ -27,7 +27,7 @@ import type {
   NotebookStatus,
   OrderDraft,
   OrderStatus,
-  OrderTeam,
+  OrderNotebookRow,
 } from "@/interfaces";
 
 type ConfirmKind = "leave" | "return-prep" | "delete" | null;
@@ -39,7 +39,7 @@ export default function OrderDetailPage() {
   const { notebooks: availableNotebooks } = useAvailableNotebooks();
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<OrderDraft | null>(null);
-  const [teamToRemove, setTeamToRemove] = useState<OrderTeam | null>(null);
+  const [notebookToRemove, setNotebookToRemove] = useState<OrderNotebookRow | null>(null);
   const [confirmKind, setConfirmKind] = useState<ConfirmKind>(null);
   const [leaveTarget, setLeaveTarget] = useState<"cancel" | "back">("cancel");
 
@@ -64,10 +64,10 @@ export default function OrderDetailPage() {
       draft.attach.length > 0 ||
       draft.detach.length > 0);
 
-  const rows = useMemo<OrderTeam[]>(() => {
+  const rows = useMemo<OrderNotebookRow[]>(() => {
     const detachById = new Map(draft?.detach.map((item) => [item.notebookId, item.status] as const));
 
-    const base: OrderTeam[] = (orderNotebooks ?? []).map((notebook) => ({
+    const base: OrderNotebookRow[] = (orderNotebooks ?? []).map((notebook) => ({
       id: notebook.id,
       name: [notebook.brand, notebook.model].filter(Boolean).join(" ") || "Equipo",
       serialNumber: notebook.serialNumber?.toString() ?? "",
@@ -79,7 +79,7 @@ export default function OrderDetailPage() {
 
     if (!draft) return base;
 
-    const attached: OrderTeam[] = [];
+    const attached: OrderNotebookRow[] = [];
 
     draft.attach.forEach((item) => {
       const notebook = (availableNotebooks ?? []).find(
@@ -102,19 +102,19 @@ export default function OrderDetailPage() {
     return [...base, ...attached];
   }, [orderNotebooks, draft, availableNotebooks]);
 
-  const handleRemoveTeam = useCallback((notebook: OrderTeam) => {
+  const handleRemoveNotebook = useCallback((notebook: OrderNotebookRow) => {
     if (notebook.pending === "Pendiente") {
       setDraft((prev) =>
         prev ? { ...prev, attach: prev.attach.filter((item) => item.notebookId !== notebook.id) } : prev
       );
       return;
     }
-    setTeamToRemove(notebook);
+    setNotebookToRemove(notebook);
   }, []);
 
   const columns = useMemo(
-    () => orderNotebookColumns(isEditing ? handleRemoveTeam : undefined),
-    [isEditing, handleRemoveTeam]
+    () => orderNotebookColumns(isEditing ? handleRemoveNotebook : undefined),
+    [isEditing, handleRemoveNotebook]
   );
 
   const handleEdit = () => {
@@ -169,26 +169,26 @@ export default function OrderDetailPage() {
     navigate("/ordenes");
   };
 
-  const handleConfirmRemoveTeam = (returnStatus: NotebookStatus) => {
-    if (!draft || !teamToRemove) return;
+  const handleConfirmRemoveNotebook = (returnStatus: NotebookStatus) => {
+    if (!draft || !notebookToRemove) return;
 
-    const team = teamToRemove;
+    const notebook = notebookToRemove;
     setDraft((prev) => {
       if (!prev) return prev;
 
-      if (prev.attach.some((item) => item.notebookId === team.id)) {
-        return { ...prev, attach: prev.attach.filter((item) => item.notebookId !== team.id) };
+      if (prev.attach.some((item) => item.notebookId === notebook.id)) {
+        return { ...prev, attach: prev.attach.filter((item) => item.notebookId !== notebook.id) };
       }
 
       return {
         ...prev,
         detach: [
-          ...prev.detach.filter((item) => item.notebookId !== team.id),
-          { notebookId: team.id, status: returnStatus },
+          ...prev.detach.filter((item) => item.notebookId !== notebook.id),
+          { notebookId: notebook.id, status: returnStatus },
         ],
       };
     });
-    setTeamToRemove(null);
+    setNotebookToRemove(null);
   };
 
   const handleAttach = (values: string[]) => {
@@ -221,7 +221,7 @@ export default function OrderDetailPage() {
     );
   }
 
-  const teamsCount = rows.filter((team) => team.pending !== "Se quitará").length;
+  const notebooksCount = rows.filter((row) => row.pending !== "Se quitará").length;
 
   return (
     <div className="inventory-page">
@@ -323,7 +323,7 @@ export default function OrderDetailPage() {
       <div className="orders-section-head">
         <div className="orders-section-head-left">
           <h2>
-            Equipos asociados <span>({teamsCount})</span>
+            Equipos asociados <span>({notebooksCount})</span>
           </h2>
           {isEditing && (
             <MultiSelect
@@ -366,11 +366,11 @@ export default function OrderDetailPage() {
         />
       </div>
 
-      {teamToRemove && (
-        <OrderRemoveTeamModal
-          notebook={teamToRemove}
-          onConfirm={handleConfirmRemoveTeam}
-          onClose={() => setTeamToRemove(null)}
+      {notebookToRemove && (
+        <OrderRemoveNotebookModal
+          notebook={notebookToRemove}
+          onConfirm={handleConfirmRemoveNotebook}
+          onClose={() => setNotebookToRemove(null)}
         />
       )}
 

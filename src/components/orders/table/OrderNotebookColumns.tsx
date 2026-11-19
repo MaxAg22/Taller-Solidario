@@ -5,11 +5,11 @@ import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { type DataTableFeatures } from "@/components/shared/table/data-table-features"
 import { NOTEBOOK_STATUSES } from "@/utils/notebookStatus"
-import type { OrderTeam } from "@/interfaces"
+import type { OrderNotebookRow } from "@/interfaces"
 
-const columnHelper = createColumnHelper<DataTableFeatures, OrderTeam>()
+const columnHelper = createColumnHelper<DataTableFeatures, OrderNotebookRow>()
 
-export const orderNotebookColumns = (onRemove?: (notebook: OrderTeam) => void) =>
+export const orderNotebookColumns = (onRemove?: (notebook: OrderNotebookRow) => void) =>
   columnHelper.columns([
     columnHelper.accessor("name", {
       header: "Nombre de equipo",

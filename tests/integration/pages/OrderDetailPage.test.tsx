@@ -186,7 +186,7 @@ describe("OrderDetailPage", () => {
     expect(screen.queryByRole("heading", { name: "Quitar equipo" })).not.toBeInTheDocument();
   });
 
-  it("editar: quitar un equipo asociado abre el OrderRemoveTeamModal; confirmar marca la fila Se quitará", async () => {
+  it("editar: quitar un equipo asociado abre el OrderRemoveNotebookModal; confirmar marca la fila Se quitará", async () => {
     mockOrder(makeOrder(), [makeNotebook()]);
     renderWithProviders(<OrderDetailPage />, { route: "/ordenes/ord-1" });
 

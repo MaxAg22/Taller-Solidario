@@ -2,10 +2,10 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { OrderRemoveTeamModal } from "@/components/orders/OrderRemoveTeamModal";
-import type { OrderTeam } from "@/interfaces";
+import { OrderRemoveNotebookModal } from "@/components/orders/OrderRemoveNotebookModal";
+import type { OrderNotebookRow } from "@/interfaces";
 
-const notebook: OrderTeam = {
+const notebook: OrderNotebookRow = {
   id: "nb-1",
   name: "Dell Latitude 3400",
   serialNumber: "SN001",
@@ -15,18 +15,18 @@ const notebook: OrderTeam = {
   removeStatus: null,
 };
 
-function renderWithProps(overrides: Partial<React.ComponentProps<typeof OrderRemoveTeamModal>> = {}) {
+function renderWithProps(overrides: Partial<React.ComponentProps<typeof OrderRemoveNotebookModal>> = {}) {
   const props = {
     notebook,
     onConfirm: vi.fn(),
     onClose: vi.fn(),
     ...overrides,
   };
-  const result = render(<OrderRemoveTeamModal {...props} />);
+  const result = render(<OrderRemoveNotebookModal {...props} />);
   return { props, ...result };
 }
 
-describe("OrderRemoveTeamModal", () => {
+describe("OrderRemoveNotebookModal", () => {
   it("renderiza el título y la descripción con el nombre del equipo", () => {
     renderWithProps();
 
