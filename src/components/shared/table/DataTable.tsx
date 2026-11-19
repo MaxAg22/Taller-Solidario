@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  FlexRender,
   useTable,
   type ColumnDef,
   type OnChangeFn,
@@ -26,7 +27,7 @@ interface RowState<TData> {
 }
 
 interface DataTableProps<TData extends RowData> {
-  columns: ColumnDef<DataTableFeatures, TData>[]
+  columns: ColumnDef<DataTableFeatures, TData, any>[]
   data: TData[]
   rowState?: RowState<TData>
   pagination?: PaginationState
@@ -68,7 +69,7 @@ export function DataTable<TData extends RowData>({
                 return (
                   <TableHead key={header.id}>
                     {header.isPlaceholder ? null : (
-                      <table.FlexRender header={header} />
+                      <FlexRender header={header} />
                     )}
                   </TableHead>
                 )
@@ -103,10 +104,10 @@ export function DataTable<TData extends RowData>({
                   >
                     {cell.column.id === "status" ? (
                       <span className="inventory-table-status" data-status={String(cell.getValue())}>
-                        <table.FlexRender cell={cell} />
+                        <FlexRender cell={cell} />
                       </span>
                     ) : (
-                      <table.FlexRender cell={cell} />
+                      <FlexRender cell={cell} />
                     )}
                   </TableCell>
                 ))}
