@@ -22,10 +22,10 @@ export const orderNotebookColumns = (onRemove?: (notebook: OrderNotebookRow) => 
         </span>
       ),
     }),
-    columnHelper.accessor("serialNumber", {
+    columnHelper.accessor("notebook.serialNumber", {
       header: "N.° de Serie",
     }),
-    columnHelper.accessor("status", {
+    columnHelper.accessor("notebook.status", {
       header: "Estado",
       cell: ({ row }) =>
         row.original.pending === "Se quitará" && row.original.removeStatus ? (
@@ -33,10 +33,10 @@ export const orderNotebookColumns = (onRemove?: (notebook: OrderNotebookRow) => 
             {NOTEBOOK_STATUSES.find((state) => state.value === row.original.removeStatus)?.label ?? row.original.removeStatus}
           </span>
         ) : (
-          <span className="inventory-table-status" data-status={String(row.original.status)}>{row.original.status}</span>
+          <span className="inventory-table-status" data-status={String(row.original.notebook.status ?? "")}>{row.original.notebook.status}</span>
         ),
     }),
-    columnHelper.accessor("specs", {
+    columnHelper.accessor("notebook.specs", {
       header: "Especificaciones",
     }),
     columnHelper.display({
@@ -55,7 +55,7 @@ export const orderNotebookColumns = (onRemove?: (notebook: OrderNotebookRow) => 
             variant="ghost"
             size="icon-sm"
             className={className}
-            aria-label={`Quitar equipo ${row.original.serialNumber}`}
+            aria-label={`Quitar equipo ${row.original.notebook.serialNumber?.toString() ?? ""}`}
             title={onRemove ? "Quitar de la orden" : "Quitar de la orden (solo disponible en modo edición)"}
             disabled={!onRemove}
             onClick={() => onRemove?.(row.original)}

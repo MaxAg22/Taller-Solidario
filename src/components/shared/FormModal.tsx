@@ -15,9 +15,9 @@ interface FormModalProps {
   title: string;
   description: string;
   isPending: boolean;
-  submitLabel: string;
+  submitLabel?: string;
   onClose: () => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   children: ReactNode;
 }
 
@@ -61,10 +61,12 @@ export function FormModal({
             <Button variant="outline" onClick={onClose} type="button">
               Cancelar
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending && <Spinner />}
-              {submitLabel}
-            </Button>
+            {submitLabel && (
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Spinner />}
+                {submitLabel}
+              </Button>
+            )}
           </CardFooter>
         </form>
       </DialogContent>

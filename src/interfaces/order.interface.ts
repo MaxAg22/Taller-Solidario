@@ -1,4 +1,4 @@
-import type { NotebookStatus } from "./notebook.interface";
+import type { Notebook, NotebookStatus } from "./notebook.interface";
 
 export type OrderStatus = "En Preparación" | "Donado";
 
@@ -35,11 +35,8 @@ export interface OrderDraft {
 }
 
 export interface OrderNotebookRow {
-  id: string;
+  notebook: Notebook;
   name: string;
-  serialNumber: string;
-  status: string;
-  specs: string;
   pending: "Pendiente" | "Se quitará" | null;
   removeStatus: NotebookStatus | null;
 }

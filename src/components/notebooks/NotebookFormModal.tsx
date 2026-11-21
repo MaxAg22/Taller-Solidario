@@ -31,7 +31,9 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   notebook,
   onSave,
   onClose,
+  editable = true,
 }) => {
+  const isEditable = editable && !notebook?.orderId;
   const {
     register,
     handleSubmit,
@@ -85,13 +87,15 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
       title={notebook ? "Editar equipo" : "Agregar nuevo equipo"}
       description={
         notebook
-          ? "Modifica los detalles del equipo seleccionado."
+          ? isEditable
+            ? "Modifica los detalles del equipo seleccionado."
+            : "Equipo asociado a una orden: solo lectura."
           : "Completá los datos de la netbook que ingresa al taller."
       }
       isPending={isPendingCreate || isPendingUpdate}
-      submitLabel={notebook ? "Guardar cambios" : "Agregar equipo"}
+      submitLabel={isEditable ? (notebook ? "Guardar cambios" : "Agregar equipo") : undefined}
       onClose={onClose}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={isEditable ? handleSubmit(onSubmit) : undefined}
     >
       <CardContent className="grid grid-cols-1 md:grid-cols-2">
         <div className="space-y-2">
@@ -100,6 +104,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
             id="model"
             {...register("model")}
             placeholder="Ej: Juana Manso V3"
+            disabled={!isEditable}
           />
           {errors.model && (
             <p className="text-red-500 text-sm">{errors.model.message}</p>
@@ -111,6 +116,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
             id="brand"
             {...register("brand")}
             placeholder="Ej: Gob. Ed."
+            disabled={!isEditable}
           />
           {errors.brand && (
             <p className="text-red-500 text-sm">{errors.brand.message}</p>
@@ -125,7 +131,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
               <Select
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                disabled={!!notebook?.orderId}
+                disabled={!isEditable}
               >
                 <SelectTrigger id="status" className="w-full">
                   <SelectValue placeholder="Seleccionar estado" />
@@ -151,6 +157,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
             id="specs"
             {...register("specs")}
             placeholder="Ej: Intel Celeron N4020, 4GB RAM, 120GB SSD..."
+            disabled={!isEditable}
           />
           {errors.specs && (
             <p className="text-red-500 text-sm">{errors.specs.message}</p>
@@ -162,6 +169,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
             id="repairNeeded"
             {...register("repairNeeded")}
             placeholder="Describir los problemas detectados y las reparaciones necesarias."
+            disabled={!isEditable}
           />
           {errors.repairNeeded && (
             <p className="text-red-500 text-sm">
@@ -175,6 +183,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
             id="repairHistory"
             {...register("repairHistory")}
             placeholder="Registrar las reparaciones y cambios realizados."
+            disabled={!isEditable}
           />
           {errors.repairHistory && (
             <p className="text-red-500 text-sm">

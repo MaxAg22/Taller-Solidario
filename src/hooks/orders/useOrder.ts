@@ -1,4 +1,5 @@
 import { getOrder } from "@/actions";
+import { mapNotebook } from "@/utils/notebook";
 import { useQuery } from "@tanstack/react-query";
 
 export const useOrder = (id?: string, options: { enabled?: boolean } = {}) => {
@@ -11,7 +12,7 @@ export const useOrder = (id?: string, options: { enabled?: boolean } = {}) => {
 
   return {
     order: data?.order,
-    notebooks: data?.notebooks,
+    notebooks: data?.notebooks?.map(mapNotebook),
     isLoading,
     isError,
     refetch,

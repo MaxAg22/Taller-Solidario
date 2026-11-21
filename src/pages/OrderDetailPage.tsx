@@ -11,6 +11,7 @@ import { DataTable } from "@/components/shared/table/DataTable";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { OrderRemoveNotebookModal } from "@/components/orders/OrderRemoveNotebookModal";
 import { orderNotebookColumns } from "@/components/orders/table/OrderNotebookColumns";
+import { NotebookFormModal } from "@/components/notebooks/NotebookFormModal";
 import {
   MultiSelect,
   MultiSelectContent,
@@ -28,6 +29,7 @@ import type {
   OrderDraft,
   OrderStatus,
   OrderNotebookRow,
+  Notebook,
 } from "@/interfaces";
 
 type ConfirmKind = "leave" | "return-prep" | "delete" | null;
@@ -42,6 +44,8 @@ export default function OrderDetailPage() {
   const [notebookToRemove, setNotebookToRemove] = useState<OrderNotebookRow | null>(null);
   const [confirmKind, setConfirmKind] = useState<ConfirmKind>(null);
   const [leaveTarget, setLeaveTarget] = useState<"cancel" | "back">("cancel");
+  const [isNotebookModalOpen, setIsNotebookModalOpen] = useState(false);
+  const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null);
 
   const { mutate: saveOrder, isPending: isSaving } = useUpdateOrder({
     onSuccess: () => {
@@ -68,11 +72,8 @@ export default function OrderDetailPage() {
     const detachById = new Map(draft?.detach.map((item) => [item.notebookId, item.status] as const));
 
     const base: OrderNotebookRow[] = (orderNotebooks ?? []).map((notebook) => ({
-      id: notebook.id,
+      notebook: notebook,
       name: [notebook.brand, notebook.model].filter(Boolean).join(" ") || "Equipo",
-      serialNumber: notebook.serialNumber?.toString() ?? "",
-      status: notebook.status ?? "",
-      specs: notebook.specs ?? "",
       pending: detachById.has(notebook.id) ? ("Se quitará" as const) : null,
       removeStatus: detachById.get(notebook.id) ?? null,
     }));
@@ -89,11 +90,8 @@ export default function OrderDetailPage() {
       if (!notebook) return;
 
       attached.push({
-        id: notebook.id,
+        notebook,
         name: [notebook.brand, notebook.model].filter(Boolean).join(" ") || "Equipo",
-        serialNumber: notebook.serialNumber?.toString() ?? "",
-        status: notebook.status ?? "",
-        specs: notebook.specs ?? "",
         pending: "Pendiente",
         removeStatus: null,
       });
@@ -102,14 +100,15 @@ export default function OrderDetailPage() {
     return [...base, ...attached];
   }, [orderNotebooks, draft, availableNotebooks]);
 
-  const handleRemoveNotebook = useCallback((notebook: OrderNotebookRow) => {
-    if (notebook.pending === "Pendiente") {
+  const handleRemoveNotebook = useCallback((row: OrderNotebookRow) => {
+    const { id } = row.notebook;
+    if (row.pending === "Pendiente") {
       setDraft((prev) =>
-        prev ? { ...prev, attach: prev.attach.filter((item) => item.notebookId !== notebook.id) } : prev
+        prev ? { ...prev, attach: prev.attach.filter((item) => item.notebookId !== id) } : prev
       );
       return;
     }
-    setNotebookToRemove(notebook);
+    setNotebookToRemove(row);
   }, []);
 
   const columns = useMemo(
@@ -172,19 +171,19 @@ export default function OrderDetailPage() {
   const handleConfirmRemoveNotebook = (returnStatus: NotebookStatus) => {
     if (!draft || !notebookToRemove) return;
 
-    const notebook = notebookToRemove;
+    const { id: notebookId } = notebookToRemove.notebook;
     setDraft((prev) => {
       if (!prev) return prev;
 
-      if (prev.attach.some((item) => item.notebookId === notebook.id)) {
-        return { ...prev, attach: prev.attach.filter((item) => item.notebookId !== notebook.id) };
+      if (prev.attach.some((item) => item.notebookId === notebookId)) {
+        return { ...prev, attach: prev.attach.filter((item) => item.notebookId !== notebookId) };
       }
 
       return {
         ...prev,
         detach: [
-          ...prev.detach.filter((item) => item.notebookId !== notebook.id),
-          { notebookId: notebook.id, status: returnStatus },
+          ...prev.detach.filter((item) => item.notebookId !== notebookId),
+          { notebookId, status: returnStatus },
         ],
       };
     });
@@ -362,9 +361,18 @@ export default function OrderDetailPage() {
               "Pendiente": "orders-row-pending",
             },
           }}
+          onRowClick={(row) => {
+            setSelectedNotebook(row.notebook);
+            setIsNotebookModalOpen(true);
+          }}
           emptyMessage="No hay equipos disponibles"
         />
       </div>
+
+      
+      {isNotebookModalOpen && (
+        <NotebookFormModal notebook={selectedNotebook} onSave={() => setIsNotebookModalOpen(false)} onClose={() => setIsNotebookModalOpen(false)} editable={false} />
+      )}
 
       {notebookToRemove && (
         <OrderRemoveNotebookModal
