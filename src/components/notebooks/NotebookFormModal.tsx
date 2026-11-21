@@ -32,8 +32,9 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
   onSave,
   onClose,
   editable = true,
+  showOrderBlock = true,
 }) => {
-  const isEditable = editable && !notebook?.orderId;
+  const isEditable = editable;
   const {
     register,
     handleSubmit,
@@ -89,7 +90,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
         notebook
           ? isEditable
             ? "Modifica los detalles del equipo seleccionado."
-            : "Equipo asociado a una orden: solo lectura."
+            : "Equipo solo lectura."
           : "Completá los datos de la netbook que ingresa al taller."
       }
       isPending={isPendingCreate || isPendingUpdate}
@@ -131,7 +132,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
               <Select
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                disabled={!isEditable}
+                disabled={!isEditable || !!notebook?.orderId}
               >
                 <SelectTrigger id="status" className="w-full">
                   <SelectValue placeholder="Seleccionar estado" />
@@ -191,7 +192,7 @@ export const NotebookFormModal: React.FC<NotebookFormModalProps> = ({
             </p>
           )}
         </div>
-        {notebook?.orderId && notebookOrder && (
+        {showOrderBlock && notebook?.orderId && notebookOrder && (
           <NotebookOrderBlock order={notebookOrder} />
         )}
       </CardContent>

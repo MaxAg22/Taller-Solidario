@@ -371,7 +371,7 @@ export default function OrderDetailPage() {
 
       
       {isNotebookModalOpen && (
-        <NotebookFormModal notebook={selectedNotebook} onSave={() => setIsNotebookModalOpen(false)} onClose={() => setIsNotebookModalOpen(false)} editable={false} />
+        <NotebookFormModal notebook={selectedNotebook} onSave={() => setIsNotebookModalOpen(false)} onClose={() => setIsNotebookModalOpen(false)} editable={false} showOrderBlock={false}/>
       )}
 
       {notebookToRemove && (

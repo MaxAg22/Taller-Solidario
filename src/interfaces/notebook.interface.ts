@@ -34,4 +34,5 @@ export interface NotebookFormModalProps {
   onSave: () => void;
   onClose: () => void;
   editable?: boolean;
+  showOrderBlock?: boolean;
 }
