@@ -11,6 +11,9 @@ export const useUpdateNotebook = ({ onSuccess }: any = {}) => {
       queryClient.invalidateQueries({
         queryKey: ["notebooks"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["orders"],
+      });
       toast.success("Equipo actualizado correctamente!");
       onSuccess?.();
     },

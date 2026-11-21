@@ -9,6 +9,7 @@ export const useCreateNotebook = ({ onSuccess }: any = {}) => {
     mutationFn: createNotebook,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notebooks"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       toast.success("Equipo creado correctamente");
       onSuccess?.();
     },
