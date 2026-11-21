@@ -96,7 +96,7 @@ PROJECT_REF=...
 2. `VITE_SUPABASE_API_KEY`: En Project Settings → API o API Keys: copiar la anon public key (o la legacy anon si corresponde).
 3. `PROJECT_REF`: Es la referencia del proyecto en Supabase (Project ID), se encuentra en Project Settings → General.
 
-## Proyectos Supabase
+### Proyectos Supabase
 
 - Taller-Solidario-Equipos → Producción (NO USAR para desarrollo)
 - Taller-Solidario-Pruebas → Desarrollo
@@ -109,7 +109,7 @@ En Supabase → API Docs → Tables and Views → Introduction.
 1. Hacer click en Generate and download types.
 2. Reemplazar supabase.js por el generado.
 
-### Flujo de trabajo con el CLI de Supabase
+## Flujo de trabajo con el CLI de Supabase
 
 Este proyecto usa el CLI de Supabase para aplicar migraciones y regenerar tipos. El flujo es el siguiente:
 
@@ -129,6 +129,25 @@ npx supabase db push --remote
 # 5. Regenerar los tipos TypeScript a partir del esquema remoto
 npx supabase gen types typescript --linked --project-ref <PROJECT_REF>
 ```
+
+## Generar el instalador de Electron apuntando a un proyecto específico
+
+El instalador se genera con `npm run dist` (corre `vite build` + `electron-builder`). La app empaquetada va a usar las variables de entorno que estén presentes **al momento del build**, así que para que el instalador apunte a un proyecto Supabase en particular:
+
+```bash
+# 1. Asegurate de que las migraciones estén aplicadas en el proyecto objetivo
+#    (ver sección anterior)
+
+# 2. Configurar las credenciales del proyecto objetivo en el .env
+#    (o en un .env.local que no se suba al repo)
+#    - VITE_PROJECT_URL_SUPABASE: URL del proyecto objetivo
+#    - VITE_SUPABASE_API_KEY: anon key del proyecto objetivo
+#    - PROJECT_REF: ref del proyecto objetivo
+
+# 3. Generar el build y el instalador
+npm run dist
+```
+El instalador NSIS queda en `releases/` con el nombre del proyecto y la versión. La app instalada no tiene acceso a `.env`: las variables quedaron empaquetadas en el JS del build.
 
 **Notas:**
 - El comando `supabase link` guarda el enlace en el **keychain del sistema operativo** (no en un archivo del proyecto). Por lo tanto, **cada máquina debe ejecutarlo una vez** después de clonar el repo. Si cambiás de máquina o borrás el keychain, deberás repetirlo.
