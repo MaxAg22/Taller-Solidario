@@ -3,15 +3,29 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DataTable } from "@/components/shared/table/DataTable";
 import { orderNotebookColumns } from "@/components/orders/table/OrderNotebookColumns";
-import type { OrderNotebookRow } from "@/interfaces";
+import type { OrderNotebookRow, Notebook } from "@/interfaces";
 
-function makeTeam(overrides: Partial<OrderNotebookRow> = {}): OrderNotebookRow {
+function makeNotebook(overrides: Partial<Notebook> = {}): Notebook {
   return {
     id: "nb-1",
-    name: "Dell Latitude 3400",
     serialNumber: "SN001",
+    brand: "Dell",
+    model: "Latitude 3400",
     status: "Listo para Donar",
     specs: "Core i5 · 8GB RAM",
+    repairNeeded: "",
+    repairHistory: "",
+    entryDate: "2026-01-01",
+    orderId: null,
+    ...overrides,
+  };
+}
+
+function makeTeam(overrides: Partial<OrderNotebookRow> = {}): OrderNotebookRow {
+  const notebook = makeNotebook();
+  return {
+    notebook,
+    name: `${notebook.brand} ${notebook.model}`,
     pending: null,
     removeStatus: null,
     ...overrides,
@@ -77,6 +91,6 @@ describe("orderNotebookColumns", () => {
 
     await userEvent.click(button);
     expect(onRemove).toHaveBeenCalledTimes(1);
-    expect(onRemove).toHaveBeenCalledWith(expect.objectContaining({ id: "nb-1" }));
+    expect(onRemove).toHaveBeenCalledWith(expect.objectContaining({ notebook: expect.objectContaining({ id: "nb-1" }) }));
   });
 });
