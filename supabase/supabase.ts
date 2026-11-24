@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.18"
+    PostgrestVersion: "13.0.5"
   }
   graphql_public: {
     Tables: {
@@ -151,7 +151,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: number
-          name?: string
+          name: string
         }
         Update: {
           created_at?: string
@@ -187,17 +187,14 @@ export type Database = {
     }
     Functions: {
       change_order_status: {
-        Args: {
-          p_order_id: string
-          p_status: string
-        }
+        Args: { p_order_id: string; p_status: string }
         Returns: undefined
       }
       save_order_changes: {
         Args: {
           p_attach: Json
           p_delivery_date: string
-          p_description: string | null
+          p_description: string
           p_detach: Json
           p_order_id: string
           p_recipient: string
