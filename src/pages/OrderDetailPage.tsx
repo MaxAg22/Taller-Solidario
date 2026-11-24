@@ -277,8 +277,24 @@ export default function OrderDetailPage() {
           )}
         </div>
       </div>
-
       <div className={`orders-fields${isDonated ? " orders-fields-locked" : ""}`}>
+        <div className="orders-field">
+          <Label htmlFor="recipient">Destinatario</Label>
+          {isEditing ? (
+            <Input
+              id="recipient"
+              type="text"
+              value={draft?.recipient ?? ""}
+              onChange={(event) =>
+                setDraft((prev) =>
+                  prev ? { ...prev, recipient: event.target.value } : prev
+                )
+              }
+            />
+          ) : (
+            <span className="orders-value">{order.recipient}</span>
+          )}
+        </div>
         <div className="orders-field">
           <Label htmlFor="deliveryDate">Fecha de entrega</Label>
           {isEditing ? (
